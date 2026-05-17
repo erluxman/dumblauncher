@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Focus Launcher</string>
+    <string name="device_admin_description">Focus Launcher uses device administrator permissions to prevent accidental uninstallation during focus periods.</string>
 </resources>
