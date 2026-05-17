@@ -1,0 +1,354 @@
+{
+  "metadata": {
+    "project": "FocusLauncher (working name: Built)",
+    "version": "1.0.0-plan",
+    "generated": "2026-05-17",
+    "source": "Synthesized from ../docs/09-features-master.json + ../docs/00-13 narrative specs",
+    "total_features_in_stages": 246,
+    "stage_counts": { "stage1_mvp": 20, "stage2_v1": 62, "stage3_v2": 92, "stage4_v3": 72 },
+    "impossible_features_excluded": 18,
+    "impossible_features_location": "challenges.md §'Technically impossible features'",
+    "stage_definitions": {
+      "stage1": "MVP — 4-6 weeks. Launcher + restriction primitives + anti-uninstall + onboarding. Author must dogfood without bypass before exit.",
+      "stage2": "V1 — 3-4 months. Track engine, full Sad Self, Mantra Gate, psychology stack, productivity loop, basic integrations, backup. Beta with 100 testers.",
+      "stage3": "V2 — 6+ months. Social tier, financial stakes, hardware (NFC/breath/posture), couples/family, Plaid + life integrations, Built Wrapped MVP, AI insight engine.",
+      "stage4": "V3 — 12+ months. Marketplace, dashboards (B2B), web/desktop companion, WearOS, AI Life Coach, multi-domain Wrapped, Counterfactual Twin, full social experimentation surfaces."
+    },
+    "scoring": {
+      "priority": "1-5 (5=must-have for that stage)",
+      "difficulty": "1-5 (5=months of work)",
+      "impact": "1-5 (5=life-changing)",
+      "feasibility": "1-5 (5=fully possible on Android)"
+    }
+  },
+
+  "stage1_mvp": {
+    "summary": "A launcher that hurts to leave. Bare minimum to dogfood.",
+    "features": [
+      { "id": "CORE-001", "name": "Custom Launcher Home Screen", "category": "core", "description": "Replace default home screen. Shows projects, todos, behavior indicator, 5 widgets max, 5 app dock.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "CORE-002", "name": "5-App Dock (2 Fixed + 3 User)", "category": "core", "description": "Max 5 apps visible. Phone + Messages fixed. 3 user-configurable with 24hr cooldown.", "priority": 5, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "CORE-003", "name": "Hidden App Search (No Drawer)", "category": "core", "description": "No browseable drawer. Swipe up → search bar. Must type name to launch hidden apps.", "priority": 5, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "CORE-004", "name": "App Usage Tracking", "category": "core", "description": "Time per app, unlock count, session duration, foreground detection.", "priority": 5, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "CORE-005", "name": "Widget System (Max 5 Our Widgets)", "category": "core", "description": "5 widget slots, FocusLauncher-only widgets (no 3rd party).", "priority": 4, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["CORE-001"] },
+
+      { "id": "RESTRICT-001", "name": "The Lobby (Wait Timer)", "category": "restriction", "description": "Mandatory wait screen before distraction app opens. 15s productive, 90s distractions. No skip.", "priority": 5, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "RESTRICT-002", "name": "Cognitive Tax (Puzzles Before App)", "category": "restriction", "description": "Solve puzzle to open distraction. Scales with daily opens.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-003", "name": "Progressive Dimming Overlay", "category": "restriction", "description": "Overlay dims screen 2%/min in distraction apps. Near-black at 25min.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": ["CORE-004"] },
+
+      { "id": "CALLS-001", "name": "VIP Contact List (Max 10)", "category": "urgent_calls", "description": "Up to 10 numbers always ring through. 24hr cooldown on edits.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "CALLS-005", "name": "Silent Mode Enforcement", "category": "urgent_calls", "description": "DND by default during focus. Only VIP/pass calls break silence.", "priority": 5, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "PROD-001", "name": "Todo System with App-Unlock Rewards", "category": "productivity", "description": "Todos that, on completion, unlock a specific app for a defined duration. Verification: none/photo/timer/location/companion.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "PROD-002", "name": "Project Tracking (Max 3 Active)", "category": "productivity", "description": "Projects with tasks, milestones, progress bar. Main home screen element.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["CORE-001", "PROD-001"] },
+      { "id": "PROD-003", "name": "Behavior Indicator (5-State Meter)", "category": "productivity", "description": "Real-time meter: Thriving → Neutral → Drifting → Sinking → Drowning.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004"] },
+
+      { "id": "PSYCH-008", "name": "Intervention Screen (14 Unlocks)", "category": "psychology", "description": "Full-screen after excessive unlocks: 'This is attempt #14. Phone is not your friend.'", "priority": 4, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+
+      { "id": "UNINSTALL-001", "name": "Device Admin Registration", "category": "anti_uninstall", "description": "Register as Device Administrator. Greys out uninstall button.", "priority": 5, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "UNINSTALL-002", "name": "In-App Deactivation Flow (72hr Cooldown)", "category": "anti_uninstall", "description": "App-controlled deactivation flow with 72hr countdown and daily check-ins.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["UNINSTALL-001"] },
+
+      { "id": "ONBOARD-001", "name": "First-Run Sequencer", "category": "onboarding", "description": "Guided 20-min ritual: permissions, mantra capture, future-self video, VIP contacts, baseline observation start.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-001", "UNINSTALL-001", "MANTRA-001", "PSYCH-006", "CALLS-001", "TRACK-004"] },
+      { "id": "ONBOARD-002", "name": "Why Are You Here? Capture", "category": "onboarding", "description": "First screen captures the user's pain verbatim. Resurfaced at every weak moment and uninstall attempt.", "priority": 5, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": ["ONBOARD-001"] },
+
+      { "id": "ETHICS-001", "name": "Manipulation Transparency Page", "category": "safety", "description": "Settings page lists every psychological technique used + per-technique toggle to disable.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "A11Y-001", "name": "Accessibility Pass", "category": "safety", "description": "TalkBack-friendly overlays, type-mantra fallback, switch-control, high contrast.", "priority": 4, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": [] }
+    ]
+  },
+
+  "stage2_v1": {
+    "summary": "Track engine + full psychology stack + productivity loop + first integrations + backup.",
+    "features": [
+      { "id": "RESTRICT-004", "name": "Variable Ratio Punishment", "category": "restriction", "description": "Restrictions are RANDOM. Sometimes app works, sometimes locked. Unpredictability breaks habits.", "priority": 4, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-005", "name": "The Boredom Preservatory", "category": "restriction", "description": "2-min intervals of NOTHING. Blank screen. Trains boredom tolerance.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "RESTRICT-006", "name": "Intent Declaration", "category": "restriction", "description": "State intention + timer before opening distraction. Fail to finish = app locked for day.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+      { "id": "RESTRICT-007", "name": "Escalating Lockout", "category": "restriction", "description": "Open blocked app → locked out of everything. 5min → 30min → 2hr escalation.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-008", "name": "Gatekeeper Tasks", "category": "restriction", "description": "Complete boring math/Duolingo-style task before accessing distraction.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+      { "id": "RESTRICT-009", "name": "Time Debt System", "category": "restriction", "description": "Overspent today? Double penalty tomorrow. Debt compounds.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-010", "name": "Context-Aware Locks (GPS+Time+Calendar)", "category": "restriction", "description": "At gym=music only. At desk 9-5=work only. In bed after 10pm=kindle only.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-011", "name": "Dream Mode (Night Wind-Down)", "category": "restriction", "description": "After 10pm: tomorrow's schedule, quote, breathing exercise. Apps disappear.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "RESTRICT-012", "name": "One App At A Time (No Multitask)", "category": "restriction", "description": "No app switcher. 3-second close animation before next app opens.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": ["CORE-001"] },
+      { "id": "RESTRICT-013", "name": "App Roulette Lock", "category": "restriction", "description": "Pick 3 apps. System randomly allows ONE per day.", "priority": 2, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-015", "name": "Reverse Notifications (Scheduled Check-Ins)", "category": "restriction", "description": "No push notifications. Manual check-in at 2-3 windows per day.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-016", "name": "The Replacement Engine", "category": "restriction", "description": "Intercept distraction app open → offer micro-action (2 pages, 10 pushups, 3 sentences). Accept = earn time.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+
+      { "id": "MANTRA-001", "name": "Mantra Gate (Voice Unlock)", "category": "mantra_system", "description": "Speak mantra 5 times verified by speech recognition before phone unlocks.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["CORE-001"] },
+      { "id": "MANTRA-002", "name": "Mantra Scaling by Track Level", "category": "mantra_system", "description": "1 → 3 → 5 reps based on track level. Level 8+ adds today's task statement.", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["MANTRA-001", "TRACK-001"] },
+      { "id": "MANTRA-003", "name": "Whisper Mode / Type Fallback", "category": "mantra_system", "description": "Whisper detection or type mantra 5 times for public settings.", "priority": 3, "difficulty": 2, "impact": 2, "feasibility": 5, "dependencies": ["MANTRA-001"] },
+
+      { "id": "CALLS-002", "name": "Emergency Pass System (5/week)", "category": "urgent_calls", "description": "5 weekly passes for non-VIP calls. Resets Monday. Repeat caller (2x/3min) free.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CALLS-001"] },
+      { "id": "CALLS-003", "name": "Hover Window for Calls", "category": "urgent_calls", "description": "Floating overlay during focus showing caller + answer/decline.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CALLS-001"] },
+      { "id": "CALLS-004", "name": "Auto-Reply on Decline", "category": "urgent_calls", "description": "Decline call → pre-written SMS: 'In focus mode. Will call back in X min.'", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["CALLS-003"] },
+
+      { "id": "PROD-004", "name": "Journal / Day Summary (Auto-Generated)", "category": "productivity", "description": "Nightly auto-summary: focus score, todos done, project progress, AI insight, mood input.", "priority": 4, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004", "PROD-001", "PROD-002"] },
+      { "id": "PROD-005", "name": "Focus Timer (Pomodoro Built-In)", "category": "productivity", "description": "25min focus blocks as widget. Between blocks: brief app window. Auto-DND.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "PROD-006", "name": "Face-Down Detection", "category": "productivity", "description": "Proximity sensor detects phone face-down. Tracks duration. Rewards intentional breaks.", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["PROD-003"] },
+      { "id": "PROD-007", "name": "Morning Routine Sequencer", "category": "productivity", "description": "First 60min after alarm: one task at a time, sequential. Nothing else accessible.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001", "PROD-001"] },
+      { "id": "PROD-012", "name": "Shutdown Ritual", "category": "productivity", "description": "End-of-day prompt: what you shipped + tomorrow's #1 priority. Enter evening mode.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["PROD-001"] },
+      { "id": "PROD-013", "name": "The One Thing (Daily Priority Pin)", "category": "productivity", "description": "Declare ONE most important task each morning. Pinned all day. Reminded every 2hr.", "priority": 4, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["PROD-001"] },
+      { "id": "PROD-015", "name": "Time Blocking Enforcer (Calendar Integration)", "category": "productivity", "description": "Calendar says 'Deep Work 9-11am' → phone ENFORCES it. Apps locked.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PROD-016", "name": "Nourishing Consumption Category", "category": "productivity", "description": "Third category beyond Productive/Distraction: Nourishing (Kindle, audiobooks, Duolingo). Encouraged.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004", "PROD-011"] },
+      { "id": "PROD-017", "name": "Mood Pings (2x Daily Emotion Check)", "category": "productivity", "description": "Two 5-second mood check-ins per day. Emoji tap + 1-word note. Paired with usage stats.", "priority": 4, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": ["PROD-004"] },
+
+      { "id": "TRACK-001", "name": "Track System (Gradual Commitment Scaling)", "category": "tracks", "description": "10-level commitment paths. Start tiny. Scale on proven 7-day consistency.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004", "PROD-001"] },
+      { "id": "TRACK-002", "name": "Level-Up / Demotion Mechanics", "category": "tracks", "description": "7 success days = level up. 3 fail days = drop one level (grace period).", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["TRACK-001"] },
+      { "id": "TRACK-003", "name": "Multiple Independent Tracks", "category": "tracks", "description": "Separate tracks: Deep Work, Sleep, Morning Routine, Fitness, Learning. Each levels independently.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["TRACK-001"] },
+      { "id": "TRACK-004", "name": "Smart Starting Point (Baseline Detection)", "category": "tracks", "description": "Observe usage 3 days before Level 1. Never require >25% behavior change from baseline.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["TRACK-001", "CORE-004"] },
+
+      { "id": "SAD-001", "name": "Sad Self Notifications (Personified Regret)", "category": "sad_self", "description": "Notifications from 'Sad [Name]' — future self that loses when you scroll.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004", "PROD-002"] },
+      { "id": "SAD-002", "name": "Voice Style Selection (4 Personalities)", "category": "sad_self", "description": "Gentle/Blunt/Sarcastic/Philosophical voices.", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["SAD-001"] },
+      { "id": "SAD-003", "name": "Celebration Self (Proud [Name])", "category": "sad_self", "description": "Same character, positive messages when doing well.", "priority": 4, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["SAD-001"] },
+      { "id": "SAD-005", "name": "Adaptive Frequency (Back-Off on Ignore)", "category": "sad_self", "description": "Ignore 5 messages = Sad Self gets quieter. One powerful message max.", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["SAD-001"] },
+
+      { "id": "PSYCH-001", "name": "Identity Voting (Consumer vs Creator)", "category": "psychology", "description": "Every app open framed as vote: Consumer or Creator? Single tap.", "priority": 4, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "PSYCH-002", "name": "Session Receipts", "category": "psychology", "description": "After closing any app: full-screen receipt showing time spent + equivalents.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-003", "name": "Legacy Counter (Lifetime Stats)", "category": "psychology", "description": "Home widget: 'Entertainment: 4,247hr. Creation: 312hr. Ratio: 13.6:1.'", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-004", "name": "Builder/Consumer Mode Toggle", "category": "psychology", "description": "Two modes. Builder = unlimited productive apps. Consumer = daily entertainment budget.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "PSYCH-005", "name": "The Mirror Widget (Camera as Wallpaper)", "category": "psychology", "description": "Front camera as home screen background. See your face every unlock.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+      { "id": "PSYCH-006", "name": "Future Self Video (Pre-Recorded Deterrent)", "category": "psychology", "description": "Record video during strong moment. Plays before every relapse. Can't skip.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "PSYCH-007", "name": "Opportunity Cost Ticker (Overlay)", "category": "psychology", "description": "Persistent overlay: 'This session = $34.50 at your hourly rate.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-010", "name": "The Last Day Test", "category": "psychology", "description": "'If you die tomorrow, would your last 30 min be this?' Yes/No before distraction.", "priority": 3, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+      { "id": "PSYCH-011", "name": "Phantom Vibration Counter", "category": "psychology", "description": "Detects phone checks without notification. 'You checked for no reason 34 times today.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-015", "name": "Future Self Messenger (Scheduled Letters)", "category": "psychology", "description": "Write letters that deliver at random future weak moments.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "UNINSTALL-003", "name": "Nuclear Passphrase", "category": "anti_uninstall", "description": "20+ char passphrase set on install. Written on paper. Required to begin uninstall.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["UNINSTALL-002"] },
+      { "id": "UNINSTALL-004", "name": "Future Self Video on Uninstall Attempt", "category": "anti_uninstall", "description": "Future-self video plays full-length, can't skip, before uninstall proceeds.", "priority": 4, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": ["UNINSTALL-002", "PSYCH-006"] },
+      { "id": "UNINSTALL-007", "name": "Graduated Freedom", "category": "anti_uninstall", "description": "Restrictions ease over time. By Level 10, near-invisible. No reason to remove.", "priority": 4, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001"] },
+
+      { "id": "GAMIFY-001", "name": "The Applause", "category": "gamification", "description": "Put phone DOWN after short use → speaker plays applause. Pavlov for quitting.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "GAMIFY-002", "name": "Compound Time Bank", "category": "gamification", "description": "Every avoided minute banks with compound interest. Monthly earnings report.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "GAMIFY-005", "name": "Productivity Heatmap Widget", "category": "gamification", "description": "GitHub-style hourly heatmap. Green=focused. Red=wasted.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "GAMIFY-006", "name": "Streak System (Multi-Domain)", "category": "gamification", "description": "Separate streaks for focus, sleep, creation, todos. Each with counter and record.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+
+      { "id": "GRACE-001", "name": "Grace Day System", "category": "grace", "description": "1-2 declared grace days per month. Zero penalty. Must be declared in advance.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001"] },
+      { "id": "GRACE-002", "name": "Streak Freeze (Earnable)", "category": "grace", "description": "Earn 1 streak freeze per 30 perfect days. Auto-applies on miss. Max 3 in reserve.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["GAMIFY-006"] },
+      { "id": "GRACE-003", "name": "Compassionate Demotion", "category": "grace", "description": "Dropping a level framed as 'recalibration'. Recovery plan. Faster re-promotion next time.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["TRACK-002"] },
+
+      { "id": "RECOVERY-001", "name": "After-Fall Ritual", "category": "recovery", "description": "After a streak break: 3-step ritual — reflect, recommit smaller scope, optional message to partner.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001", "PROD-004"] },
+
+      { "id": "SAFETY-001", "name": "Crisis Detection & Soften Mode", "category": "safety", "description": "Detect concerning patterns (3am scrolling + zero todos + low motion + flat mood). Pause Sad Self, surface help.", "priority": 5, "difficulty": 4, "impact": 5, "feasibility": 4, "dependencies": ["CORE-004", "PROD-017", "SAD-005"] },
+
+      { "id": "BACKUP-001", "name": "Encrypted Cloud Backup & Device Migration", "category": "infrastructure", "description": "E2EE backup of journal/streak/track/social. Restore on new device.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "BACKUP-002", "name": "Data Export (PDF / CSV / Photo Book)", "category": "infrastructure", "description": "Journal as PDF, stats as CSV, year heatmap as image.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "INTEG-001", "name": "HealthConnect Integration", "category": "integration", "description": "Read all body data (steps, sleep, HR, HRV, workouts, weight, cycle, mindfulness) from HealthConnect.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "FIT-001", "name": "Daily Activity Loop", "category": "fitness", "description": "Steps, active minutes, calories, floors. Apple-rings-style daily goals widget.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] },
+      { "id": "SLEEP-001", "name": "Sleep Stats Dashboard", "category": "sleep", "description": "Duration, debt, consistency, stages from HealthConnect.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] }
+    ]
+  },
+
+  "stage3_v2": {
+    "summary": "Social tier (the moat), financial stakes, hardware, life integrations, Wrapped MVP, AI insight engine.",
+    "features": [
+      { "id": "RESTRICT-014", "name": "Weather-Gated Apps", "category": "restriction", "description": "Beautiful day? Entertainment locked. Only unlocks in bad weather.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-017", "name": "The Paradox Lock", "category": "restriction", "description": "Write 50-word essay on why you SHOULDN'T open app. AI judges. Good=locked. Bad=also locked.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+      { "id": "RESTRICT-018", "name": "Choice Overload Weapon", "category": "restriction", "description": "47 alternative activities in chaotic grid. Decision fatigue → give up.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["RESTRICT-001"] },
+      { "id": "RESTRICT-020", "name": "Per-App Network Blocking (VPN)", "category": "restriction", "description": "Cut internet to specific apps via local VPN. Instagram opens but shows nothing new.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 4, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-021", "name": "Bandwidth Throttling", "category": "restriction", "description": "Throttle to 1kbps. Videos won't load. Text-only experience.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 4, "dependencies": ["RESTRICT-020"] },
+      { "id": "RESTRICT-022", "name": "Life-State Mode Set", "category": "restriction", "description": "Commute, Travel, Sick, Vacation, Weekend modes. Auto or manual.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["RESTRICT-010"] },
+      { "id": "RESTRICT-023", "name": "Lite Mode for Distraction Apps", "category": "restriction", "description": "Open IG in text-only/grayscale/no-Reels mode. VPN content stripping + overlay.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 3, "dependencies": ["RESTRICT-020"] },
+
+      { "id": "PROD-008", "name": "Voice-to-Todo Capture", "category": "productivity", "description": "Double-tap power button → 5sec voice → AI converts to todo + project.", "priority": 3, "difficulty": 3, "impact": 3, "feasibility": 4, "dependencies": ["PROD-001"] },
+      { "id": "PROD-009", "name": "Idea Parking Lot", "category": "productivity", "description": "Gesture captures screenshot + note while in distraction. Convert later to project tasks.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["PROD-001"] },
+      { "id": "PROD-010", "name": "Effort Estimation Training", "category": "productivity", "description": "Estimate task time on creation. Log actual. Track estimation accuracy.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["PROD-001"] },
+      { "id": "PROD-011", "name": "Input/Output Ratio Tracker", "category": "productivity", "description": "Consumption vs creation ratio on home screen.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": ["CORE-004"] },
+      { "id": "PROD-014", "name": "Energy Zones", "category": "productivity", "description": "User tags energy by time of day. Phone adapts: high=deep work only.", "priority": 3, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PROD-018", "name": "Cycle / Energy-Window Awareness", "category": "productivity", "description": "Optional menstrual cycle / energy tracking. Adjusts expectations.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["PROD-014"] },
+      { "id": "PROD-019", "name": "Companion Verification for Todos", "category": "productivity", "description": "Friend confirms task completion via push. Prevents fake-todo gaming.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["PROD-001", "SOCIAL-001"] },
+
+      { "id": "SAD-004", "name": "AI-Generated Messages (On-Device LLM)", "category": "sad_self", "description": "Move from templates to on-device AI for contextual messages.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 3, "dependencies": ["SAD-001"] },
+
+      { "id": "PSYCH-009", "name": "Deathbed Simulator (Lifespan Projection)", "category": "psychology", "description": "Monthly: 'At current rate: 11.3 years on social by end of life.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-012", "name": "Pattern Detection & Insights", "category": "psychology", "description": "'38 of 47 failures between 2-4pm. After Sarah's notification.' AI finds your patterns.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-013", "name": "Anchoring Attack", "category": "psychology", "description": "Show 'most disciplined user: 12min total' before your stats.", "priority": 2, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "PSYCH-014", "name": "App Tombstones", "category": "psychology", "description": "Killed/deleted apps show gravestones on home screen.", "priority": 2, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["CORE-001"] },
+
+      { "id": "SOCIAL-001", "name": "Group Creation & Management", "category": "social", "description": "Create accountability groups. Invite. Shared streaks, voting, visibility.", "priority": 4, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "SOCIAL-002", "name": "Group Uninstall Approval (Voting)", "category": "social", "description": "Can't uninstall without group vote. Majority required.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["SOCIAL-001", "UNINSTALL-001"] },
+      { "id": "SOCIAL-003", "name": "Shame Notification to Friends", "category": "social", "description": "Fail → silent notification to friend.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-004", "name": "Team Streaks", "category": "social", "description": "Squad of 5. All must stay installed. You quit = everyone's streak dies.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-005", "name": "The Disappointment API", "category": "social", "description": "One respected person gets ONE notification/week: your worst stat.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-006", "name": "Co-Working Presence (Live Focus Status)", "category": "social", "description": "See group members in focus mode. Avatars + green dots on home screen.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-008", "name": "Sponsor System (AA-Style)", "category": "social", "description": "Designated person notified on uninstall attempt. Can call you.", "priority": 3, "difficulty": 2, "impact": 5, "feasibility": 4, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-009", "name": "Public Builder Profile", "category": "social", "description": "Shareable profile URL with streaks, projects, heatmap, badges.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001", "BACKUP-001"] },
+      { "id": "SOCIAL-010", "name": "Built Wrapped (Year in Review)", "category": "social", "description": "Annual recap: projects shipped, hours saved, top distraction defeated. Screen-shareable.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["CORE-004", "BACKUP-001"] },
+      { "id": "SOCIAL-011", "name": "Built Verification Badge", "category": "social", "description": "Earned after 365 days + 3 shipped projects + 3 vouches. Visible checkmark.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-009"] },
+      { "id": "SOCIAL-012", "name": "Receipt Wall", "category": "social", "description": "Phone-down-within-3min adds small tile to profile wall. Texture of restraint.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-009", "PSYCH-002"] },
+      { "id": "SOCIAL-013", "name": "Anti-Bio", "category": "social", "description": "Bio describes what user has chosen NOT to do.", "priority": 2, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-009"] },
+      { "id": "SOCIAL-014", "name": "Profile Highlight Reels", "category": "social", "description": "Pinnable permanent stories on profile (shipped projects, streaks). Data-verified.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-009"] },
+      { "id": "SOCIAL-016", "name": "Chronological Feed (No Algorithm)", "category": "social", "description": "Followed users only, reverse-chronological. No algorithm.", "priority": 4, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-020", "name": "Disappointment Inbox", "category": "social", "description": "Feed surface for Sad Self + accountability disappointment notes.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["SAD-001", "SOCIAL-005"] },
+      { "id": "SOCIAL-021", "name": "Focus Stories (24hr Ephemeral)", "category": "social", "description": "End-of-day card auto-generated from data. 24hr expiry.", "priority": 4, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001", "PROD-004"] },
+      { "id": "SOCIAL-025", "name": "Dual Streaks With Friends (🔥)", "category": "social", "description": "Both hit daily focus goal = shared fire. Snapchat retention mechanic.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001", "GAMIFY-006"] },
+      { "id": "SOCIAL-029", "name": "Push Reactions to Friend's Failure", "category": "social", "description": "Friend opens TikTok 10th time → your phone buzzes. One-tap reactions.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001", "SOCIAL-003"] },
+      { "id": "SOCIAL-030", "name": "Focus DMs (Queued During Deep Work)", "category": "social", "description": "DMs sent during recipient's focus block are queued for after.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001", "PROD-005"] },
+      { "id": "SOCIAL-033", "name": "Public Pre-Commitments", "category": "social", "description": "Post tomorrow's goals to feed. Auto-graded at end of day.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["PROD-001", "SOCIAL-016"] },
+      { "id": "SOCIAL-036", "name": "Quiet Brag Post", "category": "social", "description": "Finish One Thing → app prompts 'share?' One-tap post. 🙏 reactions.", "priority": 3, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": ["PROD-013", "SOCIAL-016"] },
+
+      { "id": "UNINSTALL-005", "name": "Public Shame Post on Uninstall", "category": "anti_uninstall", "description": "Uninstall auto-posts to community/friends: '[Name] quit after X days.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "UNINSTALL-006", "name": "Relapse Prediction on Uninstall Screen", "category": "anti_uninstall", "description": "'94% of users who uninstalled at day 12 reinstalled in 9 days.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+
+      { "id": "GAMIFY-003", "name": "Focus Score Economy (Earn/Spend Points)", "category": "gamification", "description": "Focus Points as currency. Earn by productivity, spend to unlock apps.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004", "PROD-001"] },
+      { "id": "GAMIFY-007", "name": "Earned Pixels (Home Screen Beauty as Reward)", "category": "gamification", "description": "Home screen starts grayscale. Focused hours earn color/resolution.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["CORE-001"] },
+
+      { "id": "FINANCE-001", "name": "Money Stake (Escrow Deposit)", "category": "financial", "description": "Deposit $50-500. Fail = donated to cause you hate. Complete = refund + bonus.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 4, "dependencies": ["SOCIAL-001"] },
+      { "id": "FINANCE-002", "name": "Streak Insurance Value Display", "category": "financial", "description": "'Your streak = $94 in rewards. Forfeit on uninstall?'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["GAMIFY-006"] },
+
+      { "id": "HARDWARE-001", "name": "Physical NFC Key Unlock", "category": "hardware", "description": "Distraction apps unlock only when phone touches NFC tag on desk.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "HARDWARE-002", "name": "Breath to Unlock (4-7-8)", "category": "hardware", "description": "Breathing pattern verified by mic timing. 16s minimum.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": [] },
+      { "id": "HARDWARE-004", "name": "Posture Lock (Accelerometer)", "category": "hardware", "description": "Detect lying-in-bed or toilet angles. Block entertainment.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 4, "dependencies": ["CORE-004"] },
+
+      { "id": "ABSURD-001", "name": "Kazoo Mode", "category": "absurdist", "description": "Speaker plays kazoo in restricted apps. Can't mute. Public embarrassment.", "priority": 1, "difficulty": 1, "impact": 2, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "ABSURD-002", "name": "The Narrator (TTS Narrates Your Actions)", "category": "absurdist", "description": "TTS reads aloud: 'He opened Twitter. Again. 14th time.'", "priority": 1, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "ABSURD-003", "name": "Time Dilation UI (Clock 3x Fast)", "category": "absurdist", "description": "Clock overlay in distraction apps runs 3x speed.", "priority": 2, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["CORE-004"] },
+      { "id": "ABSURD-004", "name": "Voice Authenticity Gate", "category": "absurdist", "description": "Must say aloud: 'I am choosing distraction over my goals.'", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": ["MANTRA-001"] },
+
+      { "id": "COUPLES-001", "name": "Partner Pair Mode", "category": "couples", "description": "Pair with partner. Shared streaks, shared time-saved, proud pings.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "COUPLES-002", "name": "Phone Sabbath Together", "category": "couples", "description": "Schedule shared full-day disconnect with partner.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["COUPLES-001"] },
+
+      { "id": "FAMILY-001", "name": "Parent/Child Pair Mode", "category": "family", "description": "Parent's app shows child's stats + approve/deny apps.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 4, "dependencies": ["SOCIAL-001"] },
+
+      { "id": "RECOVERY-002", "name": "Account Recovery via Trusted Contacts", "category": "recovery", "description": "Lost phone? 2-of-3 trusted contacts vouch to restore account.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["UNINSTALL-003", "SOCIAL-001"] },
+
+      { "id": "INTEG-002", "name": "Plaid / Banking Integration", "category": "integration", "description": "OAuth bank link. Transactions, balances, recurring charges. Auto-categorized.", "priority": 4, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-003", "name": "Strava / Garmin / Whoop / Oura Sync", "category": "integration", "description": "OAuth with major fitness platforms.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] },
+      { "id": "INTEG-004", "name": "Spotify + Last.fm Music Sync", "category": "integration", "description": "Scrobble listening. Powers top-artist widget and Wrapped.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-006", "name": "Photos Library Integration", "category": "integration", "description": "Read-only access. Faces, places, dates. Powers Memories, People-Met Graph.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-007", "name": "Calendar Deep Integration", "category": "integration", "description": "Pull all events for People-Met inference, focus-block detection.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-010", "name": "Voice-to-Structured-Data Capture", "category": "integration", "description": "30-sec voice → on-device LLM extracts workout/mood/meal/expense/gratitude.", "priority": 5, "difficulty": 4, "impact": 5, "feasibility": 4, "dependencies": [] },
+
+      { "id": "FIT-002", "name": "Workout Log", "category": "fitness", "description": "Strength sets/reps + cardio sessions, auto-imported from Strava/Hevy/Garmin.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001", "INTEG-003", "INTEG-010"] },
+      { "id": "FIT-003", "name": "PR Wall (Lifetime Records)", "category": "fitness", "description": "Lifetime personal records auto-detected. Pinned to profile.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["FIT-002", "SOCIAL-009"] },
+      { "id": "FIT-004", "name": "Sport-Specific Clocks", "category": "fitness", "description": "Time-since-last-run, days-since-rest. Overtraining pattern detection.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["FIT-002"] },
+      { "id": "FIT-005", "name": "Recovery Score (Synthesized)", "category": "fitness", "description": "Daily 0-100 recovery from HRV + sleep + soreness + RHR. Non-athlete-focused.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["INTEG-001"] },
+
+      { "id": "MIND-001", "name": "Meditation Session Log", "category": "mind", "description": "Minutes, technique, guided/unguided. HRV before/after.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] },
+      { "id": "MIND-002", "name": "Stress Weather Report", "category": "mind", "description": "Multi-signal stress forecast: HRV + unlock freq + typing + voice pitch.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-001", "CORE-004"] },
+
+      { "id": "SLEEP-002", "name": "Sleep ↔ Everything Correlator", "category": "sleep", "description": "Cross-correlate sleep score against scroll hours, food, drinks, etc.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SLEEP-001", "CORE-004"] },
+      { "id": "SLEEP-003", "name": "Sleep Window Guardrails", "category": "sleep", "description": "Hard cutoff time. Phone goes Dream Mode. Won't reopen entertainment until alarm.", "priority": 3, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["RESTRICT-011", "SLEEP-001"] },
+
+      { "id": "FIN-001", "name": "Auto-Categorized Spending", "category": "finance_v2", "description": "Plaid-fed transactions auto-categorized via ML.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-002"] },
+      { "id": "FIN-002", "name": "Net Worth Tracker", "category": "finance_v2", "description": "Assets minus liabilities. Line chart over time.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-002"] },
+      { "id": "FIN-003", "name": "Subscription Hunter", "category": "finance_v2", "description": "Detects recurring charges. Pays for the app.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-002"] },
+      { "id": "FIN-004", "name": "Savings Rate %", "category": "finance_v2", "description": "Income minus spend, as % of income, per month.", "priority": 3, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-002"] },
+      { "id": "FIN-006", "name": "Time-Money Conversion", "category": "finance_v2", "description": "Purchases shown as 'X hrs of your life at your hourly rate.'", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-002", "PSYCH-007"] },
+
+      { "id": "LOC-001", "name": "Lifetime Location Heatmap", "category": "location", "description": "Every minute pinned on a map. On-device by default. Beautiful artifact.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "LOC-002", "name": "Time-Per-Place Ranking", "category": "location", "description": "'Home: 14hr/day. Office: 6hr. Coffee shop: 3hr/week.' Auto-clustered.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["LOC-001"] },
+      { "id": "LOC-003", "name": "Third-Place Tracker", "category": "location", "description": "Distinct non-home/work places visited ≥30min/week. Loneliness indicator.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["LOC-002"] },
+      { "id": "LOC-004", "name": "Commute Tax Counter", "category": "location", "description": "Hours/year lost to commute. Equivalent at hourly rate, books unread, gym sessions skipped.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["LOC-002", "FIN-006"] },
+      { "id": "LOC-005", "name": "Outdoor Minutes + Nature Score", "category": "location", "description": "GPS + step + light → outdoor minutes vs need. Green-space coverage tagging.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["LOC-001"] },
+      { "id": "LOC-006", "name": "Travel Atlas", "category": "location", "description": "Every country/state/city visited. Lifetime travel map.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["LOC-001", "SOCIAL-009"] },
+
+      { "id": "SUB-001", "name": "Hangover Calculus", "category": "substance", "description": "Drinks logged → next-day HRV/sleep/mood deltas charted.", "priority": 3, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-001"] },
+      { "id": "SUB-003", "name": "Caffeine Half-Life Graph", "category": "substance", "description": "Last coffee at 3pm = 25% still in bloodstream at midnight. Pairs with sleep.", "priority": 2, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "LIFE-001", "name": "Personal Bloomberg Terminal", "category": "life_os", "description": "Single dashboard, all dimensions side-by-side. Power-user view.", "priority": 4, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-001", "INTEG-002", "LOC-001"] },
+      { "id": "LIFE-002", "name": "Auto-Insight Engine", "category": "life_os", "description": "On-device LLM scans all dimensions weekly for cross-correlations.", "priority": 5, "difficulty": 5, "impact": 5, "feasibility": 4, "dependencies": ["LIFE-001"] },
+      { "id": "LIFE-003", "name": "Sunday Life Review", "category": "life_os", "description": "30-min weekly ritual. App walks through each dimension, set next week's One Thing.", "priority": 4, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["LIFE-001", "PROD-013"] },
+      { "id": "LIFE-009", "name": "Beach Days Remaining Widget", "category": "life_os", "description": "Actuarial × proportion of summer Saturdays = beach Saturdays left. Lock-screen widget.", "priority": 3, "difficulty": 1, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "LIFE-010", "name": "Compounding Curve Visualizer", "category": "life_os", "description": "Pick a habit + % improvement → see the curve over years.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "LIFE-012", "name": "Death Clock Widget (Opt-In)", "category": "life_os", "description": "Actuarial life expectancy countdown. WeCroak-style.", "priority": 2, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "READ-001", "name": "Reading Stats", "category": "reading", "description": "Books finished, reading minutes, top authors. From Kindle/Audible/Readwise.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-009"] },
+      { "id": "READ-002", "name": "Daily Highlight Resurfacing", "category": "reading", "description": "Surface a random past highlight every morning. Spaced repetition for ideas.", "priority": 3, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-009"] }
+    ]
+  },
+
+  "stage4_v3": {
+    "summary": "OS for life — marketplace, dashboards, web companion, WearOS, AI life coach, multi-domain Wrapped, full social experimentation.",
+    "features": [
+      { "id": "RESTRICT-019", "name": "Sound Diet", "category": "restriction", "description": "Track audio consumption. After threshold: forced silence.", "priority": 1, "difficulty": 3, "impact": 3, "feasibility": 3, "dependencies": ["CORE-004"] },
+      { "id": "RESTRICT-024", "name": "Topic-Level Filter", "category": "restriction", "description": "Twitter for tech, not politics. LLM classifies content. User defines whitelist topics.", "priority": 2, "difficulty": 5, "impact": 5, "feasibility": 2, "dependencies": ["RESTRICT-020"] },
+
+      { "id": "GAMIFY-004", "name": "Skill Tree Phone (Unlock Features by Real Actions)", "category": "gamification", "description": "Fresh install = calls only. Real-world tasks unlock features.", "priority": 2, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["PROD-001", "TRACK-001"] },
+
+      { "id": "HARDWARE-003", "name": "WearOS Companion (Heart Rate + Vibration)", "category": "hardware", "description": "Watch reads HR, sends somatic vibration warnings, detects stress.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 3, "dependencies": [] },
+
+      { "id": "ABSURD-005", "name": "The Confession Call (Auto-Dial Random Contact)", "category": "absurdist", "description": "After 30min in distraction, auto-dials random contact. Explain or hang up.", "priority": 1, "difficulty": 2, "impact": 3, "feasibility": 4, "dependencies": [] },
+
+      { "id": "LIFECYCLE-001", "name": "Graduate Mode", "category": "lifecycle", "description": "After 18+ months mastery, app near-invisible. Stats-only widget, monthly check-in.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001", "UNINSTALL-007"] },
+
+      { "id": "B2B-001", "name": "Therapist / Coach Dashboard", "category": "b2b", "description": "Web dashboard for licensed coaches/therapists. Consent-based anonymized patterns. Subscription product.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["PLATFORM-001"] },
+      { "id": "B2B-002", "name": "Team Focus Dashboard", "category": "b2b", "description": "Company-level managers see aggregate focus hours (no individual surveillance).", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["PLATFORM-001"] },
+
+      { "id": "PLATFORM-001", "name": "Web / Desktop Companion", "category": "infrastructure", "description": "Web app for read-only stats, journal, todos, project tracking.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["BACKUP-001"] },
+      { "id": "MERCH-001", "name": "Print Shop (Heatmap / Journal / NFC Puck)", "category": "infrastructure", "description": "Order physical artifacts of your year. Real anchor in the world.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["BACKUP-002", "HARDWARE-001"] },
+
+      { "id": "CREATOR-001", "name": "Track Marketplace", "category": "creator_economy", "description": "Verified creators publish curated tracks. Users clone, follow stats. Revenue split.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001", "SOCIAL-011"] },
+      { "id": "CREATOR-002", "name": "Mentor Subscriptions", "category": "creator_economy", "description": "Pay verified Built user $5/mo for unlocked stat-sharing + DM access.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-009", "SOCIAL-011"] },
+
+      { "id": "SOCIAL-007", "name": "Group Sprints", "category": "social", "description": "Schedule 2hr sprint with group. Everyone commits to a task. Real-time progress.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-015", "name": "Aura Avatar", "category": "social", "description": "In-app avatar shifts with behavior meter: gold = Thriving, foggy = Drowning.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["PROD-003", "SOCIAL-009"] },
+      { "id": "SOCIAL-017", "name": "Today's Top Builders Tab", "category": "social", "description": "Discover surface sorted by data-verified output.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-009"] },
+      { "id": "SOCIAL-018", "name": "Anti-Influencer Tab", "category": "social", "description": "Verified creators publish actual focus rules + real stats. Forced honesty.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-011", "CREATOR-001"] },
+      { "id": "SOCIAL-019", "name": "Hashtag Tracks", "category": "social", "description": "Public joinable tracks: #75hard, #buildinpublic. Leaderboards within tag.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["TRACK-001", "SOCIAL-001"] },
+      { "id": "SOCIAL-022", "name": "Mood Voice Notes", "category": "social", "description": "30-sec audio note about today (Clubhouse-style). Expires in 24hr.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-021"] },
+      { "id": "SOCIAL-023", "name": "Confession Booth", "category": "social", "description": "Anonymous post of today's failure to community. Curated stickers back.", "priority": 2, "difficulty": 4, "impact": 3, "feasibility": 4, "dependencies": ["SOCIAL-001"] },
+      { "id": "SOCIAL-024", "name": "Vault Stories (Close Friends)", "category": "social", "description": "Share REAL stats with 3-5 trusted people. Brutal honesty club.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-001", "SOCIAL-021"] },
+      { "id": "SOCIAL-026", "name": "Streak Charms (Friendship Facts)", "category": "social", "description": "Auto-surfaced facts about your relationship's data.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-025"] },
+      { "id": "SOCIAL-027", "name": "Focus Map", "category": "social", "description": "Snap Map equivalent. Opt-in location share showing friends in deep work right now.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-006", "RESTRICT-010"] },
+      { "id": "SOCIAL-028", "name": "Live Focus Rooms (Audio)", "category": "social", "description": "Discord-style audio rooms. Verified focus state. Mic muted.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["SOCIAL-006"] },
+      { "id": "SOCIAL-031", "name": "Focus Aura Filter (AR)", "category": "social", "description": "Selfie AR filter overlays a glow based on real data. Off-platform virality.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 4, "dependencies": ["PROD-003"] },
+      { "id": "SOCIAL-032", "name": "Brutal Mirror Filter (AR)", "category": "social", "description": "AR filter re-skins face based on actual data. Disciplined = young. Drowning = aged.", "priority": 2, "difficulty": 5, "impact": 5, "feasibility": 3, "dependencies": ["SOCIAL-031"] },
+      { "id": "SOCIAL-034", "name": "Focus Duels", "category": "social", "description": "Challenge friend to 2-hour focus block. Live scoreboard.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-007"] },
+      { "id": "SOCIAL-035", "name": "Time Donation", "category": "social", "description": "Gift saved time to a friend's bank. Venmo for hours.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["GAMIFY-002", "SOCIAL-001"] },
+      { "id": "SOCIAL-037", "name": "Late Night Crew", "category": "social", "description": "Auto-formed group of grinders/insomniacs in your timezone, visible 11pm-4am.", "priority": 1, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-027"] },
+      { "id": "SOCIAL-038", "name": "Mantra Mentions", "category": "social", "description": "Tag friend in mantra → push 'Risky did their mantra and mentioned you.'", "priority": 1, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["MANTRA-001", "SOCIAL-001"] },
+      { "id": "SOCIAL-039", "name": "Best Friends List (Top 8)", "category": "social", "description": "Auto-curated 8 most-supportive friends. Visible on profile.", "priority": 1, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["SOCIAL-009"] },
+      { "id": "SOCIAL-040", "name": "Public Phone Funeral", "category": "social", "description": "30 days zero opens of an app = community ritual. Friends attend. Gravestone on profile.", "priority": 1, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["PSYCH-014", "SOCIAL-001"] },
+
+      { "id": "INTEG-005", "name": "Letterboxd + Trakt + TV Time Sync", "category": "integration", "description": "Pull films and TV episodes watched. Feeds cultural-input stats and Wrapped.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-008", "name": "GitHub / Code Output Integration", "category": "integration", "description": "Pull commits, PRs, contribution heatmap. Output stats for developers.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": [] },
+      { "id": "INTEG-009", "name": "Goodreads / Kindle / Audible Reading Sync", "category": "integration", "description": "Books finished, reading minutes, highlights.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 4, "dependencies": [] },
+
+      { "id": "FIT-006", "name": "Reps-as-Currency", "category": "fitness", "description": "Completed workouts mint time-credits for distraction apps. Earn entertainment with effort.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["FIT-002", "GAMIFY-003"] },
+      { "id": "FIT-007", "name": "Form Check Video", "category": "fitness", "description": "10-sec lift video → on-device pose-estimation critique. AR joint angles.", "priority": 1, "difficulty": 5, "impact": 4, "feasibility": 3, "dependencies": ["FIT-002"] },
+
+      { "id": "MIND-003", "name": "Voice-Tone EQ", "category": "mind", "description": "Weekly recording of fixed sentence. AI tracks pitch/jitter/shimmer over months.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 3, "dependencies": [] },
+      { "id": "MIND-004", "name": "Subconscious Dump", "category": "mind", "description": "60-sec stream-of-consciousness voice before bed. LLM extracts themes weekly.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 3, "dependencies": ["INTEG-010"] },
+      { "id": "MIND-005", "name": "Cognitive Vitals", "category": "mind", "description": "30-sec daily test (n-back, reaction time, Stroop). Long-term cognition curve.", "priority": 2, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": [] },
+      { "id": "MIND-006", "name": "Dream Journal + AI Symbols", "category": "mind", "description": "Voice-record morning recall. AI extracts symbols/themes weekly.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-010"] },
+      { "id": "MIND-007", "name": "Reading-as-Thinking Loop", "category": "mind", "description": "Pull highlights from Readwise/Kindle. Surface daily highlight + journal prompt.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-009"] },
+
+      { "id": "NUT-001", "name": "Plate-Photo Nutrition Log", "category": "nutrition", "description": "Photo a meal → on-device CV estimates calories + macros.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 4, "dependencies": [] },
+      { "id": "NUT-002", "name": "Fasting Window Auto-Detect", "category": "nutrition", "description": "Last-meal-to-first-meal auto-computed. No manual timer.", "priority": 2, "difficulty": 2, "impact": 3, "feasibility": 5, "dependencies": ["NUT-001"] },
+      { "id": "NUT-003", "name": "Trigger-Food Detector", "category": "nutrition", "description": "Correlate foods with next-day mood/energy/sleep.", "priority": 2, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["NUT-001", "MIND-002", "SLEEP-002"] },
+      { "id": "NUT-004", "name": "Cooking Ratio", "category": "nutrition", "description": "Meals cooked vs eaten out + cost delta via finance integration.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["NUT-001", "FIN-001"] },
+
+      { "id": "FIN-005", "name": "Spend Heatmap by Place", "category": "finance_v2", "description": "Every dollar pinned to geo. See your coffee habit as a constellation.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-002", "LOC-001"] },
+      { "id": "FIN-007", "name": "Future-Self Budget Projector", "category": "finance_v2", "description": "Project age-65 net worth. Slider simulates 'what if I save $200 more/mo.'", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["FIN-002"] },
+      { "id": "FIN-008", "name": "Regret Receipts", "category": "finance_v2", "description": "24hr after purchase: 'still glad?' Build personal regret-rate by category.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["FIN-001"] },
+      { "id": "FIN-009", "name": "Money Mirror Tile", "category": "finance_v2", "description": "Home tile: today's spend + estimated days-of-freedom gained/lost.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["FIN-001", "FIN-007"] },
+      { "id": "FIN-010", "name": "Tax-Aware Income Tracker", "category": "finance_v2", "description": "Every 1099 / gig / sale auto-tracked. Quarterly nag.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-002"] },
+      { "id": "FIN-011", "name": "Couples Joint Finance Mode", "category": "finance_v2", "description": "Shared 'we' ledger overlaying both partners' data.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["INTEG-002", "COUPLES-001"] },
+      { "id": "FIN-012", "name": "Built Wrapped — Money Edition", "category": "finance_v2", "description": "Annual finance recap. Shareable.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-010", "INTEG-002"] },
+
+      { "id": "LOC-007", "name": "Sound-Fingerprint Place ID", "category": "location", "description": "Ambient mic identifies place by acoustics, not GPS.", "priority": 1, "difficulty": 5, "impact": 3, "feasibility": 3, "dependencies": [] },
+      { "id": "LOC-008", "name": "Air-Quality / UV Exposure Ledger", "category": "location", "description": "Location × AQI + UV APIs → lifetime PM2.5 inhaled, sun-on-skin minutes.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["LOC-001"] },
+
+      { "id": "SUB-002", "name": "Substance Log (Private)", "category": "substance", "description": "Cannabis, mushrooms, MDMA, etc. PII-grade encryption, never synced.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": [] },
+
+      { "id": "PRM-001", "name": "Time-With-People Auto-Detect", "category": "personal_crm", "description": "Bluetooth proximity + calendar events → time spent per person. Auto-logged.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 4, "dependencies": ["INTEG-007"] },
+      { "id": "PRM-002", "name": "Last-Contacted List", "category": "personal_crm", "description": "Humans you haven't spoken to in 30/60/90 days. Nudges.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-007"] },
+      { "id": "PRM-003", "name": "Reciprocity Score per Friend", "category": "personal_crm", "description": "Who initiates calls/texts. 'You called Sarah 12x. She called you 1x.'", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 4, "dependencies": ["PRM-001"] },
+      { "id": "PRM-004", "name": "Family Time Budget", "category": "personal_crm", "description": "Weekly hours with each immediate family member, target vs actual.", "priority": 2, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["PRM-001"] },
+      { "id": "PRM-005", "name": "People-Met Graph (Lifetime)", "category": "personal_crm", "description": "Lifetime graph of who you've shared a calendar event or photo with. Ambient PRM.", "priority": 2, "difficulty": 5, "impact": 5, "feasibility": 3, "dependencies": ["INTEG-006", "INTEG-007"] },
+
+      { "id": "LIFE-004", "name": "Quarterly Self-Audit", "category": "life_os", "description": "90-day review, scored, with deltas. Comp report for the company-of-one.", "priority": 3, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["LIFE-003"] },
+      { "id": "LIFE-005", "name": "Personal Annual Report (PDF)", "category": "life_os", "description": "Year-end PDF. Like a public company files annually — for your life.", "priority": 3, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["LIFE-001", "BACKUP-002"] },
+      { "id": "LIFE-006", "name": "Built Wrapped — Life Edition (Multi-Domain)", "category": "life_os", "description": "Spotify-Wrapped for your entire life: films + books + travel + people + photos + mood + money.", "priority": 5, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["SOCIAL-010", "FIN-012", "INTEG-004", "INTEG-005", "INTEG-006"] },
+      { "id": "LIFE-007", "name": "Counterfactual Twin", "category": "life_os", "description": "AI persona of 'you, but with one habit different.' Sober/sleeps-8hrs/no-scroll alt trajectories.", "priority": 2, "difficulty": 5, "impact": 5, "feasibility": 3, "dependencies": ["LIFE-002"] },
+      { "id": "LIFE-008", "name": "Digital Twin Timeline", "category": "life_os", "description": "Every datapoint of your life on one infinite scrollable timeline.", "priority": 2, "difficulty": 5, "impact": 5, "feasibility": 4, "dependencies": ["LIFE-001"] },
+      { "id": "LIFE-011", "name": "AI Life Coach (Trained on YOUR Data)", "category": "life_os", "description": "On-device LLM as Stoic / CBT therapist / coach. Reads your full data weekly.", "priority": 3, "difficulty": 5, "impact": 5, "feasibility": 3, "dependencies": ["LIFE-002"] },
+
+      { "id": "READ-003", "name": "Vocabulary Growth Curve", "category": "reading", "description": "New words encountered + actively used in journals, tracked over months.", "priority": 1, "difficulty": 3, "impact": 3, "feasibility": 5, "dependencies": ["INTEG-009", "PROD-004"] },
+
+      { "id": "IDENT-001", "name": "Daily Selfie Timelapse", "category": "identity", "description": "8am selfie every day → year-end timelapse video.", "priority": 2, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": [] },
+      { "id": "IDENT-002", "name": "Promise Kept Ratio", "category": "identity", "description": "Every commitment tagged → auto-graded at deadline. Self-trust score over time.", "priority": 2, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["PROD-001"] },
+      { "id": "IDENT-003", "name": "Rejection Counter", "category": "identity", "description": "Jia-Jiang-style. Asks made, rejected, accepted. Courage practice.", "priority": 1, "difficulty": 1, "impact": 4, "feasibility": 5, "dependencies": [] },
+      { "id": "IDENT-004", "name": "Risks-Taken Log", "category": "identity", "description": "Uncomfortable conversation, big email, raise asked for. Tagged end-of-day.", "priority": 1, "difficulty": 1, "impact": 3, "feasibility": 5, "dependencies": ["PROD-004"] },
+      { "id": "IDENT-005", "name": "Things-Made Counter", "category": "identity", "description": "Photos, videos, recipes, drawings, songs, posts shipped. The verb 'made', tracked.", "priority": 2, "difficulty": 3, "impact": 5, "feasibility": 4, "dependencies": ["INTEG-006", "INTEG-008"] }
+    ]
+  }
+}
