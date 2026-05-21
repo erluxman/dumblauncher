@@ -46,6 +46,7 @@ import com.erluxman.focuslauncher.data.local.AppDatabase
 import com.erluxman.focuslauncher.data.local.entity.ProjectEntity
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
 import com.erluxman.focuslauncher.data.prefs.UserPrefs
+import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
@@ -64,11 +65,13 @@ fun HomeScreen(
     val database = remember { AppDatabase.getDatabase(context) }
     val todoRepository = remember { TodoRepository(database.todoDao()) }
     val projectRepository = remember { ProjectRepository(database.projectDao()) }
+    val journalRepository = remember { JournalRepository(database.journalDao()) }
 
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModel.provideFactory(
             todoRepository,
             projectRepository,
+            journalRepository,
             context.packageManager,
             prefs,
             context.applicationContext
@@ -89,6 +92,7 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var showSetupDialog by remember { mutableStateOf(false) }
+    var showInterventionDialog by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize().testTag("home"),
@@ -124,6 +128,15 @@ fun HomeScreen(
                     ) {
                         Icon(Icons.Default.Settings, contentDescription = "Setup", tint = MaterialTheme.colorScheme.outline)
                     }
+                }
+
+                if (uiState.behaviorState in setOf("SINKING", "DROWNING")) {
+                    Spacer(Modifier.height(16.dp))
+                    InterventionBanner(
+                        state = uiState.behaviorState,
+                        whyHere = uiState.whyHere,
+                        onPause = { showInterventionDialog = true }
+                    )
                 }
 
                 if (uiState.whyHere.isNotBlank()) {
@@ -180,6 +193,18 @@ fun HomeScreen(
                 )
             }
 
+            if (showInterventionDialog) {
+                InterventionDialog(
+                    state = uiState.behaviorState,
+                    whyHere = uiState.whyHere,
+                    onDismiss = { showInterventionDialog = false },
+                    onSave = { note ->
+                        viewModel.saveInterventionNote(note)
+                        showInterventionDialog = false
+                    }
+                )
+            }
+
             if (showSetupDialog) {
                 SetupDialog(
                     onDismiss = { showSetupDialog = false },
@@ -195,6 +220,88 @@ fun HomeScreen(
             }
         }
     }
+}
+
+@Composable
+internal fun InterventionBanner(state: String, whyHere: String, onPause: () -> Unit) {
+    val color = if (state == "DROWNING") MaterialTheme.colorScheme.error else Color(0xFFF57C00)
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("intervention-banner"),
+        shape = RoundedCornerShape(12.dp),
+        color = color.copy(alpha = 0.12f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "PAUSE",
+                style = MaterialTheme.typography.labelSmall,
+                color = color,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (whyHere.isBlank())
+                    "You're in $state. Step away for a minute."
+                else
+                    "You said: \"$whyHere\" — and you're in $state.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(8.dp))
+            TextButton(
+                onClick = onPause,
+                modifier = Modifier.testTag("intervention-pause")
+            ) {
+                Text("What are you actually doing?")
+            }
+        }
+    }
+}
+
+@Composable
+internal fun InterventionDialog(
+    state: String,
+    whyHere: String,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var note by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("You're in $state") },
+        text = {
+            Column {
+                if (whyHere.isNotBlank()) {
+                    Text(
+                        text = "Your declaration: \"$whyHere\"",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+                Text("What are you actually doing right now?", style = MaterialTheme.typography.bodyLarge)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("intervention-note-input"),
+                    minLines = 3,
+                    placeholder = { Text("Be honest with yourself.") }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = note.trim().isNotEmpty(),
+                onClick = { onSave(note) },
+                modifier = Modifier.testTag("intervention-save")
+            ) { Text("Save & continue") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Dismiss") }
+        }
+    )
 }
 
 @Composable

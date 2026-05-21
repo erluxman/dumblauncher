@@ -7,10 +7,12 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.erluxman.focuslauncher.data.local.entity.JournalEntryEntity
 import com.erluxman.focuslauncher.data.local.entity.ProjectEntity
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
 import com.erluxman.focuslauncher.data.prefs.PrefKeys
 import com.erluxman.focuslauncher.data.prefs.UserPrefs
+import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
@@ -35,6 +37,7 @@ data class HomeUiState(
 class HomeViewModel(
     private val todoRepository: TodoRepository,
     private val projectRepository: ProjectRepository,
+    private val journalRepository: JournalRepository,
     private val packageManager: PackageManager,
     private val prefs: UserPrefs,
     private val appContext: Context
@@ -187,17 +190,32 @@ class HomeViewModel(
         }
     }
 
+    fun saveInterventionNote(text: String) {
+        if (text.isBlank()) return
+        val current = _uiState.value
+        viewModelScope.launch {
+            journalRepository.insert(
+                JournalEntryEntity(
+                    text = text.trim(),
+                    behaviorState = current.behaviorState,
+                    screenMinutes = current.screenMinutesToday
+                )
+            )
+        }
+    }
+
     companion object {
         fun provideFactory(
             todoRepository: TodoRepository,
             projectRepository: ProjectRepository,
+            journalRepository: JournalRepository,
             packageManager: PackageManager,
             prefs: UserPrefs,
             appContext: Context
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return HomeViewModel(todoRepository, projectRepository, packageManager, prefs, appContext) as T
+                return HomeViewModel(todoRepository, projectRepository, journalRepository, packageManager, prefs, appContext) as T
             }
         }
     }
