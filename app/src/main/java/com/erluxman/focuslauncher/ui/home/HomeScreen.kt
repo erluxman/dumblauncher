@@ -41,9 +41,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.testTag
 import com.erluxman.focuslauncher.data.local.AppDatabase
 import com.erluxman.focuslauncher.data.local.entity.ProjectEntity
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
+import com.erluxman.focuslauncher.data.prefs.UserPrefs
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
@@ -53,28 +55,43 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    prefs: UserPrefs,
+    onOpenTransparency: () -> Unit,
+    onReplayOnboarding: () -> Unit
+) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
     val todoRepository = remember { TodoRepository(database.todoDao()) }
     val projectRepository = remember { ProjectRepository(database.projectDao()) }
-    
+
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModel.provideFactory(
             todoRepository,
             projectRepository,
-            context.packageManager
+            context.packageManager,
+            prefs,
+            context.applicationContext
         )
     )
 
     val uiState by viewModel.uiState.collectAsState()
-    
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val obs = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refreshUsage()
+        }
+        lifecycleOwner.lifecycle.addObserver(obs)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+    }
+
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var showSetupDialog by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().testTag("home"),
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -90,14 +107,28 @@ fun HomeScreen() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BehaviorIndicator(
-                        state = uiState.behaviorState,
-                        progress = uiState.behaviorProgress,
-                        modifier = Modifier.weight(1f)
-                    )
-                    IconButton(onClick = { showSetupDialog = true }) {
+                    if (uiState.behaviorIndicatorEnabled) {
+                        BehaviorIndicator(
+                            state = uiState.behaviorState,
+                            progress = uiState.behaviorProgress,
+                            screenMinutes = uiState.screenMinutesToday,
+                            targetMinutes = uiState.dailyTargetMin,
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                    IconButton(
+                        onClick = { showSetupDialog = true },
+                        modifier = Modifier.testTag("settings-button")
+                    ) {
                         Icon(Icons.Default.Settings, contentDescription = "Setup", tint = MaterialTheme.colorScheme.outline)
                     }
+                }
+
+                if (uiState.whyHere.isNotBlank()) {
+                    Spacer(Modifier.height(16.dp))
+                    WhyHereCard(text = uiState.whyHere)
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -150,14 +181,52 @@ fun HomeScreen() {
             }
 
             if (showSetupDialog) {
-                SetupDialog(onDismiss = { showSetupDialog = false })
+                SetupDialog(
+                    onDismiss = { showSetupDialog = false },
+                    onOpenTransparency = {
+                        showSetupDialog = false
+                        onOpenTransparency()
+                    },
+                    onReplayOnboarding = {
+                        showSetupDialog = false
+                        onReplayOnboarding()
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun SetupDialog(onDismiss: () -> Unit) {
+private fun WhyHereCard(text: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("why-here-card"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "YOUR DECLARATION",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+fun SetupDialog(
+    onDismiss: () -> Unit,
+    onOpenTransparency: () -> Unit = {},
+    onReplayOnboarding: () -> Unit = {}
+) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
     val componentName = ComponentName(context, FocusDeviceAdminReceiver::class.java)
@@ -234,6 +303,32 @@ fun SetupDialog(onDismiss: () -> Unit) {
                         Text(if (isDefault) "Default Launcher Active" else "Set as Default Launcher")
                     }
                 }
+
+                Button(
+                    onClick = {
+                        context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Grant Usage Access") }
+
+                Button(
+                    onClick = {
+                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Enable Lobby (Accessibility)") }
+
+                TextButton(
+                    onClick = onOpenTransparency,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-transparency")
+                ) { Text("Transparency / Techniques") }
+
+                TextButton(
+                    onClick = onReplayOnboarding,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Replay Onboarding") }
             }
         },
         confirmButton = {
@@ -260,7 +355,13 @@ private fun isDefaultLauncher(context: Context): Boolean {
 }
 
 @Composable
-fun BehaviorIndicator(state: String, progress: Float, modifier: Modifier = Modifier) {
+fun BehaviorIndicator(
+    state: String,
+    progress: Float,
+    screenMinutes: Int,
+    targetMinutes: Int,
+    modifier: Modifier = Modifier
+) {
     val stateColor = when(state) {
         "THRIVING" -> MaterialTheme.colorScheme.primary
         "NEUTRAL" -> MaterialTheme.colorScheme.secondary
@@ -270,7 +371,7 @@ fun BehaviorIndicator(state: String, progress: Float, modifier: Modifier = Modif
         else -> MaterialTheme.colorScheme.outline
     }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.testTag("behavior-indicator")) {
         Text(
             text = "CURRENT STATE",
             style = MaterialTheme.typography.labelMedium,
@@ -289,10 +390,11 @@ fun BehaviorIndicator(state: String, progress: Float, modifier: Modifier = Modif
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-1).sp
                 ),
-                color = stateColor
+                color = stateColor,
+                modifier = Modifier.testTag("behavior-state-text")
             )
             Text(
-                text = "Level 1",
+                text = "${screenMinutes}m / ${targetMinutes}m",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary
             )

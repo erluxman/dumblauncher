@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Focus Launcher</string>
     <string name="device_admin_description">Focus Launcher uses device administrator permissions to prevent accidental uninstallation during focus periods.</string>
+    <string name="accessibility_service_description">Focus Launcher detects when a flagged distraction app is opened and shows The Lobby — a friction screen that forces a pause and an intent declaration before the app is allowed through. You can disable any technique in Transparency settings.</string>
 </resources>
