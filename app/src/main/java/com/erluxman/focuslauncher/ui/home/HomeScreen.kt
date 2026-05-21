@@ -182,6 +182,14 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     contentPadding = PaddingValues(bottom = 120.dp)
                 ) {
+                    if (uiState.dueFutureLetter.isNotBlank()) {
+                        item {
+                            FutureLetterBanner(
+                                entry = uiState.dueFutureLetter,
+                                onDismiss = viewModel::dismissDueLetter
+                            )
+                        }
+                    }
                     item {
                         OneThingCard(
                             text = uiState.oneThingText,
@@ -189,6 +197,12 @@ fun HomeScreen(
                             onSet = viewModel::setOneThing,
                             onClear = viewModel::clearOneThing
                         )
+                    }
+                    item {
+                        AnchorChip(distractionMinutes = uiState.distractionMinutesToday)
+                    }
+                    item {
+                        DomainStreaksRow(streaks = uiState.domainStreaks)
                     }
                     item {
                         StreakRow(
@@ -278,6 +292,16 @@ fun HomeScreen(
                     }
                     item { ProjectSection(uiState.projects) }
                     item { TodoSection(uiState.todos, onToggle = viewModel::toggleTodo, onAdd = viewModel::addTodo, onDelete = viewModel::deleteTodo) }
+                    item {
+                        TombstoneSection(
+                            entries = uiState.appTombstones,
+                            onAdd = viewModel::addTombstone,
+                            onRemove = viewModel::removeTombstone
+                        )
+                    }
+                    item {
+                        FutureLetterComposer(onSave = viewModel::saveFutureLetter)
+                    }
                     item { WidgetSection() }
                 }
             }
@@ -1424,6 +1448,226 @@ fun SearchOverlay(
 
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnchorChip(distractionMinutes: Int) {
+    val delta = com.erluxman.focuslauncher.service.AnchorMath.delta(distractionMinutes)
+    val tone = if (delta <= 0) MaterialTheme.colorScheme.primary
+               else MaterialTheme.colorScheme.error
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("anchor-chip"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = "MOST DISCIPLINED USER",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Text(
+                text = "${com.erluxman.focuslauncher.service.AnchorMath.ANCHOR_MINUTES} min today",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = if (delta > 0) "You: $distractionMinutes min  (+$delta over)"
+                else if (delta < 0) "You: $distractionMinutes min  (${delta} under)"
+                else "You: $distractionMinutes min  (matched)",
+                style = MaterialTheme.typography.bodySmall,
+                color = tone
+            )
+        }
+    }
+}
+
+@Composable
+private fun DomainStreaksRow(streaks: Map<String, Pair<Int, Int>>) {
+    val domains = listOf("focus" to "FOCUS", "creation" to "CREATE", "sleep" to "SLEEP")
+    Column(modifier = Modifier.testTag("domain-streaks")) {
+        SectionHeader("DOMAIN STREAKS")
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            domains.forEach { (key, label) ->
+                val (days, best) = streaks[key] ?: (0 to 0)
+                StatChip(
+                    label = label,
+                    value = "${days}d",
+                    sub = "best ${best}d",
+                    modifier = Modifier.weight(1f).testTag("domain-$key")
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FutureLetterBanner(entry: String, onDismiss: () -> Unit) {
+    val parts = entry.split("|", limit = 4)
+    val text = parts.getOrNull(3).orEmpty()
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("future-letter-banner"),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "LETTER FROM A STRONGER YOU",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(text, style = MaterialTheme.typography.bodyLarge)
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier.testTag("future-letter-dismiss")
+            ) { Text("Got it") }
+        }
+    }
+}
+
+@Composable
+private fun TombstoneSection(
+    entries: List<String>,
+    onAdd: (String) -> Unit,
+    onRemove: (String) -> Unit
+) {
+    var newName by remember { mutableStateOf("") }
+    Column(modifier = Modifier.testTag("tombstones")) {
+        SectionHeader("TOMBSTONES")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Apps you've sworn off.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(8.dp))
+                entries.forEach { entry ->
+                    val parts = entry.split("|", limit = 2)
+                    val label = parts.getOrNull(0).orEmpty()
+                    val date = parts.getOrNull(1).orEmpty()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "RIP $label",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            date,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        TextButton(
+                            onClick = { onRemove(entry) },
+                            modifier = Modifier.testTag("tombstone-remove-$label")
+                        ) { Text("Resurrect") }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it.take(40) },
+                        placeholder = { Text("App you've quit") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f).testTag("tombstone-input")
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            onAdd(newName.trim())
+                            newName = ""
+                        },
+                        enabled = newName.isNotBlank(),
+                        modifier = Modifier.testTag("tombstone-add")
+                    ) { Text("Bury") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FutureLetterComposer(onSave: (String, String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+    var daysOut by remember { mutableStateOf("14") }
+    Column(modifier = Modifier.testTag("future-letter-composer")) {
+        SectionHeader("WRITE TO FUTURE SELF")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Write a note now. It will surface on a future weak day.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it.take(600) },
+                    placeholder = { Text("Dear future me...") },
+                    minLines = 2,
+                    modifier = Modifier.fillMaxWidth().testTag("future-letter-text")
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = daysOut,
+                        onValueChange = { daysOut = it.filter { c -> c.isDigit() }.take(3) },
+                        placeholder = { Text("days") },
+                        singleLine = true,
+                        modifier = Modifier.width(80.dp).testTag("future-letter-days"),
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                        )
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("days out", style = MaterialTheme.typography.labelSmall)
+                    Spacer(Modifier.weight(1f))
+                    Button(
+                        onClick = {
+                            val n = daysOut.toIntOrNull() ?: 14
+                            val cal = java.util.Calendar.getInstance().apply {
+                                add(java.util.Calendar.DAY_OF_YEAR, n)
+                            }
+                            val iso = java.text.SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                java.util.Locale.US
+                            ).format(cal.time)
+                            onSave(iso, text)
+                            text = ""
+                        },
+                        enabled = text.isNotBlank(),
+                        modifier = Modifier.testTag("future-letter-save")
+                    ) { Text("Schedule") }
+                }
             }
         }
     }

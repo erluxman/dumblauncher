@@ -64,7 +64,10 @@ data class HomeUiState(
     val hourlyRateUsd: Int = 0,
     val userAge: Int = 0,
     val distractionMinutesToday: Int = 0,
-    val todosCompletedToday: Int = 0
+    val todosCompletedToday: Int = 0,
+    val appTombstones: List<String> = emptyList(),
+    val dueFutureLetter: String = "",
+    val domainStreaks: Map<String, Pair<Int, Int>> = emptyMap()
 )
 
 class HomeViewModel(
@@ -87,6 +90,7 @@ class HomeViewModel(
         startUsagePolling()
         rollStreakIfNewDay()
         rollTimeDebtIfNewDay()
+        rollDomainStreaks()
         observeHeatmap()
         startDreamModeClock()
     }
@@ -193,6 +197,36 @@ class HomeViewModel(
                 .collect { (rate, age) ->
                     _uiState.update { it.copy(hourlyRateUsd = rate, userAge = age) }
                 }
+        }
+
+        viewModelScope.launch {
+            prefs.appTombstones.collect { set ->
+                _uiState.update { it.copy(appTombstones = set.sorted()) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.futureLetters.collect { set ->
+                val today = todayIso()
+                val due = set.firstOrNull { e ->
+                    val parts = e.split("|", limit = 4)
+                    parts.size == 4 && parts[1] <= today && parts[2] == "0"
+                }
+                _uiState.update { it.copy(dueFutureLetter = due.orEmpty()) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.domainStreaks.collect { set ->
+                val map = set.mapNotNull { e ->
+                    val parts = e.split("|", limit = 4)
+                    if (parts.size != 4) return@mapNotNull null
+                    val days = parts[1].toIntOrNull() ?: return@mapNotNull null
+                    val best = parts[2].toIntOrNull() ?: return@mapNotNull null
+                    parts[0] to (days to best)
+                }.toMap()
+                _uiState.update { it.copy(domainStreaks = map) }
+            }
         }
 
         viewModelScope.launch {
@@ -360,6 +394,80 @@ class HomeViewModel(
 
     fun dismissAfterFall() {
         viewModelScope.launch { prefs.clearAfterFall() }
+    }
+
+    fun addTombstone(label: String) {
+        viewModelScope.launch { prefs.addTombstone(label, todayIso()) }
+    }
+
+    fun removeTombstone(entry: String) {
+        viewModelScope.launch { prefs.removeTombstone(entry) }
+    }
+
+    fun saveFutureLetter(deliverDateIso: String, text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch { prefs.addFutureLetter(deliverDateIso, text) }
+    }
+
+    fun dismissDueLetter() {
+        val due = _uiState.value.dueFutureLetter
+        if (due.isBlank()) return
+        viewModelScope.launch { prefs.markLetterDelivered(due) }
+    }
+
+    private fun rollDomainStreaks() {
+        viewModelScope.launch {
+            val today = todayIso()
+            val current = prefs.domainStreaks.first()
+            fun forDomain(domain: String): Triple<Int, Int, String> {
+                val entry = current.firstOrNull { it.startsWith("$domain|") }
+                val parts = entry?.split("|", limit = 4) ?: return Triple(0, 0, "")
+                if (parts.size != 4) return Triple(0, 0, "")
+                return Triple(parts[1].toIntOrNull() ?: 0, parts[2].toIntOrNull() ?: 0, parts[3])
+            }
+
+            // FOCUS: at least one focus session yesterday → continues; today's date prevents re-roll.
+            val focus = forDomain("focus")
+            if (focus.third != today) {
+                val sessionsYesterday = prefs.focusSessionsToday.first().takeIf {
+                    prefs.focusSessionsDate.first() == yesterdayIso()
+                } ?: 0
+                val hit = sessionsYesterday > 0
+                val (days, best) = streakNext(focus.first, focus.second, hit)
+                prefs.updateDomainStreak("focus", days, best, today)
+            }
+
+            // CREATION: at least one todo completed yesterday → continues.
+            val creation = forDomain("creation")
+            if (creation.third != today) {
+                val cal = Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, -1)
+                    set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                }
+                val yStart = cal.timeInMillis
+                val yEnd = yStart + 24L * 60 * 60 * 1000
+                val recent = todoRepository.completedSince(yStart).first()
+                val hit = recent.any { it in yStart until yEnd }
+                val (days, best) = streakNext(creation.first, creation.second, hit)
+                prefs.updateDomainStreak("creation", days, best, today)
+            }
+
+            // SLEEP: presence of morning steps done yesterday = went to bed on time proxy.
+            val sleep = forDomain("sleep")
+            if (sleep.third != today) {
+                val mDate = prefs.morningDoneDate.first()
+                val mSteps = prefs.morningDoneSteps.first()
+                val hit = mDate == yesterdayIso() && mSteps.size >= MORNING_STEPS.size
+                val (days, best) = streakNext(sleep.first, sleep.second, hit)
+                prefs.updateDomainStreak("sleep", days, best, today)
+            }
+        }
+    }
+
+    private fun streakNext(currentDays: Int, currentBest: Int, hit: Boolean): Pair<Int, Int> {
+        val next = if (hit) currentDays + 1 else 0
+        return next to maxOf(currentBest, next)
     }
 
     fun setOneThing(text: String) {

@@ -70,6 +70,11 @@ object PrefKeys {
     val HOURLY_RATE_USD = intPreferencesKey("hourly_rate_usd")
     val USER_AGE = intPreferencesKey("user_age")
 
+    val APP_TOMBSTONES = stringSetPreferencesKey("app_tombstones")  // "label|date_added"
+    val FUTURE_LETTERS = stringSetPreferencesKey("future_letters")  // "id|deliverDate|delivered(0/1)|text"
+
+    val DOMAIN_STREAKS = stringSetPreferencesKey("domain_streaks")  // "domain|days|best|lastDate"
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -151,6 +156,10 @@ class UserPrefs(private val context: Context) {
 
     val hourlyRateUsd: Flow<Int> = store.data.map { it[PrefKeys.HOURLY_RATE_USD] ?: 0 }
     val userAge: Flow<Int> = store.data.map { it[PrefKeys.USER_AGE] ?: 0 }
+
+    val appTombstones: Flow<Set<String>> = store.data.map { it[PrefKeys.APP_TOMBSTONES] ?: emptySet() }
+    val futureLetters: Flow<Set<String>> = store.data.map { it[PrefKeys.FUTURE_LETTERS] ?: emptySet() }
+    val domainStreaks: Flow<Set<String>> = store.data.map { it[PrefKeys.DOMAIN_STREAKS] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -334,6 +343,48 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setUserAge(age: Int) {
         store.edit { it[PrefKeys.USER_AGE] = age.coerceIn(0, 120) }
+    }
+
+    suspend fun addTombstone(label: String, dateIso: String) {
+        if (label.isBlank()) return
+        store.edit {
+            val current = it[PrefKeys.APP_TOMBSTONES] ?: emptySet()
+            it[PrefKeys.APP_TOMBSTONES] = current + "${label.replace("|", " ")}|$dateIso"
+        }
+    }
+
+    suspend fun removeTombstone(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.APP_TOMBSTONES] ?: emptySet()
+            it[PrefKeys.APP_TOMBSTONES] = current - entry
+        }
+    }
+
+    suspend fun addFutureLetter(deliverDateIso: String, text: String) {
+        val id = System.currentTimeMillis().toString()
+        val safe = text.replace("|", " ")
+        store.edit {
+            val current = it[PrefKeys.FUTURE_LETTERS] ?: emptySet()
+            it[PrefKeys.FUTURE_LETTERS] = current + "$id|$deliverDateIso|0|$safe"
+        }
+    }
+
+    suspend fun markLetterDelivered(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.FUTURE_LETTERS] ?: emptySet()
+            val parts = entry.split("|", limit = 4)
+            if (parts.size < 4) return@edit
+            val replaced = "${parts[0]}|${parts[1]}|1|${parts[3]}"
+            it[PrefKeys.FUTURE_LETTERS] = (current - entry) + replaced
+        }
+    }
+
+    suspend fun updateDomainStreak(domain: String, days: Int, best: Int, dateIso: String) {
+        store.edit {
+            val current = it[PrefKeys.DOMAIN_STREAKS] ?: emptySet()
+            val others = current.filterNot { e -> e.startsWith("$domain|") }.toSet()
+            it[PrefKeys.DOMAIN_STREAKS] = others + "$domain|$days|$best|$dateIso"
+        }
     }
 
     suspend fun toggleAfterFallStep(step: String) {
