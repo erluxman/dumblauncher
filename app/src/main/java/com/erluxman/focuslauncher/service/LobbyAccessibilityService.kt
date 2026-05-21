@@ -100,6 +100,10 @@ class LobbyAccessibilityService : AccessibilityService() {
                     "${prettyLabel(exitedPkg)} locked for the rest of today — you overstayed.",
                     android.widget.Toast.LENGTH_LONG
                 ).show()
+            } else {
+                Applause.maybeLine(elapsed)?.let { line ->
+                    android.widget.Toast.makeText(this, line, android.widget.Toast.LENGTH_SHORT).show()
+                }
             }
             if (!isDistraction) {
                 DimmingOverlay.stop(this)
