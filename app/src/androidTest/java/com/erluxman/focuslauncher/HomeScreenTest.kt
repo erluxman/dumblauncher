@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -62,8 +63,7 @@ class HomeScreenTest {
             composeTestRule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
         composeTestRule.onNodeWithTag("settings-button").performClick()
-        composeTestRule.onNodeWithTag("open-transparency").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("open-transparency").performClick()
+        composeTestRule.onNodeWithTag("open-transparency").performScrollTo().performClick()
         composeTestRule.waitUntil(5_000) {
             composeTestRule.onAllNodesWithTag("transparency").fetchSemanticsNodes().isNotEmpty()
         }

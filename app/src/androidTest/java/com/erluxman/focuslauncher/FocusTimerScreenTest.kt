@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.erluxman.focuslauncher.data.prefs.UserPrefs
@@ -36,7 +37,7 @@ class FocusTimerScreenTest {
             rule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
         rule.onNodeWithTag("settings-button").performClick()
-        rule.onNodeWithTag("open-focus").performClick()
+        rule.onNodeWithTag("open-focus").performScrollTo().performClick()
         rule.waitUntil(5_000) {
             rule.onAllNodesWithTag("focus-timer").fetchSemanticsNodes().isNotEmpty()
         }

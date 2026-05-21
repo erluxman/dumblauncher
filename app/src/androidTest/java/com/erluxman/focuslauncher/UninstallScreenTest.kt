@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.erluxman.focuslauncher.data.prefs.UserPrefs
@@ -40,7 +41,7 @@ class UninstallScreenTest {
             rule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
         rule.onNodeWithTag("settings-button").performClick()
-        rule.onNodeWithTag("open-uninstall").performClick()
+        rule.onNodeWithTag("open-uninstall").performScrollTo().performClick()
 
         rule.waitUntil(5_000) {
             rule.onAllNodesWithTag("uninstall").fetchSemanticsNodes().isNotEmpty()

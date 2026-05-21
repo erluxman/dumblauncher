@@ -15,6 +15,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -49,6 +51,10 @@ import com.erluxman.focuslauncher.data.prefs.UserPrefs
 import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
+import com.erluxman.focuslauncher.service.ExportBuilder
+import com.erluxman.focuslauncher.service.ExportSnapshot
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import com.erluxman.focuslauncher.model.AppInfo
 import com.erluxman.focuslauncher.receiver.FocusDeviceAdminReceiver
 import com.erluxman.focuslauncher.ui.home.viewmodel.HomeViewModel
@@ -97,6 +103,7 @@ fun HomeScreen(
     var isSearching by remember { mutableStateOf(false) }
     var showSetupDialog by remember { mutableStateOf(false) }
     var showInterventionDialog by remember { mutableStateOf(false) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     Surface(
         modifier = Modifier.fillMaxSize().testTag("home"),
@@ -257,6 +264,30 @@ fun HomeScreen(
                     onOpenMantra = {
                         showSetupDialog = false
                         onOpenMantra()
+                    },
+                    onExport = {
+                        showSetupDialog = false
+                        scope.launch {
+                            val snapshot = ExportSnapshot(
+                                whyHere = prefs.whyHere.first(),
+                                mantra = prefs.mantraPhrase.first(),
+                                dailyTargetMin = prefs.dailyTargetMin.first(),
+                                streakDays = prefs.streakDays.first(),
+                                streakBest = prefs.streakBest.first(),
+                                vipContacts = prefs.vipContacts.first(),
+                                distractionPackages = prefs.distractionPackages.first(),
+                                todos = todoRepository.allTodos.first(),
+                                projects = projectRepository.activeProjects.first(),
+                                journal = journalRepository.recent.first()
+                            )
+                            val json = ExportBuilder.buildJson(snapshot, System.currentTimeMillis())
+                            val send = Intent(Intent.ACTION_SEND).apply {
+                                type = "application/json"
+                                putExtra(Intent.EXTRA_TEXT, json)
+                                putExtra(Intent.EXTRA_SUBJECT, "FocusLauncher export")
+                            }
+                            context.startActivity(Intent.createChooser(send, "Export data"))
+                        }
                     }
                 )
             }
@@ -477,7 +508,8 @@ fun SetupDialog(
     onOpenUninstall: () -> Unit = {},
     onOpenVip: () -> Unit = {},
     onOpenFocus: () -> Unit = {},
-    onOpenMantra: () -> Unit = {}
+    onOpenMantra: () -> Unit = {},
+    onExport: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -510,7 +542,10 @@ fun SetupDialog(
         onDismissRequest = onDismiss,
         title = { Text("System Setup") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
                 Text("Complete these steps to enable anti-uninstall features and lock your experience.")
                 
                 Button(
@@ -606,6 +641,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-mantra")
                 ) { Text("Set Mantra") }
+
+                TextButton(
+                    onClick = onExport,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-export")
+                ) { Text("Export data (JSON)") }
 
                 TextButton(
                     onClick = onOpenUninstall,
