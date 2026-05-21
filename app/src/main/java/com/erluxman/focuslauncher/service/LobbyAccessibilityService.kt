@@ -24,6 +24,8 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val dimmingEnabledFlow = MutableStateFlow(true)
     private val escalatingEnabledFlow = MutableStateFlow(true)
     private val variableRatioEnabledFlow = MutableStateFlow(true)
+    private val streakDaysFlow = MutableStateFlow(0)
+    private val focusSessionsTodayFlow = MutableStateFlow(0)
     private var lastIntercept: Pair<String, Long>? = null
     private var lastDistractionPackage: String? = null
     private var lastDistractionStartMs: Long = 0L
@@ -46,6 +48,8 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { prefs.technique(PrefKeys.TECH_DIMMING).collect { dimmingEnabledFlow.value = it } }
         scope.launch { prefs.technique(PrefKeys.TECH_ESCALATING).collect { escalatingEnabledFlow.value = it } }
         scope.launch { prefs.technique(PrefKeys.TECH_VARIABLE_RATIO).collect { variableRatioEnabledFlow.value = it } }
+        scope.launch { prefs.streakDays.collect { streakDaysFlow.value = it } }
+        scope.launch { prefs.focusSessionsToday.collect { focusSessionsTodayFlow.value = it } }
     }
 
     private fun bumpAndGetVisitOrdinal(pkg: String): Int {
@@ -98,11 +102,17 @@ class LobbyAccessibilityService : AccessibilityService() {
         lastIntercept = pkg to now
 
         val visitOrdinal = bumpAndGetVisitOrdinal(pkg)
+        val builderMinutes = LegacyCounter.totalBuilderMinutes(
+            completedTodos = streakDaysFlow.value,
+            focusSessions = focusSessionsTodayFlow.value
+        )
+        val level = UserLevel.level(builderMinutes)
         val seconds = LobbyTuner.countdownSeconds(
             visitOrdinal = visitOrdinal,
             escalating = escalatingEnabledFlow.value,
             variableRatio = variableRatioEnabledFlow.value,
-            randomRoll = kotlin.random.Random.Default.nextDouble()
+            randomRoll = kotlin.random.Random.Default.nextDouble(),
+            userLevel = level
         )
         val harderMath = LobbyTuner.isHarderMath(
             variableRatio = variableRatioEnabledFlow.value,

@@ -54,6 +54,9 @@ object PrefKeys {
 
     val MOOD_PINGS = stringSetPreferencesKey("mood_pings")  // "yyyy-MM-dd HH:mm|emoji|note"
 
+    val NUCLEAR_PASSPHRASE = stringPreferencesKey("nuclear_passphrase")
+    val FUTURE_SELF_LETTER = stringPreferencesKey("future_self_letter")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -119,6 +122,9 @@ class UserPrefs(private val context: Context) {
     val timeDebtDate: Flow<String> = store.data.map { it[PrefKeys.TIME_DEBT_DATE].orEmpty() }
 
     val moodPings: Flow<Set<String>> = store.data.map { it[PrefKeys.MOOD_PINGS] ?: emptySet() }
+
+    val nuclearPassphrase: Flow<String> = store.data.map { it[PrefKeys.NUCLEAR_PASSPHRASE].orEmpty() }
+    val futureSelfLetter: Flow<String> = store.data.map { it[PrefKeys.FUTURE_SELF_LETTER].orEmpty() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -235,6 +241,14 @@ class UserPrefs(private val context: Context) {
             it[PrefKeys.TIME_DEBT_MIN] = min.coerceAtLeast(0)
             it[PrefKeys.TIME_DEBT_DATE] = todayIso
         }
+    }
+
+    suspend fun setNuclearPassphrase(phrase: String) {
+        store.edit { it[PrefKeys.NUCLEAR_PASSPHRASE] = phrase }
+    }
+
+    suspend fun setFutureSelfLetter(text: String) {
+        store.edit { it[PrefKeys.FUTURE_SELF_LETTER] = text }
     }
 
     suspend fun addMoodPing(timestamp: String, emoji: String, note: String) {

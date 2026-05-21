@@ -22,8 +22,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,10 +52,14 @@ fun UninstallScreen(prefs: UserPrefs, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val startedAt by prefs.uninstallRequestedAt.collectAsState(initial = null)
+    val passphrase by prefs.nuclearPassphrase.collectAsState(initial = "")
+    val futureLetter by prefs.futureSelfLetter.collectAsState(initial = "")
     var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
-    // Last Day Test: gate this whole screen behind a reflection unless cooldown already started.
     var lastDayAcknowledged by remember { mutableStateOf(false) }
+    var passphraseCleared by remember { mutableStateOf(false) }
+    var letterShown by remember { mutableStateOf(false) }
     val showLastDayTest = startedAt == null && !lastDayAcknowledged
+    val showPassphraseGate = startedAt == null && lastDayAcknowledged && !passphraseCleared
 
     LaunchedEffect(startedAt) {
         while (true) {
@@ -63,6 +70,23 @@ fun UninstallScreen(prefs: UserPrefs, onBack: () -> Unit) {
 
     if (showLastDayTest) {
         LastDayTest(onAcknowledged = { lastDayAcknowledged = true }, onBack = onBack)
+        return
+    }
+
+    if (showPassphraseGate) {
+        PassphraseGate(
+            currentPassphrase = passphrase,
+            currentLetter = futureLetter,
+            onSet = { phrase, letter ->
+                scope.launch {
+                    prefs.setNuclearPassphrase(phrase)
+                    prefs.setFutureSelfLetter(letter)
+                    passphraseCleared = true
+                }
+            },
+            onVerified = { passphraseCleared = true },
+            onBack = onBack
+        )
         return
     }
 
@@ -90,10 +114,19 @@ fun UninstallScreen(prefs: UserPrefs, onBack: () -> Unit) {
                 start == null -> NotStartedState(
                     onStart = { scope.launch { prefs.startUninstallRequest() } }
                 )
-                CooldownMath.isElapsed(start, nowMs) -> ElapsedState(
-                    onUninstall = { startUninstall(context) },
-                    onCancel = { scope.launch { prefs.cancelUninstallRequest() } }
-                )
+                CooldownMath.isElapsed(start, nowMs) -> {
+                    if (!letterShown && futureLetter.isNotBlank()) {
+                        FutureSelfLetterPage(
+                            letter = futureLetter,
+                            onDone = { letterShown = true }
+                        )
+                    } else {
+                        ElapsedState(
+                            onUninstall = { startUninstall(context) },
+                            onCancel = { scope.launch { prefs.cancelUninstallRequest() } }
+                        )
+                    }
+                }
                 else -> InProgressState(
                     startedAt = start,
                     nowMs = nowMs,
@@ -249,6 +282,161 @@ private fun LastDayTest(onAcknowledged: () -> Unit, onBack: () -> Unit) {
         }
     }
 }
+
+@Composable
+private fun PassphraseGate(
+    currentPassphrase: String,
+    currentLetter: String,
+    onSet: (String, String) -> Unit,
+    onVerified: () -> Unit,
+    onBack: () -> Unit
+) {
+    val setupMode = currentPassphrase.length < MIN_PASSPHRASE_LEN
+    var newPhrase by remember { mutableStateOf("") }
+    var newLetter by remember { mutableStateOf(currentLetter) }
+    var typed by remember { mutableStateOf("") }
+    val match = !setupMode && typed == currentPassphrase
+
+    Surface(
+        modifier = Modifier.fillMaxSize().testTag("passphrase-gate"),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp)
+        ) {
+            Spacer(Modifier.height(40.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+                Text(
+                    text = "PASSPHRASE",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.outline,
+                    letterSpacing = 2.sp
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            if (setupMode) {
+                Text(
+                    "Set a Nuclear Passphrase",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "20+ characters. Write it on paper. You will be asked to type it verbatim to start a cooldown later.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = newPhrase,
+                    onValueChange = { newPhrase = it },
+                    placeholder = { Text("Type your passphrase") },
+                    modifier = Modifier.fillMaxWidth().testTag("passphrase-new"),
+                    minLines = 2
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Also write a letter to your future self about why you started this.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = newLetter,
+                    onValueChange = { newLetter = it.take(2000) },
+                    placeholder = { Text("Dear future self...") },
+                    modifier = Modifier.fillMaxWidth().testTag("passphrase-letter"),
+                    minLines = 4
+                )
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { onSet(newPhrase, newLetter) },
+                    enabled = newPhrase.length >= MIN_PASSPHRASE_LEN && newLetter.length >= 20,
+                    modifier = Modifier.fillMaxWidth().testTag("passphrase-save")
+                ) { Text("Save and continue") }
+            } else {
+                Text(
+                    "Type your Nuclear Passphrase",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Exact match required. We will not show hints.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = typed,
+                    onValueChange = { typed = it },
+                    placeholder = { Text("Your passphrase") },
+                    modifier = Modifier.fillMaxWidth().testTag("passphrase-verify"),
+                    minLines = 2
+                )
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = onVerified,
+                    enabled = match,
+                    modifier = Modifier.fillMaxWidth().testTag("passphrase-continue")
+                ) { Text(if (match) "Continue" else "Doesn't match") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FutureSelfLetterPage(letter: String, onDone: () -> Unit) {
+    val totalSeconds = 30
+    var remaining by remember { mutableStateOf(totalSeconds) }
+    LaunchedEffect(Unit) {
+        while (remaining > 0) {
+            delay(1000)
+            remaining--
+        }
+    }
+    Surface(
+        modifier = Modifier.fillMaxSize().testTag("future-self-letter"),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp)
+        ) {
+            Spacer(Modifier.height(40.dp))
+            Text(
+                "A LETTER FROM YOU",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 2.sp
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = letter,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.testTag("future-self-text")
+            )
+            Spacer(Modifier.height(32.dp))
+            Button(
+                onClick = onDone,
+                enabled = remaining == 0,
+                modifier = Modifier.fillMaxWidth().testTag("future-self-done")
+            ) {
+                Text(if (remaining > 0) "Read for ${remaining}s" else "I've read it. Proceed.")
+            }
+        }
+    }
+}
+
+const val MIN_PASSPHRASE_LEN = 20
 
 private fun startUninstall(context: Context) {
     val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager

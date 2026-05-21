@@ -14,9 +14,11 @@ object LobbyTuner {
         visitOrdinal: Int,
         escalating: Boolean,
         variableRatio: Boolean,
-        randomRoll: Double
+        randomRoll: Double,
+        userLevel: Int = 0
     ): Int {
-        var s = base
+        val eased = UserLevel.easedLobbySeconds(base, userLevel)
+        var s = eased
         if (escalating && visitOrdinal > 0) s += visitOrdinal * ESCALATE_STEP_S
         if (variableRatio && randomRoll < VARIABLE_RATIO_CHANCE) s += VARIABLE_RATIO_PENALTY_S
         return s

@@ -38,6 +38,17 @@ class LobbyTunerTest {
     }
 
     @Test
+    fun userLevel_easesBase() {
+        assertEquals(7, LobbyTuner.countdownSeconds(
+            visitOrdinal = 0,
+            escalating = false,
+            variableRatio = false,
+            randomRoll = 0.99,
+            userLevel = 3
+        ))
+    }
+
+    @Test
     fun replacement_isStableAndInPool() {
         val a = LobbyTuner.replacement(42L)
         val b = LobbyTuner.replacement(42L)
