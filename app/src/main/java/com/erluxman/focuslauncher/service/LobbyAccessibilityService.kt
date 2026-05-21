@@ -22,9 +22,13 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val distractionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val lobbyEnabledFlow = MutableStateFlow(true)
     private val dimmingEnabledFlow = MutableStateFlow(true)
+    private val escalatingEnabledFlow = MutableStateFlow(true)
+    private val variableRatioEnabledFlow = MutableStateFlow(true)
     private var lastIntercept: Pair<String, Long>? = null
     private var lastDistractionPackage: String? = null
     private var lastDistractionStartMs: Long = 0L
+    private val visitCountToday = mutableMapOf<String, Int>()
+    private var visitCountDate: String = ""
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -40,6 +44,19 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { prefs.distractionPackages.collect { distractionsFlow.value = it } }
         scope.launch { prefs.technique(PrefKeys.TECH_LOBBY).collect { lobbyEnabledFlow.value = it } }
         scope.launch { prefs.technique(PrefKeys.TECH_DIMMING).collect { dimmingEnabledFlow.value = it } }
+        scope.launch { prefs.technique(PrefKeys.TECH_ESCALATING).collect { escalatingEnabledFlow.value = it } }
+        scope.launch { prefs.technique(PrefKeys.TECH_VARIABLE_RATIO).collect { variableRatioEnabledFlow.value = it } }
+    }
+
+    private fun bumpAndGetVisitOrdinal(pkg: String): Int {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        if (today != visitCountDate) {
+            visitCountToday.clear()
+            visitCountDate = today
+        }
+        val current = visitCountToday[pkg] ?: 0
+        visitCountToday[pkg] = current + 1
+        return current
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -80,9 +97,23 @@ class LobbyAccessibilityService : AccessibilityService() {
         if (lastPkg == pkg && now - lastTs < 30_000L) return
         lastIntercept = pkg to now
 
+        val visitOrdinal = bumpAndGetVisitOrdinal(pkg)
+        val seconds = LobbyTuner.countdownSeconds(
+            visitOrdinal = visitOrdinal,
+            escalating = escalatingEnabledFlow.value,
+            variableRatio = variableRatioEnabledFlow.value,
+            randomRoll = kotlin.random.Random.Default.nextDouble()
+        )
+        val harderMath = LobbyTuner.isHarderMath(
+            variableRatio = variableRatioEnabledFlow.value,
+            randomRoll = kotlin.random.Random.Default.nextDouble()
+        )
+
         val intent = Intent(this, LobbyActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(LobbyActivity.EXTRA_TARGET_PACKAGE, pkg)
+            putExtra(LobbyActivity.EXTRA_COUNTDOWN_SECONDS, seconds)
+            putExtra(LobbyActivity.EXTRA_HARDER_MATH, harderMath)
         }
         startActivity(intent)
     }

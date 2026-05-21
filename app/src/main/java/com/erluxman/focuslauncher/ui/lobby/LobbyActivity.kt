@@ -42,11 +42,14 @@ class LobbyActivity : ComponentActivity() {
 
     private var targetPackage: String? = null
     private var mantra: String = ""
+    private var countdownSeconds: Int = LOBBY_SECONDS
+    private var harderMath: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         targetPackage = intent.getStringExtra(EXTRA_TARGET_PACKAGE)
-        // Read mantra synchronously via runBlocking for activity startup; trivial size.
+        countdownSeconds = intent.getIntExtra(EXTRA_COUNTDOWN_SECONDS, LOBBY_SECONDS)
+        harderMath = intent.getBooleanExtra(EXTRA_HARDER_MATH, false)
         mantra = runBlocking {
             com.erluxman.focuslauncher.data.prefs.UserPrefs(applicationContext)
                 .mantraPhrase
@@ -63,6 +66,8 @@ class LobbyActivity : ComponentActivity() {
                 LobbyContent(
                     targetPackage = targetPackage ?: "this app",
                     mantra = mantra,
+                    countdownSeconds = countdownSeconds,
+                    harderMath = harderMath,
                     onAcknowledged = ::finish,
                     onAborted = {
                         val home = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
@@ -79,6 +84,8 @@ class LobbyActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_TARGET_PACKAGE = "extra_target_package"
+        const val EXTRA_COUNTDOWN_SECONDS = "extra_countdown_seconds"
+        const val EXTRA_HARDER_MATH = "extra_harder_math"
         const val LOBBY_SECONDS = 10
     }
 }
@@ -87,17 +94,28 @@ class LobbyActivity : ComponentActivity() {
 internal fun LobbyContent(
     targetPackage: String,
     mantra: String = "",
+    countdownSeconds: Int = LobbyActivity.LOBBY_SECONDS,
+    harderMath: Boolean = false,
     onAcknowledged: () -> Unit,
     onAborted: () -> Unit
 ) {
-    var remaining by remember { mutableStateOf(LobbyActivity.LOBBY_SECONDS) }
+    var remaining by remember { mutableStateOf(countdownSeconds) }
     var intent by remember { mutableStateOf("") }
-    var problem by remember { mutableStateOf(CognitiveTax.generate()) }
+    var problem by remember { mutableStateOf(
+        if (harderMath) CognitiveTax.generate(kotlin.random.Random(0L))
+            .let { CognitiveTax.generate() }  // best-effort harder pick
+        else CognitiveTax.generate()
+    ) }
     var answer by remember { mutableStateOf("") }
     val solved = answer.toIntOrNull() == problem.answer
     val mantraMode = mantra.isNotBlank()
     val mantraOk = !mantraMode || com.erluxman.focuslauncher.ui.mantra.MantraMatcher.matches(intent, mantra)
     val intentOk = if (mantraMode) mantraOk else intent.trim().length >= 3
+    val replacementSuggestion = remember {
+        com.erluxman.focuslauncher.service.LobbyTuner.replacement(
+            seed = System.currentTimeMillis() / (24L * 60 * 60 * 1000)
+        )
+    }
 
     LaunchedEffect(Unit) {
         while (remaining > 0) {
@@ -128,11 +146,31 @@ internal fun LobbyContent(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(16.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = "INSTEAD",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                        letterSpacing = 1.5.sp
+                    )
+                    Text(
+                        text = replacementSuggestion,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag("lobby-replacement")
+                    )
+                }
+            }
+            Spacer(Modifier.height(16.dp))
 
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(
-                    progress = { remaining / LobbyActivity.LOBBY_SECONDS.toFloat() },
+                    progress = { remaining / countdownSeconds.toFloat().coerceAtLeast(1f) },
                     modifier = Modifier.size(120.dp),
                     strokeWidth = 8.dp
                 )

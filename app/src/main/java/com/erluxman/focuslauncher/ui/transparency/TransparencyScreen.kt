@@ -68,6 +68,18 @@ private val TECHNIQUES = listOf(
         "Removing visual app icons cuts down on impulse opens. If you'd rather see a full grid, disable this.",
         PrefKeys.TECH_HIDDEN_DRAWER
     ),
+    Technique(
+        "Variable ratio punishment",
+        "Sometimes the Lobby is harder. Sometimes it isn't.",
+        "About 1 in 5 Lobby visits gets a longer countdown and a harder cognitive tax. This is textbook slot-machine psychology turned against itself — disable any time.",
+        PrefKeys.TECH_VARIABLE_RATIO
+    ),
+    Technique(
+        "Escalating lockout",
+        "Re-visiting the same app today makes the Lobby longer.",
+        "Each subsequent Lobby visit for the same flagged app today adds a few seconds to the countdown. Toggle off if it ever feels punitive without being useful.",
+        PrefKeys.TECH_ESCALATING
+    ),
 )
 
 @Composable
