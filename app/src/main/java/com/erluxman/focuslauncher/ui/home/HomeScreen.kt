@@ -351,6 +351,13 @@ fun HomeScreen(
                         )
                     }
                     item {
+                        NourishingSection(
+                            packages = uiState.nourishingPackages,
+                            onAdd = viewModel::addNourishing,
+                            onRemove = viewModel::removeNourishing
+                        )
+                    }
+                    item {
                         FutureLetterComposer(onSave = viewModel::saveFutureLetter)
                     }
                     item { WidgetSection() }
@@ -1964,6 +1971,67 @@ private fun TombstoneSection(
                         enabled = newName.isNotBlank(),
                         modifier = Modifier.testTag("tombstone-add")
                     ) { Text("Bury") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NourishingSection(
+    packages: Set<String>,
+    onAdd: (String) -> Unit,
+    onRemove: (String) -> Unit
+) {
+    var newPkg by remember { mutableStateOf("") }
+    Column(modifier = Modifier.testTag("nourishing-section")) {
+        SectionHeader("NOURISHING")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Packages here bypass the Lobby. Use for educational apps you actually want to use.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(8.dp))
+                packages.forEach { p ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = p,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(
+                            onClick = { onRemove(p) },
+                            modifier = Modifier.testTag("nourishing-remove-$p")
+                        ) { Text("Remove") }
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        value = newPkg,
+                        onValueChange = { newPkg = it.trim().take(80) },
+                        placeholder = { Text("com.example.duolingo") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f).testTag("nourishing-input")
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            onAdd(newPkg)
+                            newPkg = ""
+                        },
+                        enabled = newPkg.isNotBlank(),
+                        modifier = Modifier.testTag("nourishing-add")
+                    ) { Text("Mark") }
                 }
             }
         }

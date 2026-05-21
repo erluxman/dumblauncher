@@ -78,7 +78,8 @@ data class HomeUiState(
     val builderMode: Boolean = false,
     val sadVoice: String = "STERN",
     val sadSuppressedUntilMs: Long = 0L,
-    val celebrationMessage: String = ""
+    val celebrationMessage: String = "",
+    val nourishingPackages: Set<String> = emptySet()
 )
 
 class HomeViewModel(
@@ -280,6 +281,12 @@ class HomeViewModel(
                 .collect { (v, until) ->
                     _uiState.update { it.copy(sadVoice = v, sadSuppressedUntilMs = until) }
                 }
+        }
+
+        viewModelScope.launch {
+            prefs.nourishingPackages.collect { set ->
+                _uiState.update { it.copy(nourishingPackages = set) }
+            }
         }
 
         viewModelScope.launch {
@@ -644,7 +651,49 @@ class HomeViewModel(
     }
 
     fun toggleShutdownStep(step: String) {
-        viewModelScope.launch { prefs.toggleShutdownStep(step, todayIso()) }
+        viewModelScope.launch {
+            val today = todayIso()
+            prefs.toggleShutdownStep(step, today)
+            // After this toggle, if shutdown is fully complete and we haven't summarized today, write a day summary.
+            val doneSteps = prefs.shutdownDoneSteps.first()
+            val isDone = doneSteps.size >= SHUTDOWN_STEPS.size
+            val alreadySummarized = today in prefs.daySummaryDates.first()
+            if (isDone && !alreadySummarized) {
+                val state = _uiState.value
+                val text = com.erluxman.focuslauncher.service.DaySummary.build(
+                    dateIso = today,
+                    screenMinutes = state.screenMinutesToday,
+                    distractionMinutes = state.distractionMinutesToday,
+                    targetMinutes = state.dailyTargetMin,
+                    todosCompleted = state.todosCompletedToday,
+                    focusSessions = state.focusSessionsToday,
+                    oneThing = state.oneThingText
+                )
+                journalRepository.insert(
+                    com.erluxman.focuslauncher.data.local.entity.JournalEntryEntity(
+                        text = text,
+                        behaviorState = state.behaviorState,
+                        screenMinutes = state.screenMinutesToday
+                    )
+                )
+                prefs.markDaySummary(today)
+            }
+        }
+    }
+
+    fun addNourishing(pkg: String) {
+        if (pkg.isBlank()) return
+        viewModelScope.launch {
+            val current = prefs.nourishingPackages.first()
+            prefs.setNourishingPackages(current + pkg.trim())
+        }
+    }
+
+    fun removeNourishing(pkg: String) {
+        viewModelScope.launch {
+            val current = prefs.nourishingPackages.first()
+            prefs.setNourishingPackages(current - pkg)
+        }
     }
 
     fun voteIdentity(isBuilder: Boolean) {

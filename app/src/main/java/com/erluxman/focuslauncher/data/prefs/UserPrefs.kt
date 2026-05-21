@@ -90,6 +90,9 @@ object PrefKeys {
     val CELEBRATION_LAST_STREAK = intPreferencesKey("celebration_last_streak")
     val CELEBRATION_LAST_LEVEL = intPreferencesKey("celebration_last_level")
 
+    val NOURISHING_PACKAGES = stringSetPreferencesKey("nourishing_packages")
+    val DAY_SUMMARY_DATES = stringSetPreferencesKey("day_summary_dates")  // ISO dates already summarized
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -190,6 +193,9 @@ class UserPrefs(private val context: Context) {
     val sadSuppressedUntil: Flow<Long> = store.data.map { it[PrefKeys.SAD_SUPPRESSED_UNTIL] ?: 0L }
     val celebrationLastStreak: Flow<Int> = store.data.map { it[PrefKeys.CELEBRATION_LAST_STREAK] ?: 0 }
     val celebrationLastLevel: Flow<Int> = store.data.map { it[PrefKeys.CELEBRATION_LAST_LEVEL] ?: 0 }
+
+    val nourishingPackages: Flow<Set<String>> = store.data.map { it[PrefKeys.NOURISHING_PACKAGES] ?: emptySet() }
+    val daySummaryDates: Flow<Set<String>> = store.data.map { it[PrefKeys.DAY_SUMMARY_DATES] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -446,6 +452,17 @@ class UserPrefs(private val context: Context) {
         store.edit {
             it[PrefKeys.SAD_DISMISS_COUNT] = 0
             it[PrefKeys.SAD_SUPPRESSED_UNTIL] = 0L
+        }
+    }
+
+    suspend fun setNourishingPackages(packages: Set<String>) {
+        store.edit { it[PrefKeys.NOURISHING_PACKAGES] = packages }
+    }
+
+    suspend fun markDaySummary(dateIso: String) {
+        store.edit {
+            val current = it[PrefKeys.DAY_SUMMARY_DATES] ?: emptySet()
+            it[PrefKeys.DAY_SUMMARY_DATES] = current + dateIso
         }
     }
 

@@ -27,6 +27,7 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val streakDaysFlow = MutableStateFlow(0)
     private val focusSessionsTodayFlow = MutableStateFlow(0)
     private val trackLevelFlow = MutableStateFlow(1)
+    private val nourishingFlow = MutableStateFlow<Set<String>>(emptySet())
     private val lockedTodayFlow = MutableStateFlow<Set<String>>(emptySet())
     private val unlockCountsFlow = MutableStateFlow<Set<String>>(emptySet())
     private var lastIntercept: Pair<String, Long>? = null
@@ -54,6 +55,7 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { prefs.streakDays.collect { streakDaysFlow.value = it } }
         scope.launch { prefs.focusSessionsToday.collect { focusSessionsTodayFlow.value = it } }
         scope.launch { prefs.trackLevel.collect { trackLevelFlow.value = it } }
+        scope.launch { prefs.nourishingPackages.collect { nourishingFlow.value = it } }
         scope.launch { prefs.lockedTodayPackages.collect { lockedTodayFlow.value = it } }
         scope.launch { prefs.unlockCounts.collect { unlockCountsFlow.value = it } }
     }
@@ -78,7 +80,8 @@ class LobbyAccessibilityService : AccessibilityService() {
         if (pkg == packageName) return
 
         val distractions = distractionsFlow.value
-        val isDistraction = pkg in distractions
+        val nourishing = nourishingFlow.value
+        val isDistraction = pkg in distractions && pkg !in nourishing
 
         // Per-foreground transition handling: dimming + session receipts + overstay lockout.
         if (lastDistractionPackage != null && lastDistractionPackage != pkg) {

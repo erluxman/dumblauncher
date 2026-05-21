@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        com.erluxman.focuslauncher.service.CheckInScheduler.scheduleAll(applicationContext)
         setContent {
             FocusLauncherTheme {
                 AppRoot()
