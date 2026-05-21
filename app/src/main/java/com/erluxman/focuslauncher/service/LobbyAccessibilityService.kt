@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 class LobbyAccessibilityService : AccessibilityService() {
 
+    private val ONE_AT_A_TIME_GAP_MS = 60_000L
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val distractionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val lobbyEnabledFlow = MutableStateFlow(true)
@@ -33,6 +34,8 @@ class LobbyAccessibilityService : AccessibilityService() {
     private var lastIntercept: Pair<String, Long>? = null
     private var lastDistractionPackage: String? = null
     private var lastDistractionStartMs: Long = 0L
+    private var lastDistractionExitMs: Long = 0L
+    private var lastDistractionExitPkg: String? = null
     private val visitCountToday = mutableMapOf<String, Int>()
     private var visitCountDate: String = ""
 
@@ -105,6 +108,8 @@ class LobbyAccessibilityService : AccessibilityService() {
                     android.widget.Toast.makeText(this, line, android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
+            lastDistractionExitMs = System.currentTimeMillis()
+            lastDistractionExitPkg = exitedPkg
             if (!isDistraction) {
                 DimmingOverlay.stop(this)
                 lastDistractionPackage = null
@@ -120,6 +125,26 @@ class LobbyAccessibilityService : AccessibilityService() {
 
         if (!lobbyEnabledFlow.value) return
         if (!isDistraction) return
+
+        // RESTRICT-012 One App at a Time: if user is opening a *different* distraction
+        // within 60s of exiting a previous one, redirect home.
+        val nowWall = System.currentTimeMillis()
+        val recentlyExited = lastDistractionExitPkg
+        if (recentlyExited != null && recentlyExited != pkg &&
+            nowWall - lastDistractionExitMs < ONE_AT_A_TIME_GAP_MS
+        ) {
+            android.widget.Toast.makeText(
+                this,
+                "One distraction at a time. Wait 60s.",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            val home = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_HOME)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(home)
+            return
+        }
 
         // If this package is locked-for-today, redirect home and toast.
         val today = todayIsoLocal()

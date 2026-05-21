@@ -234,6 +234,15 @@ fun HomeScreen(
                             onToggleBuilder = viewModel::setBuilderMode
                         )
                     }
+                    item {
+                        DomainTracksCard(tracks = uiState.domainTracks)
+                    }
+                    item {
+                        EmergencyPassChip(
+                            passes = uiState.emergencyPasses,
+                            onSpend = viewModel::spendEmergencyPass
+                        )
+                    }
                     if (uiState.trackRecalibrated) {
                         item {
                             RecalibrationBanner(
@@ -1715,6 +1724,95 @@ private fun TrackCard(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DomainTracksCard(tracks: Map<String, Triple<Int, Int, Int>>) {
+    if (tracks.isEmpty()) return
+    val targetPts = com.erluxman.focuslauncher.service.TrackSystem.POINTS_PER_LEVEL
+    Column(modifier = Modifier.testTag("domain-tracks-card")) {
+        SectionHeader("DOMAIN TRACKS")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                tracks.toSortedMap().forEach { (domain, snapshot) ->
+                    val (level, points, miss) = snapshot
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = domain.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.width(80.dp)
+                        )
+                        Text(
+                            "L$level",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        LinearProgressIndicator(
+                            progress = { (points.toFloat() / targetPts).coerceIn(0f, 1f) },
+                            modifier = Modifier.weight(1f).height(4.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "$points/$targetPts",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        if (miss > 0) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "miss $miss",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmergencyPassChip(passes: Int, onSpend: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("emergency-pass-chip"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "EMERGENCY PASSES",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    letterSpacing = 1.5.sp
+                )
+                Text(
+                    "$passes / 5 this week",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            TextButton(
+                onClick = onSpend,
+                enabled = passes > 0,
+                modifier = Modifier.testTag("emergency-spend")
+            ) { Text("Spend") }
         }
     }
 }

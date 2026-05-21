@@ -34,15 +34,36 @@ sealed class Screen {
 }
 
 class MainActivity : ComponentActivity() {
+
+    private var faceDownDetector: com.erluxman.focuslauncher.service.FaceDownDetector? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         com.erluxman.focuslauncher.service.CheckInScheduler.scheduleAll(applicationContext)
+        faceDownDetector = com.erluxman.focuslauncher.service.FaceDownDetector(
+            applicationContext
+        ) {
+            val line = com.erluxman.focuslauncher.service.Applause
+                .maybeLine(elapsedMs = 0L, seed = System.currentTimeMillis())
+                ?: "phone down. that's a win."
+            android.widget.Toast.makeText(applicationContext, line, android.widget.Toast.LENGTH_SHORT).show()
+        }
         setContent {
             FocusLauncherTheme {
                 AppRoot()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        faceDownDetector?.start()
+    }
+
+    override fun onPause() {
+        faceDownDetector?.stop()
+        super.onPause()
     }
 }
 

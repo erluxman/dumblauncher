@@ -81,7 +81,9 @@ data class HomeUiState(
     val celebrationMessage: String = "",
     val nourishingPackages: Set<String> = emptySet(),
     val baselineProposedTarget: Int? = null,
-    val hourlyMinutes: IntArray = IntArray(24)
+    val hourlyMinutes: IntArray = IntArray(24),
+    val domainTracks: Map<String, Triple<Int, Int, Int>> = emptyMap(),  // domain → (level, points, miss)
+    val emergencyPasses: Int = 5
 )
 
 class HomeViewModel(
@@ -105,6 +107,7 @@ class HomeViewModel(
         rollStreakIfNewDay()
         rollTimeDebtIfNewDay()
         rollDomainStreaks()
+        ensureEmergencyPassesForWeek()
         recordBaselineSample()
         observeHeatmap()
         startDreamModeClock()
@@ -325,6 +328,26 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.nourishingPackages.collect { set ->
                 _uiState.update { it.copy(nourishingPackages = set) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.domainTracks.collect { set ->
+                val map = set.mapNotNull { e ->
+                    val parts = e.split("|", limit = 5)
+                    if (parts.size != 5) return@mapNotNull null
+                    val level = parts[1].toIntOrNull() ?: return@mapNotNull null
+                    val points = parts[2].toIntOrNull() ?: return@mapNotNull null
+                    val miss = parts[3].toIntOrNull() ?: return@mapNotNull null
+                    parts[0] to Triple(level, points, miss)
+                }.toMap()
+                _uiState.update { it.copy(domainTracks = map) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.emergencyPasses.collect { n ->
+                _uiState.update { it.copy(emergencyPasses = n) }
             }
         }
 
@@ -567,11 +590,30 @@ class HomeViewModel(
         viewModelScope.launch {
             val today = todayIso()
             val current = prefs.domainStreaks.first()
+            val currentTracks = prefs.domainTracks.first()
             fun forDomain(domain: String): Triple<Int, Int, String> {
                 val entry = current.firstOrNull { it.startsWith("$domain|") }
                 val parts = entry?.split("|", limit = 4) ?: return Triple(0, 0, "")
                 if (parts.size != 4) return Triple(0, 0, "")
                 return Triple(parts[1].toIntOrNull() ?: 0, parts[2].toIntOrNull() ?: 0, parts[3])
+            }
+
+            fun trackFor(domain: String): com.erluxman.focuslauncher.service.TrackSystem.Snapshot {
+                val entry = currentTracks.firstOrNull { it.startsWith("$domain|") }
+                val parts = entry?.split("|", limit = 5)
+                return if (parts != null && parts.size == 5) {
+                    com.erluxman.focuslauncher.service.TrackSystem.Snapshot(
+                        level = parts[1].toIntOrNull() ?: 1,
+                        pointsToward = parts[2].toIntOrNull() ?: 0,
+                        missStreak = parts[3].toIntOrNull() ?: 0
+                    )
+                } else com.erluxman.focuslauncher.service.TrackSystem.Snapshot(1, 0, 0)
+            }
+
+            suspend fun rollTrack(domain: String, hit: Boolean, lastDate: String) {
+                if (lastDate == today) return
+                val next = com.erluxman.focuslauncher.service.TrackSystem.applyDay(trackFor(domain), hit)
+                prefs.updateDomainTrack(domain, next.level, next.pointsToward, next.missStreak, today)
             }
 
             // FOCUS: at least one focus session yesterday → continues; today's date prevents re-roll.
@@ -583,6 +625,7 @@ class HomeViewModel(
                 val hit = sessionsYesterday > 0
                 val (days, best) = streakNext(focus.first, focus.second, hit)
                 prefs.updateDomainStreak("focus", days, best, today)
+                rollTrack("focus", hit, focus.third)
             }
 
             // CREATION: at least one todo completed yesterday → continues.
@@ -599,6 +642,7 @@ class HomeViewModel(
                 val hit = recent.any { it in yStart until yEnd }
                 val (days, best) = streakNext(creation.first, creation.second, hit)
                 prefs.updateDomainStreak("creation", days, best, today)
+                rollTrack("creation", hit, creation.third)
             }
 
             // SLEEP: presence of morning steps done yesterday = went to bed on time proxy.
@@ -609,8 +653,24 @@ class HomeViewModel(
                 val hit = mDate == yesterdayIso() && mSteps.size >= MORNING_STEPS.size
                 val (days, best) = streakNext(sleep.first, sleep.second, hit)
                 prefs.updateDomainStreak("sleep", days, best, today)
+                rollTrack("sleep", hit, sleep.third)
             }
         }
+    }
+
+    private fun ensureEmergencyPassesForWeek() {
+        viewModelScope.launch {
+            val cal = Calendar.getInstance()
+            val week = "%d-W%02d".format(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.WEEK_OF_YEAR)
+            )
+            prefs.resetEmergencyPassesIfNewWeek(week)
+        }
+    }
+
+    fun spendEmergencyPass() {
+        viewModelScope.launch { prefs.spendEmergencyPass() }
     }
 
     private fun streakNext(currentDays: Int, currentBest: Int, hit: Boolean): Pair<Int, Int> {

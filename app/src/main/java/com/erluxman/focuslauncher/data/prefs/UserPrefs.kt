@@ -96,6 +96,12 @@ object PrefKeys {
     val BASELINE_SAMPLES = stringSetPreferencesKey("baseline_samples")  // "iso|minutes"
     val BASELINE_APPLIED = booleanPreferencesKey("baseline_applied")
 
+    /** Per-domain track snapshots. Format: "domain|level|points|miss|date". */
+    val DOMAIN_TRACKS = stringSetPreferencesKey("domain_tracks")
+
+    val EMERGENCY_PASSES = intPreferencesKey("emergency_passes")
+    val EMERGENCY_WEEK = stringPreferencesKey("emergency_week")  // yyyy-Www
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -202,6 +208,10 @@ class UserPrefs(private val context: Context) {
 
     val baselineSamples: Flow<Set<String>> = store.data.map { it[PrefKeys.BASELINE_SAMPLES] ?: emptySet() }
     val baselineApplied: Flow<Boolean> = store.data.map { it[PrefKeys.BASELINE_APPLIED] ?: false }
+
+    val domainTracks: Flow<Set<String>> = store.data.map { it[PrefKeys.DOMAIN_TRACKS] ?: emptySet() }
+    val emergencyPasses: Flow<Int> = store.data.map { it[PrefKeys.EMERGENCY_PASSES] ?: 0 }
+    val emergencyWeek: Flow<String> = store.data.map { it[PrefKeys.EMERGENCY_WEEK].orEmpty() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -476,6 +486,36 @@ class UserPrefs(private val context: Context) {
 
     suspend fun markBaselineApplied() {
         store.edit { it[PrefKeys.BASELINE_APPLIED] = true }
+    }
+
+    suspend fun updateDomainTrack(domain: String, level: Int, points: Int, miss: Int, dateIso: String) {
+        store.edit {
+            val current = it[PrefKeys.DOMAIN_TRACKS] ?: emptySet()
+            val others = current.filterNot { e -> e.startsWith("$domain|") }.toSet()
+            it[PrefKeys.DOMAIN_TRACKS] = others + "$domain|$level|$points|$miss|$dateIso"
+        }
+    }
+
+    suspend fun resetEmergencyPassesIfNewWeek(thisWeek: String) {
+        store.edit {
+            val last = it[PrefKeys.EMERGENCY_WEEK]
+            if (last != thisWeek) {
+                it[PrefKeys.EMERGENCY_PASSES] = 5
+                it[PrefKeys.EMERGENCY_WEEK] = thisWeek
+            }
+        }
+    }
+
+    suspend fun spendEmergencyPass(): Boolean {
+        var spent = false
+        store.edit {
+            val current = it[PrefKeys.EMERGENCY_PASSES] ?: 0
+            if (current > 0) {
+                it[PrefKeys.EMERGENCY_PASSES] = current - 1
+                spent = true
+            }
+        }
+        return spent
     }
 
     suspend fun markDaySummary(dateIso: String) {
