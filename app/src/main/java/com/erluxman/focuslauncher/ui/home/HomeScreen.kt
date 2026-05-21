@@ -134,11 +134,18 @@ fun HomeScreen(
                     }
                 }
 
-                if (uiState.behaviorState in setOf("SINKING", "DROWNING")) {
+                if (uiState.behaviorState in setOf("SINKING", "DROWNING") && uiState.behaviorIndicatorEnabled) {
                     Spacer(Modifier.height(16.dp))
+                    val sadSelfMessage = remember(uiState.behaviorState, uiState.whyHere) {
+                        com.erluxman.focuslauncher.service.SadSelfEngine.pick(
+                            state = uiState.behaviorState,
+                            why = uiState.whyHere,
+                            seed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt()
+                        )
+                    }
                     InterventionBanner(
                         state = uiState.behaviorState,
-                        whyHere = uiState.whyHere,
+                        whyHere = sadSelfMessage,
                         onPause = { showInterventionDialog = true }
                     )
                 }
@@ -275,10 +282,7 @@ internal fun InterventionBanner(state: String, whyHere: String, onPause: () -> U
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (whyHere.isBlank())
-                    "You're in $state. Step away for a minute."
-                else
-                    "You said: \"$whyHere\" — and you're in $state.",
+                text = whyHere.ifBlank { "You're in $state. Step away for a minute." },
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.height(8.dp))
