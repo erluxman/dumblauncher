@@ -756,7 +756,7 @@ fun EmptyWidgetPlaceholder() {
             ),
         contentAlignment = Alignment.Center
     ) {
-        Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+        Icon(Icons.Default.Add, contentDescription = "Empty widget slot", tint = MaterialTheme.colorScheme.outline)
     }
 }
 

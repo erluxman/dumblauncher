@@ -44,13 +44,18 @@ class LobbyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         targetPackage = intent.getStringExtra(EXTRA_TARGET_PACKAGE)
 
+        // Block the back button — user must either Continue (gated) or Abort.
+        onBackPressedDispatcher.addCallback(this, object :
+            androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = Unit
+        })
+
         setContent {
             FocusLauncherTheme {
                 LobbyContent(
                     targetPackage = targetPackage ?: "this app",
                     onAcknowledged = ::finish,
                     onAborted = {
-                        // Send user back home rather than into the distraction app.
                         val home = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
                             addCategory(android.content.Intent.CATEGORY_HOME)
                             addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -61,10 +66,6 @@ class LobbyActivity : ComponentActivity() {
                 )
             }
         }
-    }
-
-    override fun onBackPressed() {
-        // Block back button — must declare or abort.
     }
 
     companion object {
