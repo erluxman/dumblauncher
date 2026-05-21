@@ -247,6 +247,22 @@ internal fun LobbyContent(
                 minLines = if (mantraReps > 1) mantraReps else 2
             )
 
+            if (mantraMode) {
+                Spacer(Modifier.height(8.dp))
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                val voice = remember { com.erluxman.focuslauncher.service.VoiceMantra(ctx) }
+                TextButton(
+                    onClick = {
+                        voice.recognize { spoken ->
+                            if (!spoken.isNullOrBlank()) {
+                                intent = if (intent.isBlank()) spoken else "$intent\n$spoken"
+                            }
+                        }
+                    },
+                    modifier = Modifier.testTag("lobby-mantra-voice")
+                ) { Text("Speak mantra instead") }
+            }
+
             Spacer(Modifier.height(16.dp))
 
             Text(
