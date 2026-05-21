@@ -24,6 +24,7 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val dimmingEnabledFlow = MutableStateFlow(true)
     private var lastIntercept: Pair<String, Long>? = null
     private var lastDistractionPackage: String? = null
+    private var lastDistractionStartMs: Long = 0L
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -49,15 +50,24 @@ class LobbyAccessibilityService : AccessibilityService() {
         val distractions = distractionsFlow.value
         val isDistraction = pkg in distractions
 
-        // Dimming: tracks per-foreground transitions.
-        if (lastDistractionPackage != null && lastDistractionPackage != pkg && !isDistraction) {
-            DimmingOverlay.stop(this)
-            lastDistractionPackage = null
+        // Per-foreground transition handling: dimming + session receipts.
+        if (lastDistractionPackage != null && lastDistractionPackage != pkg) {
+            // Leaving (or switching out of) a distraction app.
+            val elapsed = System.currentTimeMillis() - lastDistractionStartMs
+            val toastText = SessionReceipt.format(elapsed, prettyLabel(lastDistractionPackage!!))
+            if (toastText != null) {
+                android.widget.Toast.makeText(this, toastText, android.widget.Toast.LENGTH_LONG).show()
+            }
+            if (!isDistraction) {
+                DimmingOverlay.stop(this)
+                lastDistractionPackage = null
+            }
         }
-        if (isDistraction && dimmingEnabledFlow.value) {
+        if (isDistraction) {
             if (lastDistractionPackage != pkg) {
-                DimmingOverlay.start(this)
                 lastDistractionPackage = pkg
+                lastDistractionStartMs = System.currentTimeMillis()
+                if (dimmingEnabledFlow.value) DimmingOverlay.start(this)
             }
         }
 
@@ -83,5 +93,12 @@ class LobbyAccessibilityService : AccessibilityService() {
         super.onDestroy()
         DimmingOverlay.stop(this)
         scope.cancel()
+    }
+
+    private fun prettyLabel(pkg: String): String = try {
+        val pm = packageManager
+        pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
+    } catch (_: Exception) {
+        pkg
     }
 }
