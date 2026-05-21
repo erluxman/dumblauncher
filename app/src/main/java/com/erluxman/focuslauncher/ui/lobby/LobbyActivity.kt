@@ -74,13 +74,16 @@ class LobbyActivity : ComponentActivity() {
 }
 
 @androidx.compose.runtime.Composable
-private fun LobbyContent(
+internal fun LobbyContent(
     targetPackage: String,
     onAcknowledged: () -> Unit,
     onAborted: () -> Unit
 ) {
     var remaining by remember { mutableStateOf(LobbyActivity.LOBBY_SECONDS) }
     var intent by remember { mutableStateOf("") }
+    var problem by remember { mutableStateOf(CognitiveTax.generate()) }
+    var answer by remember { mutableStateOf("") }
+    val solved = answer.toIntOrNull() == problem.answer
 
     LaunchedEffect(Unit) {
         while (remaining > 0) {
@@ -140,16 +143,41 @@ private fun LobbyContent(
                 minLines = 2
             )
 
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "Cognitive tax: ${problem.prompt} = ?",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value = answer,
+                onValueChange = { answer = it.filter { c -> c.isDigit() || c == '-' } },
+                modifier = Modifier.fillMaxWidth().testTag("lobby-tax-input"),
+                placeholder = { Text("Type the answer") },
+                singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                )
+            )
+
             Spacer(Modifier.height(24.dp))
 
             Button(
                 onClick = onAcknowledged,
-                enabled = remaining == 0 && intent.trim().length >= 3,
+                enabled = remaining == 0 && intent.trim().length >= 3 && solved,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("lobby-continue")
             ) {
-                Text(if (remaining == 0) "Continue" else "Wait ${remaining}s")
+                Text(
+                    when {
+                        remaining > 0 -> "Wait ${remaining}s"
+                        !solved -> "Solve the math"
+                        intent.trim().length < 3 -> "Declare your intent"
+                        else -> "Continue"
+                    }
+                )
             }
             Spacer(Modifier.height(8.dp))
             TextButton(
