@@ -420,6 +420,15 @@ fun SetupDialog(
 
                 Button(
                     onClick = {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            android.net.Uri.parse("package:${context.packageName}"))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Grant Overlay (Dimming)") }
+
+                Button(
+                    onClick = {
                         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                     },
                     modifier = Modifier.fillMaxWidth()

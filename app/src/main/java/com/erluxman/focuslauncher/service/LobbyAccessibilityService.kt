@@ -21,7 +21,9 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val distractionsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val lobbyEnabledFlow = MutableStateFlow(true)
+    private val dimmingEnabledFlow = MutableStateFlow(true)
     private var lastIntercept: Pair<String, Long>? = null
+    private var lastDistractionPackage: String? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -36,14 +38,31 @@ class LobbyAccessibilityService : AccessibilityService() {
         val prefs = UserPrefs(applicationContext)
         scope.launch { prefs.distractionPackages.collect { distractionsFlow.value = it } }
         scope.launch { prefs.technique(PrefKeys.TECH_LOBBY).collect { lobbyEnabledFlow.value = it } }
+        scope.launch { prefs.technique(PrefKeys.TECH_DIMMING).collect { dimmingEnabledFlow.value = it } }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
         if (pkg == packageName) return
+
+        val distractions = distractionsFlow.value
+        val isDistraction = pkg in distractions
+
+        // Dimming: tracks per-foreground transitions.
+        if (lastDistractionPackage != null && lastDistractionPackage != pkg && !isDistraction) {
+            DimmingOverlay.stop(this)
+            lastDistractionPackage = null
+        }
+        if (isDistraction && dimmingEnabledFlow.value) {
+            if (lastDistractionPackage != pkg) {
+                DimmingOverlay.start(this)
+                lastDistractionPackage = pkg
+            }
+        }
+
         if (!lobbyEnabledFlow.value) return
-        if (pkg !in distractionsFlow.value) return
+        if (!isDistraction) return
 
         // Debounce: don't re-intercept the same package within 30s.
         val now = SystemClock.elapsedRealtime()
@@ -62,6 +81,7 @@ class LobbyAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        DimmingOverlay.stop(this)
         scope.cancel()
     }
 }
