@@ -83,7 +83,10 @@ data class HomeUiState(
     val baselineProposedTarget: Int? = null,
     val hourlyMinutes: IntArray = IntArray(24),
     val domainTracks: Map<String, Triple<Int, Int, Int>> = emptyMap(),  // domain → (level, points, miss)
-    val emergencyPasses: Int = 5
+    val emergencyPasses: Int = 5,
+    val calendarEvents: List<com.erluxman.focuslauncher.service.CalendarReader.Event> = emptyList(),
+    val activeEventTitle: String = "",
+    val isFocusBlock: Boolean = false
 )
 
 class HomeViewModel(
@@ -832,7 +835,20 @@ class HomeViewModel(
             while (true) {
                 val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
                 val dream = hour >= DREAM_MODE_START_HOUR || hour < DREAM_MODE_END_HOUR
-                _uiState.update { it.copy(isDreamMode = dream, currentHour = hour) }
+                val events = runCatching {
+                    com.erluxman.focuslauncher.service.CalendarReader.todayEvents(appContext)
+                }.getOrDefault(emptyList())
+                val active = com.erluxman.focuslauncher.service.CalendarReader.activeEvent(events)
+                val isFocus = com.erluxman.focuslauncher.service.CalendarReader.isFocusBlock(active)
+                _uiState.update {
+                    it.copy(
+                        isDreamMode = dream,
+                        currentHour = hour,
+                        calendarEvents = events,
+                        activeEventTitle = active?.title.orEmpty(),
+                        isFocusBlock = isFocus
+                    )
+                }
                 delay(60_000)
             }
         }

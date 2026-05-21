@@ -243,6 +243,15 @@ fun HomeScreen(
                             onSpend = viewModel::spendEmergencyPass
                         )
                     }
+                    if (uiState.calendarEvents.isNotEmpty()) {
+                        item {
+                            CalendarStrip(
+                                events = uiState.calendarEvents,
+                                activeTitle = uiState.activeEventTitle,
+                                isFocusBlock = uiState.isFocusBlock
+                            )
+                        }
+                    }
                     if (uiState.trackRecalibrated) {
                         item {
                             RecalibrationBanner(
@@ -489,6 +498,30 @@ fun HomeScreen(
                                 putExtra(Intent.EXTRA_SUBJECT, "FocusLauncher export (CSV)")
                             }
                             context.startActivity(Intent.createChooser(send, "Export data (CSV)"))
+                        }
+                    },
+                    onExportEncrypted = {
+                        showSetupDialog = false
+                        scope.launch {
+                            val passphrase = prefs.nuclearPassphrase.first()
+                            if (passphrase.length < 20) {
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "Set a Nuclear Passphrase first (Try-to-leave flow).",
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                                return@launch
+                            }
+                            val snapshot = buildExportSnapshot(prefs, todoRepository, projectRepository, journalRepository)
+                            val json = ExportBuilder.buildJson(snapshot, System.currentTimeMillis())
+                            val ct = com.erluxman.focuslauncher.service.EncryptedBackup
+                                .encrypt(json, passphrase.toCharArray())
+                            val send = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, ct)
+                                putExtra(Intent.EXTRA_SUBJECT, "FocusLauncher backup (encrypted)")
+                            }
+                            context.startActivity(Intent.createChooser(send, "Export encrypted backup"))
                         }
                     }
                 )
@@ -958,7 +991,8 @@ fun SetupDialog(
     onOpenMantra: () -> Unit = {},
     onOpenBoredom: () -> Unit = {},
     onExport: () -> Unit = {},
-    onExportCsv: () -> Unit = {}
+    onExportCsv: () -> Unit = {},
+    onExportEncrypted: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -1111,6 +1145,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-export-csv")
                 ) { Text("Export data (CSV)") }
+
+                TextButton(
+                    onClick = onExportEncrypted,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-export-encrypted")
+                ) { Text("Export data (Encrypted)") }
 
                 TextButton(
                     onClick = onOpenUninstall,
@@ -1777,6 +1818,61 @@ private fun DomainTracksCard(tracks: Map<String, Triple<Int, Int, Int>>) {
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CalendarStrip(
+    events: List<com.erluxman.focuslauncher.service.CalendarReader.Event>,
+    activeTitle: String,
+    isFocusBlock: Boolean
+) {
+    val fmt = remember { java.text.SimpleDateFormat("HH:mm", java.util.Locale.US) }
+    Column(modifier = Modifier.testTag("calendar-strip")) {
+        SectionHeader(if (isFocusBlock) "FOCUS BLOCK ACTIVE" else "TODAY'S CALENDAR")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = if (isFocusBlock)
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (activeTitle.isNotBlank()) {
+                    Text(
+                        text = "NOW: $activeTitle",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (isFocusBlock) {
+                        Text(
+                            "Even nourishing apps go through the Lobby until this ends.",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                events.take(5).forEach { ev ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${fmt.format(java.util.Date(ev.startMs))}–${fmt.format(java.util.Date(ev.endMs))}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.width(96.dp)
+                        )
+                        Text(
+                            text = ev.title,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

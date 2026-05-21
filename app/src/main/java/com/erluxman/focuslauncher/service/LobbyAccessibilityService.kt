@@ -84,7 +84,12 @@ class LobbyAccessibilityService : AccessibilityService() {
 
         val distractions = distractionsFlow.value
         val nourishing = nourishingFlow.value
-        val isDistraction = pkg in distractions && pkg !in nourishing
+        val inFocusBlock = CalendarReader.isFocusBlock(
+            CalendarReader.activeEvent(CalendarReader.todayEvents(applicationContext))
+        )
+        // During a calendar focus block (RESTRICT-010), even nourishing apps lose their bypass.
+        val effectiveNourishing = if (inFocusBlock) emptySet() else nourishing
+        val isDistraction = pkg in distractions && pkg !in effectiveNourishing
 
         // Per-foreground transition handling: dimming + session receipts + overstay lockout.
         if (lastDistractionPackage != null && lastDistractionPackage != pkg) {
