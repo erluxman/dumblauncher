@@ -67,6 +67,9 @@ object PrefKeys {
     val AFTER_FALL_DUE = stringPreferencesKey("after_fall_due_date")  // ritual due on this iso date
     val AFTER_FALL_STEPS = stringSetPreferencesKey("after_fall_steps")
 
+    val HOURLY_RATE_USD = intPreferencesKey("hourly_rate_usd")
+    val USER_AGE = intPreferencesKey("user_age")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -145,6 +148,9 @@ class UserPrefs(private val context: Context) {
     val streakFreezes: Flow<Int> = store.data.map { it[PrefKeys.STREAK_FREEZES] ?: 0 }
     val afterFallDue: Flow<String> = store.data.map { it[PrefKeys.AFTER_FALL_DUE].orEmpty() }
     val afterFallSteps: Flow<Set<String>> = store.data.map { it[PrefKeys.AFTER_FALL_STEPS] ?: emptySet() }
+
+    val hourlyRateUsd: Flow<Int> = store.data.map { it[PrefKeys.HOURLY_RATE_USD] ?: 0 }
+    val userAge: Flow<Int> = store.data.map { it[PrefKeys.USER_AGE] ?: 0 }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -320,6 +326,14 @@ class UserPrefs(private val context: Context) {
             it.remove(PrefKeys.AFTER_FALL_DUE)
             it.remove(PrefKeys.AFTER_FALL_STEPS)
         }
+    }
+
+    suspend fun setHourlyRate(usd: Int) {
+        store.edit { it[PrefKeys.HOURLY_RATE_USD] = usd.coerceIn(0, 9999) }
+    }
+
+    suspend fun setUserAge(age: Int) {
+        store.edit { it[PrefKeys.USER_AGE] = age.coerceIn(0, 120) }
     }
 
     suspend fun toggleAfterFallStep(step: String) {

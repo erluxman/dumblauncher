@@ -60,7 +60,11 @@ data class HomeUiState(
     val graceDays: Set<String> = emptySet(),
     val streakFreezes: Int = 0,
     val afterFallDueDate: String = "",
-    val afterFallStepsDone: Set<String> = emptySet()
+    val afterFallStepsDone: Set<String> = emptySet(),
+    val hourlyRateUsd: Int = 0,
+    val userAge: Int = 0,
+    val distractionMinutesToday: Int = 0,
+    val todosCompletedToday: Int = 0
 )
 
 class HomeViewModel(
@@ -128,7 +132,17 @@ class HomeViewModel(
                 todoRepository.allTodos,
                 projectRepository.activeProjects
             ) { todos, projects ->
-                _uiState.update { it.copy(todos = todos, projects = projects) }
+                _uiState.update {
+                    val today = todayIso()
+                    val cal = Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                    }
+                    val todosToday = todos.count { t ->
+                        t.isCompleted && (t.completedAt ?: 0L) >= cal.timeInMillis
+                    }
+                    it.copy(todos = todos, projects = projects, todosCompletedToday = todosToday)
+                }
             }.collect()
         }
     }
@@ -172,6 +186,13 @@ class HomeViewModel(
             prefs.moodPings.collect { set ->
                 _uiState.update { it.copy(moodPings = set.sortedDescending()) }
             }
+        }
+
+        viewModelScope.launch {
+            combine(prefs.hourlyRateUsd, prefs.userAge) { rate, age -> rate to age }
+                .collect { (rate, age) ->
+                    _uiState.update { it.copy(hourlyRateUsd = rate, userAge = age) }
+                }
         }
 
         viewModelScope.launch {
@@ -367,6 +388,11 @@ class HomeViewModel(
                 .takeIf { it > 0 } ?: (_uiState.value.dailyTargetMin.takeIf { it > 0 } ?: 180)
             val minutes = runCatching { UsageStatsHelper.todayScreenMinutes(appContext) }
                 .getOrDefault(0)
+            val distractions = prefs.distractionPackages.first()
+            val distractionMin = runCatching {
+                UsageStatsHelper.todayMinutesByPackage(appContext, distractions)
+                    .values.sum()
+            }.getOrDefault(0)
             val reading = UsageStatsHelper.deriveBehaviorState(minutes, target)
             // Recent behavior states (today + 3 prior) → crisis detection.
             val recent = buildList {
@@ -384,6 +410,7 @@ class HomeViewModel(
                     behaviorState = reading.state,
                     behaviorProgress = reading.progress,
                     screenMinutesToday = reading.screenMinutes,
+                    distractionMinutesToday = distractionMin,
                     crisisActive = crisis
                 )
             }

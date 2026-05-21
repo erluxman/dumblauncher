@@ -206,6 +206,18 @@ fun HomeScreen(
                             onCancelTomorrow = { iso -> viewModel.cancelGraceDay(iso) }
                         )
                     }
+                    item {
+                        InsightsCard(
+                            distractionMinutes = uiState.distractionMinutesToday,
+                            hourlyRate = uiState.hourlyRateUsd,
+                            userAge = uiState.userAge,
+                            todosCompletedToday = uiState.todosCompletedToday,
+                            focusSessionsToday = uiState.focusSessionsToday,
+                            timeBankTotalMin = uiState.timeBankTotalMin,
+                            onSetHourlyRate = { r -> scope.launch { prefs.setHourlyRate(r) } },
+                            onSetAge = { a -> scope.launch { prefs.setUserAge(a) } }
+                        )
+                    }
                     if (uiState.afterFallDueDate.isNotBlank()) {
                         item {
                             AfterFallCard(
@@ -1415,6 +1427,124 @@ fun SearchOverlay(
             }
         }
     }
+}
+
+@Composable
+private fun InsightsCard(
+    distractionMinutes: Int,
+    hourlyRate: Int,
+    userAge: Int,
+    todosCompletedToday: Int,
+    focusSessionsToday: Int,
+    timeBankTotalMin: Int,
+    onSetHourlyRate: (Int) -> Unit = {},
+    onSetAge: (Int) -> Unit = {}
+) {
+    val cost = com.erluxman.focuslauncher.service.InsightMath
+        .opportunityCost(distractionMinutes, hourlyRate.toDouble())
+    val lifeHours = com.erluxman.focuslauncher.service.InsightMath
+        .lifetimeHoursOnScreen(distractionMinutes, userAge)
+    val ratio = com.erluxman.focuslauncher.service.InsightMath
+        .ioRatio(distractionMinutes, todosCompletedToday, focusSessionsToday)
+    val projection = com.erluxman.focuslauncher.service.InsightMath
+        .compoundedBalance(timeBankTotalMin, days = 365)
+
+    Column(modifier = Modifier.testTag("insights-card")) {
+        SectionHeader("INSIGHTS")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (hourlyRate > 0) {
+                    InsightLine(
+                        label = "Cost today",
+                        value = "$${"%.2f".format(cost)}",
+                        sub = "${distractionMinutes}m × \$$hourlyRate/hr"
+                    )
+                }
+                if (userAge in 1..120) {
+                    Spacer(Modifier.height(8.dp))
+                    InsightLine(
+                        label = "If you keep this rate",
+                        value = "${lifeHours / 24 / 365} life-years",
+                        sub = "on screen, before age 80"
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                InsightLine(
+                    label = "I/O ratio",
+                    value = "%.2f".format(ratio),
+                    sub = "creation ÷ consumption today"
+                )
+                Spacer(Modifier.height(8.dp))
+                InsightLine(
+                    label = "Bank in 1 year",
+                    value = formatBankProjection(projection),
+                    sub = "compounded at ${"%.1f".format(com.erluxman.focuslauncher.service.InsightMath.DAILY_RATE * 100)}%/day"
+                )
+                if (hourlyRate == 0 || userAge == 0) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Personalize",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        var rate by remember { mutableStateOf("") }
+                        var age by remember { mutableStateOf("") }
+                        OutlinedTextField(
+                            value = rate,
+                            onValueChange = { rate = it.filter { c -> c.isDigit() }.take(4) },
+                            placeholder = { Text("$/hr") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f).testTag("insight-rate-input"),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                            )
+                        )
+                        OutlinedTextField(
+                            value = age,
+                            onValueChange = { age = it.filter { c -> c.isDigit() }.take(3) },
+                            placeholder = { Text("age") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f).testTag("insight-age-input"),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword
+                            )
+                        )
+                        Button(
+                            onClick = {
+                                rate.toIntOrNull()?.let(onSetHourlyRate)
+                                age.toIntOrNull()?.let(onSetAge)
+                            },
+                            modifier = Modifier.testTag("insight-save-button")
+                        ) { Text("Save") }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InsightLine(label: String, value: String, sub: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(sub, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+        }
+    }
+}
+
+private fun formatBankProjection(min: Int): String = when {
+    min >= 60 * 24 -> "${min / (60 * 24)}d ${(min / 60) % 24}h"
+    min >= 60 -> "${min / 60}h ${min % 60}m"
+    else -> "${min}m"
 }
 
 @Composable
