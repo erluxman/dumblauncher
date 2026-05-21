@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,6 +19,8 @@ object PrefKeys {
     val WHY_HERE = stringPreferencesKey("why_here")
     val DAILY_SCREEN_TIME_TARGET_MIN = intPreferencesKey("daily_target_min")
     val DISTRACTION_PACKAGES = stringSetPreferencesKey("distraction_packages")
+    val UNINSTALL_REQUESTED_AT = longPreferencesKey("uninstall_requested_at")
+    val VIP_CONTACTS = stringSetPreferencesKey("vip_contacts")
 
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
@@ -41,6 +44,12 @@ class UserPrefs(private val context: Context) {
     val distractionPackages: Flow<Set<String>> =
         store.data.map { it[PrefKeys.DISTRACTION_PACKAGES] ?: DEFAULT_DISTRACTIONS }
 
+    val uninstallRequestedAt: Flow<Long?> =
+        store.data.map { it[PrefKeys.UNINSTALL_REQUESTED_AT] }
+
+    val vipContacts: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.VIP_CONTACTS] ?: emptySet() }
+
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
 
@@ -62,6 +71,18 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setTechnique(key: Preferences.Key<Boolean>, value: Boolean) {
         store.edit { it[key] = value }
+    }
+
+    suspend fun startUninstallRequest(nowMs: Long = System.currentTimeMillis()) {
+        store.edit { it[PrefKeys.UNINSTALL_REQUESTED_AT] = nowMs }
+    }
+
+    suspend fun cancelUninstallRequest() {
+        store.edit { it.remove(PrefKeys.UNINSTALL_REQUESTED_AT) }
+    }
+
+    suspend fun setVipContacts(contacts: Set<String>) {
+        store.edit { it[PrefKeys.VIP_CONTACTS] = contacts }
     }
 
     companion object {

@@ -16,11 +16,15 @@ import com.erluxman.focuslauncher.ui.home.HomeScreen
 import com.erluxman.focuslauncher.ui.onboarding.OnboardingScreen
 import com.erluxman.focuslauncher.ui.theme.FocusLauncherTheme
 import com.erluxman.focuslauncher.ui.transparency.TransparencyScreen
+import com.erluxman.focuslauncher.ui.uninstall.UninstallScreen
+import com.erluxman.focuslauncher.ui.vip.VipContactsScreen
 
 sealed class Screen {
     data object Home : Screen()
     data object Onboarding : Screen()
     data object Transparency : Screen()
+    data object Uninstall : Screen()
+    data object Vip : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -51,11 +55,19 @@ private fun AppRoot() {
         current == Screen.Transparency -> {
             TransparencyScreen(prefs = prefs, onBack = { current = Screen.Home })
         }
+        current == Screen.Uninstall -> {
+            UninstallScreen(prefs = prefs, onBack = { current = Screen.Home })
+        }
+        current == Screen.Vip -> {
+            VipContactsScreen(prefs = prefs, onBack = { current = Screen.Home })
+        }
         else -> {
             HomeScreen(
                 prefs = prefs,
                 onOpenTransparency = { current = Screen.Transparency },
-                onReplayOnboarding = { current = Screen.Onboarding }
+                onReplayOnboarding = { current = Screen.Onboarding },
+                onOpenUninstall = { current = Screen.Uninstall },
+                onOpenVip = { current = Screen.Vip }
             )
         }
     }

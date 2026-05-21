@@ -59,7 +59,9 @@ import java.util.*
 fun HomeScreen(
     prefs: UserPrefs,
     onOpenTransparency: () -> Unit,
-    onReplayOnboarding: () -> Unit
+    onReplayOnboarding: () -> Unit,
+    onOpenUninstall: () -> Unit = {},
+    onOpenVip: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -215,6 +217,14 @@ fun HomeScreen(
                     onReplayOnboarding = {
                         showSetupDialog = false
                         onReplayOnboarding()
+                    },
+                    onOpenUninstall = {
+                        showSetupDialog = false
+                        onOpenUninstall()
+                    },
+                    onOpenVip = {
+                        showSetupDialog = false
+                        onOpenVip()
                     }
                 )
             }
@@ -332,7 +342,9 @@ private fun WhyHereCard(text: String) {
 fun SetupDialog(
     onDismiss: () -> Unit,
     onOpenTransparency: () -> Unit = {},
-    onReplayOnboarding: () -> Unit = {}
+    onReplayOnboarding: () -> Unit = {},
+    onOpenUninstall: () -> Unit = {},
+    onOpenVip: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -440,6 +452,20 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-transparency")
                 ) { Text("Transparency / Techniques") }
+
+                TextButton(
+                    onClick = onOpenVip,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-vip")
+                ) { Text("VIP Contacts") }
+
+                TextButton(
+                    onClick = onOpenUninstall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-uninstall")
+                ) { Text("Try to leave (72hr cooldown)") }
 
                 TextButton(
                     onClick = onReplayOnboarding,
