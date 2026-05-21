@@ -78,6 +78,12 @@ object PrefKeys {
     val FOCUS_POINTS = intPreferencesKey("focus_points")
     val ENERGY_ZONES = stringSetPreferencesKey("energy_zones")  // "0-4|HIGH"
 
+    val TRACK_LEVEL = intPreferencesKey("track_level")
+    val TRACK_POINTS = intPreferencesKey("track_points")
+    val TRACK_MISSES = intPreferencesKey("track_misses")
+    val TRACK_RECALIBRATED = booleanPreferencesKey("track_recalibrated")
+    val BUILDER_MODE = booleanPreferencesKey("builder_mode")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -166,6 +172,12 @@ class UserPrefs(private val context: Context) {
 
     val focusPoints: Flow<Int> = store.data.map { it[PrefKeys.FOCUS_POINTS] ?: 0 }
     val energyZones: Flow<Set<String>> = store.data.map { it[PrefKeys.ENERGY_ZONES] ?: emptySet() }
+
+    val trackLevel: Flow<Int> = store.data.map { it[PrefKeys.TRACK_LEVEL] ?: 1 }
+    val trackPoints: Flow<Int> = store.data.map { it[PrefKeys.TRACK_POINTS] ?: 0 }
+    val trackMisses: Flow<Int> = store.data.map { it[PrefKeys.TRACK_MISSES] ?: 0 }
+    val trackRecalibrated: Flow<Boolean> = store.data.map { it[PrefKeys.TRACK_RECALIBRATED] ?: false }
+    val builderMode: Flow<Boolean> = store.data.map { it[PrefKeys.BUILDER_MODE] ?: false }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -384,6 +396,23 @@ class UserPrefs(private val context: Context) {
             val replaced = "${parts[0]}|${parts[1]}|1|${parts[3]}"
             it[PrefKeys.FUTURE_LETTERS] = (current - entry) + replaced
         }
+    }
+
+    suspend fun applyTrackSnapshot(level: Int, points: Int, misses: Int, recalibrated: Boolean) {
+        store.edit {
+            it[PrefKeys.TRACK_LEVEL] = level
+            it[PrefKeys.TRACK_POINTS] = points
+            it[PrefKeys.TRACK_MISSES] = misses
+            it[PrefKeys.TRACK_RECALIBRATED] = recalibrated
+        }
+    }
+
+    suspend fun clearRecalibrated() {
+        store.edit { it[PrefKeys.TRACK_RECALIBRATED] = false }
+    }
+
+    suspend fun setBuilderMode(value: Boolean) {
+        store.edit { it[PrefKeys.BUILDER_MODE] = value }
     }
 
     suspend fun setEnergyZone(window: String, energy: String) {

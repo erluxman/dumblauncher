@@ -208,6 +208,23 @@ fun HomeScreen(
                         FocusPointsChip(points = uiState.focusPoints)
                     }
                     item {
+                        TrackCard(
+                            level = uiState.trackLevel,
+                            pointsToward = uiState.trackPoints,
+                            missStreak = uiState.trackMisses,
+                            builderMode = uiState.builderMode,
+                            onToggleBuilder = viewModel::setBuilderMode
+                        )
+                    }
+                    if (uiState.trackRecalibrated) {
+                        item {
+                            RecalibrationBanner(
+                                level = uiState.trackLevel,
+                                onAck = viewModel::ackTrackRecalibration
+                            )
+                        }
+                    }
+                    item {
                         EnergyZoneCard(
                             zones = uiState.energyZones,
                             currentHour = uiState.currentHour,
@@ -324,7 +341,7 @@ fun HomeScreen(
                     .padding(bottom = 24.dp)
             ) {
                 AppDock(
-                    dockApps = uiState.dockApps,
+                    dockApps = if (uiState.builderMode) uiState.dockApps.take(2) else uiState.dockApps,
                     onAppClick = { viewModel.launchApp(context, it) },
                     onSearchClick = { isSearching = true },
                     modifier = Modifier.align(Alignment.Center)
@@ -1488,6 +1505,101 @@ fun SearchOverlay(
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
             }
+        }
+    }
+}
+
+@Composable
+private fun TrackCard(
+    level: Int,
+    pointsToward: Int,
+    missStreak: Int,
+    builderMode: Boolean,
+    onToggleBuilder: (Boolean) -> Unit
+) {
+    val target = com.erluxman.focuslauncher.service.TrackSystem.POINTS_PER_LEVEL
+    Column(modifier = Modifier.testTag("track-card")) {
+        SectionHeader("TRACK")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "LEVEL $level",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "$pointsToward / $target days to next",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        if (missStreak > 0) {
+                            Text(
+                                "miss streak: $missStreak",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier
+                            .clickable { onToggleBuilder(!builderMode) }
+                            .testTag("builder-mode-toggle"),
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (builderMode) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = if (builderMode) "BUILDER" else "CONSUMER",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = { (pointsToward.toFloat() / target.toFloat()).coerceIn(0f, 1f) },
+                    modifier = Modifier.fillMaxWidth().height(4.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecalibrationBanner(level: Int, onAck: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("recalibration-banner"),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "RECALIBRATED TO LEVEL $level",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "You missed three in a row, so the track dropped a level. " +
+                    "This is recalibration, not punishment. The friction is lighter at this " +
+                    "level — get a clean week and you'll re-promote faster than the first time.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = onAck,
+                modifier = Modifier.testTag("recalibration-ack")
+            ) { Text("Got it") }
         }
     }
 }

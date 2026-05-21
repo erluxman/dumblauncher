@@ -26,6 +26,7 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val variableRatioEnabledFlow = MutableStateFlow(true)
     private val streakDaysFlow = MutableStateFlow(0)
     private val focusSessionsTodayFlow = MutableStateFlow(0)
+    private val trackLevelFlow = MutableStateFlow(1)
     private val lockedTodayFlow = MutableStateFlow<Set<String>>(emptySet())
     private val unlockCountsFlow = MutableStateFlow<Set<String>>(emptySet())
     private var lastIntercept: Pair<String, Long>? = null
@@ -52,6 +53,7 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { prefs.technique(PrefKeys.TECH_VARIABLE_RATIO).collect { variableRatioEnabledFlow.value = it } }
         scope.launch { prefs.streakDays.collect { streakDaysFlow.value = it } }
         scope.launch { prefs.focusSessionsToday.collect { focusSessionsTodayFlow.value = it } }
+        scope.launch { prefs.trackLevel.collect { trackLevelFlow.value = it } }
         scope.launch { prefs.lockedTodayPackages.collect { lockedTodayFlow.value = it } }
         scope.launch { prefs.unlockCounts.collect { unlockCountsFlow.value = it } }
     }
@@ -137,17 +139,15 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { UserPrefs(applicationContext).bumpUnlockCount(pkg, today) }
         val nextCount = UnlockIntervention.parseCount(unlockCountsFlow.value, today, pkg) + 1
         val visitOrdinal = bumpAndGetVisitOrdinal(pkg)
-        val builderMinutes = LegacyCounter.totalBuilderMinutes(
-            completedTodos = streakDaysFlow.value,
-            focusSessions = focusSessionsTodayFlow.value
-        )
-        val level = UserLevel.level(builderMinutes)
+        // Track-level eases the Lobby base by one second per level above 1.
+        val baseSeconds = TrackSystem.easedBaseSeconds(LobbyTuner.BASE_SECONDS, trackLevelFlow.value)
         val seconds = LobbyTuner.countdownSeconds(
+            base = baseSeconds,
             visitOrdinal = visitOrdinal,
             escalating = escalatingEnabledFlow.value,
             variableRatio = variableRatioEnabledFlow.value,
             randomRoll = kotlin.random.Random.Default.nextDouble(),
-            userLevel = level
+            userLevel = 0  // legacy graduated-freedom ease already folded into baseSeconds
         )
         val harderMath = LobbyTuner.isHarderMath(
             variableRatio = variableRatioEnabledFlow.value,

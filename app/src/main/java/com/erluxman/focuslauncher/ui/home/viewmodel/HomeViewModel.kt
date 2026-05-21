@@ -70,7 +70,12 @@ data class HomeUiState(
     val domainStreaks: Map<String, Pair<Int, Int>> = emptyMap(),
     val focusPoints: Int = 0,
     val energyZones: Set<String> = emptySet(),
-    val currentHour: Int = 0
+    val currentHour: Int = 0,
+    val trackLevel: Int = 1,
+    val trackPoints: Int = 0,
+    val trackMisses: Int = 0,
+    val trackRecalibrated: Boolean = false,
+    val builderMode: Boolean = false
 )
 
 class HomeViewModel(
@@ -246,6 +251,28 @@ class HomeViewModel(
 
         viewModelScope.launch {
             combine(
+                prefs.trackLevel,
+                prefs.trackPoints,
+                prefs.trackMisses,
+                prefs.trackRecalibrated,
+                prefs.builderMode
+            ) { lvl, pts, miss, recal, builder ->
+                listOf(lvl, pts, miss, recal, builder)
+            }.collect { vals ->
+                _uiState.update {
+                    it.copy(
+                        trackLevel = vals[0] as Int,
+                        trackPoints = vals[1] as Int,
+                        trackMisses = vals[2] as Int,
+                        trackRecalibrated = vals[3] as Boolean,
+                        builderMode = vals[4] as Boolean
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(
                 prefs.graceDays,
                 prefs.streakFreezes,
                 prefs.afterFallDue,
@@ -391,8 +418,25 @@ class HomeViewModel(
                 // Auto-grant freezes as user accumulates perfect days.
                 val earned = com.erluxman.focuslauncher.service.GraceLogic.earnedFreezes(update.days)
                 if (earned > freezes) prefs.setStreakFreezes(earned)
+
+                // Track System rollover: one day at a time.
+                val snap = com.erluxman.focuslauncher.service.TrackSystem.Snapshot(
+                    level = prefs.trackLevel.first(),
+                    pointsToward = prefs.trackPoints.first(),
+                    missStreak = prefs.trackMisses.first()
+                )
+                val next = com.erluxman.focuslauncher.service.TrackSystem.applyDay(snap, hit)
+                prefs.applyTrackSnapshot(next.level, next.pointsToward, next.missStreak, next.recalibrated)
             }
         }
+    }
+
+    fun ackTrackRecalibration() {
+        viewModelScope.launch { prefs.clearRecalibrated() }
+    }
+
+    fun setBuilderMode(value: Boolean) {
+        viewModelScope.launch { prefs.setBuilderMode(value) }
     }
 
     fun declareGraceDay(dateIso: String) {
