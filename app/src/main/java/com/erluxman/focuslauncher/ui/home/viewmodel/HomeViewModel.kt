@@ -79,7 +79,9 @@ data class HomeUiState(
     val sadVoice: String = "STERN",
     val sadSuppressedUntilMs: Long = 0L,
     val celebrationMessage: String = "",
-    val nourishingPackages: Set<String> = emptySet()
+    val nourishingPackages: Set<String> = emptySet(),
+    val baselineProposedTarget: Int? = null,
+    val hourlyMinutes: IntArray = IntArray(24)
 )
 
 class HomeViewModel(
@@ -103,8 +105,45 @@ class HomeViewModel(
         rollStreakIfNewDay()
         rollTimeDebtIfNewDay()
         rollDomainStreaks()
+        recordBaselineSample()
         observeHeatmap()
         startDreamModeClock()
+    }
+
+    private fun recordBaselineSample() {
+        viewModelScope.launch {
+            if (prefs.baselineApplied.first()) return@launch
+            val today = todayIso()
+            val mins = runCatching { UsageStatsHelper.screenMinutesForDay(appContext, 1) }
+                .getOrDefault(0)
+            // Use yesterday's full-day minutes as a sample (today is incomplete).
+            val yIso = yesterdayIso()
+            prefs.addBaselineSample(yIso, mins)
+            val samples = prefs.baselineSamples.first()
+                .mapNotNull { it.split("|").getOrNull(1)?.toIntOrNull() }
+            if (com.erluxman.focuslauncher.service.BaselineDetector.isComplete(samples)) {
+                val target = com.erluxman.focuslauncher.service.BaselineDetector
+                    .proposedTarget(samples)
+                if (target != null) {
+                    _uiState.update { it.copy(baselineProposedTarget = target) }
+                }
+            }
+        }
+    }
+
+    fun acceptBaseline(target: Int) {
+        viewModelScope.launch {
+            prefs.setDailyTargetMin(target)
+            prefs.markBaselineApplied()
+            _uiState.update { it.copy(baselineProposedTarget = null) }
+        }
+    }
+
+    fun rejectBaseline() {
+        viewModelScope.launch {
+            prefs.markBaselineApplied()
+            _uiState.update { it.copy(baselineProposedTarget = null) }
+        }
     }
 
     private fun observeHeatmap() {
@@ -622,13 +661,16 @@ class HomeViewModel(
                 }
             }
             val crisis = com.erluxman.focuslauncher.service.CrisisDetector.isCrisis(recent)
+            val hourly = runCatching { UsageStatsHelper.todayHourlyMinutes(appContext) }
+                .getOrDefault(IntArray(24))
             _uiState.update {
                 it.copy(
                     behaviorState = reading.state,
                     behaviorProgress = reading.progress,
                     screenMinutesToday = reading.screenMinutes,
                     distractionMinutesToday = distractionMin,
-                    crisisActive = crisis
+                    crisisActive = crisis,
+                    hourlyMinutes = hourly
                 )
             }
             val lastDeposit = prefs.timeBankLastDate.first()

@@ -71,6 +71,41 @@ object UsageStatsHelper {
             .mapValues { (_, list) -> (list.sumOf { it.totalTimeInForeground } / 60_000L).toInt() }
     }
 
+    /**
+     * Returns today's per-hour foreground minutes as an IntArray(24).
+     * Sessions spanning hour boundaries are split via [HourlyHeatmap.bucketize].
+     */
+    fun todayHourlyMinutes(context: Context): IntArray {
+        if (!hasPermission(context)) return IntArray(24)
+        val usage = context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
+            ?: return IntArray(24)
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val dayStart = cal.timeInMillis
+        val now = System.currentTimeMillis()
+        val events = usage.queryEvents(dayStart, now)
+        val active = mutableMapOf<String, Long>()
+        val sessions = mutableListOf<LongRange>()
+        val ev = android.app.usage.UsageEvents.Event()
+        while (events.hasNextEvent()) {
+            events.getNextEvent(ev)
+            when (ev.eventType) {
+                android.app.usage.UsageEvents.Event.MOVE_TO_FOREGROUND ->
+                    active[ev.packageName ?: continue] = ev.timeStamp
+                android.app.usage.UsageEvents.Event.MOVE_TO_BACKGROUND -> {
+                    val start = active.remove(ev.packageName ?: continue) ?: continue
+                    sessions.add(start..ev.timeStamp)
+                }
+            }
+        }
+        active.forEach { (_, s) -> sessions.add(s..now) }
+        return HourlyHeatmap.bucketize(sessions, dayStart, now)
+    }
+
     /** Returns total foreground time for the day starting `daysAgo` days ago, in minutes. */
     fun screenMinutesForDay(context: Context, daysAgo: Int): Int {
         if (!hasPermission(context)) return 0

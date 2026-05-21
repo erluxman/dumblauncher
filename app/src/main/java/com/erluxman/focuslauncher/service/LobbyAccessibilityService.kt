@@ -157,6 +157,8 @@ class LobbyAccessibilityService : AccessibilityService() {
             randomRoll = kotlin.random.Random.Default.nextDouble()
         )
 
+        val mantraReps = com.erluxman.focuslauncher.ui.mantra.MantraMatcher
+            .requiredReps(trackLevelFlow.value)
         val intent = Intent(this, LobbyActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(LobbyActivity.EXTRA_TARGET_PACKAGE, pkg)
@@ -164,6 +166,7 @@ class LobbyAccessibilityService : AccessibilityService() {
             putExtra(LobbyActivity.EXTRA_HARDER_MATH, harderMath)
             putExtra(LobbyActivity.EXTRA_INTERVENTION_COUNT,
                 if (UnlockIntervention.shouldShow(nextCount)) nextCount else 0)
+            putExtra(LobbyActivity.EXTRA_MANTRA_REPS, mantraReps)
         }
         startActivity(intent)
     }

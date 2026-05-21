@@ -47,6 +47,7 @@ class LobbyActivity : ComponentActivity() {
     private var countdownSeconds: Int = LOBBY_SECONDS
     private var harderMath: Boolean = false
     private var interventionCount: Int = 0
+    private var mantraReps: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +55,7 @@ class LobbyActivity : ComponentActivity() {
         countdownSeconds = intent.getIntExtra(EXTRA_COUNTDOWN_SECONDS, LOBBY_SECONDS)
         harderMath = intent.getBooleanExtra(EXTRA_HARDER_MATH, false)
         interventionCount = intent.getIntExtra(EXTRA_INTERVENTION_COUNT, 0)
+        mantraReps = intent.getIntExtra(EXTRA_MANTRA_REPS, 1)
         mantra = runBlocking {
             com.erluxman.focuslauncher.data.prefs.UserPrefs(applicationContext)
                 .mantraPhrase
@@ -73,6 +75,7 @@ class LobbyActivity : ComponentActivity() {
                     countdownSeconds = countdownSeconds,
                     harderMath = harderMath,
                     interventionCount = interventionCount,
+                    mantraReps = mantraReps,
                     onAcknowledged = ::finish,
                     onAborted = {
                         val home = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
@@ -92,6 +95,7 @@ class LobbyActivity : ComponentActivity() {
         const val EXTRA_COUNTDOWN_SECONDS = "extra_countdown_seconds"
         const val EXTRA_HARDER_MATH = "extra_harder_math"
         const val EXTRA_INTERVENTION_COUNT = "extra_intervention_count"
+        const val EXTRA_MANTRA_REPS = "extra_mantra_reps"
         const val LOBBY_SECONDS = 10
     }
 }
@@ -103,6 +107,7 @@ internal fun LobbyContent(
     countdownSeconds: Int = LobbyActivity.LOBBY_SECONDS,
     harderMath: Boolean = false,
     interventionCount: Int = 0,
+    mantraReps: Int = 1,
     onAcknowledged: () -> Unit,
     onAborted: () -> Unit
 ) {
@@ -116,7 +121,8 @@ internal fun LobbyContent(
     var answer by remember { mutableStateOf("") }
     val solved = answer.toIntOrNull() == problem.answer
     val mantraMode = mantra.isNotBlank()
-    val mantraOk = !mantraMode || com.erluxman.focuslauncher.ui.mantra.MantraMatcher.matches(intent, mantra)
+    val mantraMatches = com.erluxman.focuslauncher.ui.mantra.MantraMatcher.countMatches(intent, mantra)
+    val mantraOk = !mantraMode || mantraMatches >= mantraReps
     val intentOk = if (mantraMode) mantraOk else intent.trim().length >= 3
     val replacementSuggestion = remember {
         com.erluxman.focuslauncher.service.LobbyTuner.replacement(
@@ -214,12 +220,13 @@ internal fun LobbyContent(
             Spacer(Modifier.height(32.dp))
             if (mantraMode) {
                 Text(
-                    text = "Type your mantra:",
+                    text = if (mantraReps > 1) "Type your mantra $mantraReps times (newline between each):"
+                    else "Type your mantra:",
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "\"$mantra\"",
+                    text = "\"$mantra\"  ($mantraMatches / $mantraReps)",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -237,7 +244,7 @@ internal fun LobbyContent(
                 placeholder = {
                     Text(if (mantraMode) "Type the mantra exactly" else "e.g. message Sam back")
                 },
-                minLines = 2
+                minLines = if (mantraReps > 1) mantraReps else 2
             )
 
             Spacer(Modifier.height(16.dp))

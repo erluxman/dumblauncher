@@ -93,6 +93,9 @@ object PrefKeys {
     val NOURISHING_PACKAGES = stringSetPreferencesKey("nourishing_packages")
     val DAY_SUMMARY_DATES = stringSetPreferencesKey("day_summary_dates")  // ISO dates already summarized
 
+    val BASELINE_SAMPLES = stringSetPreferencesKey("baseline_samples")  // "iso|minutes"
+    val BASELINE_APPLIED = booleanPreferencesKey("baseline_applied")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -196,6 +199,9 @@ class UserPrefs(private val context: Context) {
 
     val nourishingPackages: Flow<Set<String>> = store.data.map { it[PrefKeys.NOURISHING_PACKAGES] ?: emptySet() }
     val daySummaryDates: Flow<Set<String>> = store.data.map { it[PrefKeys.DAY_SUMMARY_DATES] ?: emptySet() }
+
+    val baselineSamples: Flow<Set<String>> = store.data.map { it[PrefKeys.BASELINE_SAMPLES] ?: emptySet() }
+    val baselineApplied: Flow<Boolean> = store.data.map { it[PrefKeys.BASELINE_APPLIED] ?: false }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -457,6 +463,19 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setNourishingPackages(packages: Set<String>) {
         store.edit { it[PrefKeys.NOURISHING_PACKAGES] = packages }
+    }
+
+    suspend fun addBaselineSample(dateIso: String, minutes: Int) {
+        store.edit {
+            val current = it[PrefKeys.BASELINE_SAMPLES] ?: emptySet()
+            // One sample per date.
+            val others = current.filterNot { e -> e.startsWith("$dateIso|") }.toSet()
+            it[PrefKeys.BASELINE_SAMPLES] = others + "$dateIso|$minutes"
+        }
+    }
+
+    suspend fun markBaselineApplied() {
+        store.edit { it[PrefKeys.BASELINE_APPLIED] = true }
     }
 
     suspend fun markDaySummary(dateIso: String) {

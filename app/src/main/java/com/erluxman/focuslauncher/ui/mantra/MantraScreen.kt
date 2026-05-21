@@ -42,6 +42,21 @@ object MantraMatcher {
         return normalize(input) == normalize(mantra)
     }
 
+    /** Counts how many newline-separated chunks of [input] match [mantra]. */
+    fun countMatches(input: String, mantra: String): Int {
+        if (mantra.isBlank()) return 0
+        return input.split("\n")
+            .map { it.trim() }
+            .count { it.isNotEmpty() && normalize(it) == normalize(mantra) }
+    }
+
+    /**
+     * MANTRA-002: required mantra repetitions scale with track level.
+     * Level 1-3 → 1 repetition; 4-6 → 2; 7-9 → 3; 10 → 4.
+     */
+    fun requiredReps(trackLevel: Int): Int =
+        (((trackLevel - 1) / 3) + 1).coerceIn(1, 4)
+
     fun normalize(s: String): String =
         s.trim().replace(Regex("\\s+"), " ").lowercase()
 }

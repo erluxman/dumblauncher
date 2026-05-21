@@ -341,6 +341,19 @@ fun HomeScreen(
                             onBuzz = viewModel::bumpPhantomBuzz
                         )
                     }
+                    item {
+                        HourlyHeatmapCard(hourly = uiState.hourlyMinutes)
+                    }
+                    if (uiState.baselineProposedTarget != null) {
+                        item {
+                            BaselineProposalCard(
+                                proposed = uiState.baselineProposedTarget!!,
+                                current = uiState.dailyTargetMin,
+                                onAccept = { viewModel.acceptBaseline(uiState.baselineProposedTarget!!) },
+                                onReject = viewModel::rejectBaseline
+                            )
+                        }
+                    }
                     item { ProjectSection(uiState.projects) }
                     item { TodoSection(uiState.todos, onToggle = viewModel::toggleTodo, onAdd = viewModel::addTodo, onAddWithEstimate = viewModel::addTodoWithEstimate, onDelete = viewModel::deleteTodo) }
                     item {
@@ -1971,6 +1984,95 @@ private fun TombstoneSection(
                         enabled = newName.isNotBlank(),
                         modifier = Modifier.testTag("tombstone-add")
                     ) { Text("Bury") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HourlyHeatmapCard(hourly: IntArray) {
+    Column(modifier = Modifier.testTag("hourly-heatmap")) {
+        SectionHeader("HOURLY HEATMAP")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    for (h in 0 until 24) {
+                        val level = com.erluxman.focuslauncher.service.HourlyHeatmap.level(hourly[h])
+                        val color = when (level) {
+                            0 -> MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
+                            1 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            2 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                            3 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                            else -> MaterialTheme.colorScheme.primary
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(28.dp)
+                                .testTag("hourly-cell-$h"),
+                            shape = RoundedCornerShape(2.dp),
+                            color = color
+                        ) {}
+                    }
+                }
+                Spacer(Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    listOf("0", "6", "12", "18", "23").forEach { h ->
+                        Text(
+                            h,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BaselineProposalCard(
+    proposed: Int,
+    current: Int,
+    onAccept: () -> Unit,
+    onReject: () -> Unit
+) {
+    Column(modifier = Modifier.testTag("baseline-proposal")) {
+        SectionHeader("BASELINE OBSERVED")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "One week observed. Suggested daily target: ${proposed}m " +
+                        "(currently ${current}m).",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = onAccept,
+                        modifier = Modifier.testTag("baseline-accept")
+                    ) { Text("Use ${proposed}m") }
+                    OutlinedButton(
+                        onClick = onReject,
+                        modifier = Modifier.testTag("baseline-reject")
+                    ) { Text("Keep current") }
                 }
             }
         }

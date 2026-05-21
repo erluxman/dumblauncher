@@ -1,6 +1,7 @@
 package com.erluxman.focuslauncher
 
 import com.erluxman.focuslauncher.ui.mantra.MantraMatcher
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -37,5 +38,19 @@ class MantraMatcherTest {
     fun trailingPunctuationStaysRelevant() {
         // We do not strip punctuation — typing a sentence without the period should fail.
         assertFalse(MantraMatcher.matches("Build, don't scroll", "Build, don't scroll."))
+    }
+
+    @Test
+    fun countMatches_picksUpNewlineSeparatedReps() {
+        val input = "Build, don't scroll.\nbuild, don't scroll.\nWrong"
+        assertEquals(2, MantraMatcher.countMatches(input, "Build, don't scroll."))
+    }
+
+    @Test
+    fun requiredReps_scalesWithLevel() {
+        assertEquals(1, MantraMatcher.requiredReps(1))
+        assertEquals(1, MantraMatcher.requiredReps(3))
+        assertEquals(2, MantraMatcher.requiredReps(4))
+        assertEquals(4, MantraMatcher.requiredReps(10))
     }
 }
