@@ -252,6 +252,14 @@ fun HomeScreen(
                             )
                         }
                     }
+                    if (uiState.stepsToday > 0 || uiState.sleepMinutesLastNight > 0) {
+                        item {
+                            HealthCard(
+                                steps = uiState.stepsToday,
+                                sleepMinutes = uiState.sleepMinutesLastNight
+                            )
+                        }
+                    }
                     if (uiState.trackRecalibrated) {
                         item {
                             RecalibrationBanner(
@@ -1821,6 +1829,26 @@ private fun DomainTracksCard(tracks: Map<String, Triple<Int, Int, Int>>) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun HealthCard(steps: Int, sleepMinutes: Int) {
+    val sleepLabel = when {
+        sleepMinutes >= 60 -> "${sleepMinutes / 60}h ${sleepMinutes % 60}m"
+        sleepMinutes > 0 -> "${sleepMinutes}m"
+        else -> "—"
+    }
+    Column(modifier = Modifier.testTag("health-card")) {
+        SectionHeader("HEALTH")
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StatChip(label = "STEPS", value = "$steps", sub = "today", modifier = Modifier.weight(1f).testTag("health-steps"))
+            StatChip(label = "SLEEP", value = sleepLabel, sub = "last night", modifier = Modifier.weight(1f).testTag("health-sleep"))
         }
     }
 }

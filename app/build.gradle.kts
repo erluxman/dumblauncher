@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.erluxman.focuslauncher"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -59,6 +59,9 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // HealthConnect (steps, sleep, etc.)
+    implementation(libs.androidx.health.connect)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

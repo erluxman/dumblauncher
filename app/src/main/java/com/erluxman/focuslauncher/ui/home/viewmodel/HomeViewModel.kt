@@ -86,7 +86,9 @@ data class HomeUiState(
     val emergencyPasses: Int = 5,
     val calendarEvents: List<com.erluxman.focuslauncher.service.CalendarReader.Event> = emptyList(),
     val activeEventTitle: String = "",
-    val isFocusBlock: Boolean = false
+    val isFocusBlock: Boolean = false,
+    val stepsToday: Int = 0,
+    val sleepMinutesLastNight: Int = 0
 )
 
 class HomeViewModel(
@@ -726,6 +728,10 @@ class HomeViewModel(
             val crisis = com.erluxman.focuslauncher.service.CrisisDetector.isCrisis(recent)
             val hourly = runCatching { UsageStatsHelper.todayHourlyMinutes(appContext) }
                 .getOrDefault(IntArray(24))
+            val steps = runCatching { com.erluxman.focuslauncher.service.HealthSource.todaySteps(appContext) }
+                .getOrDefault(0)
+            val sleepMin = runCatching { com.erluxman.focuslauncher.service.HealthSource.lastNightSleepMinutes(appContext) }
+                .getOrDefault(0)
             _uiState.update {
                 it.copy(
                     behaviorState = reading.state,
@@ -733,7 +739,9 @@ class HomeViewModel(
                     screenMinutesToday = reading.screenMinutes,
                     distractionMinutesToday = distractionMin,
                     crisisActive = crisis,
-                    hourlyMinutes = hourly
+                    hourlyMinutes = hourly,
+                    stepsToday = steps,
+                    sleepMinutesLastNight = sleepMin
                 )
             }
             val lastDeposit = prefs.timeBankLastDate.first()
