@@ -61,7 +61,8 @@ fun HomeScreen(
     onOpenTransparency: () -> Unit,
     onReplayOnboarding: () -> Unit,
     onOpenUninstall: () -> Unit = {},
-    onOpenVip: () -> Unit = {}
+    onOpenVip: () -> Unit = {},
+    onOpenFocus: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -240,6 +241,10 @@ fun HomeScreen(
                     onOpenVip = {
                         showSetupDialog = false
                         onOpenVip()
+                    },
+                    onOpenFocus = {
+                        showSetupDialog = false
+                        onOpenFocus()
                     }
                 )
             }
@@ -461,7 +466,8 @@ fun SetupDialog(
     onOpenTransparency: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
     onOpenUninstall: () -> Unit = {},
-    onOpenVip: () -> Unit = {}
+    onOpenVip: () -> Unit = {},
+    onOpenFocus: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -576,6 +582,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-vip")
                 ) { Text("VIP Contacts") }
+
+                TextButton(
+                    onClick = onOpenFocus,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-focus")
+                ) { Text("Focus Session (25/5)") }
 
                 TextButton(
                     onClick = onOpenUninstall,
