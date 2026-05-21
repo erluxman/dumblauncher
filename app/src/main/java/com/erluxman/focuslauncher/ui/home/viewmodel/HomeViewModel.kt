@@ -52,7 +52,11 @@ data class HomeUiState(
     val identityBuilderToday: Int = 0,
     val identityConsumerToday: Int = 0,
     val legacyBuilderMinutes: Int = 0,
-    val crisisActive: Boolean = false
+    val crisisActive: Boolean = false,
+    val timeDebtMin: Int = 0,
+    val effectiveTargetMin: Int = 180,
+    val moodPings: List<String> = emptyList(),
+    val isDreamMode: Boolean = false
 )
 
 class HomeViewModel(
@@ -74,7 +78,9 @@ class HomeViewModel(
         observePrefs()
         startUsagePolling()
         rollStreakIfNewDay()
+        rollTimeDebtIfNewDay()
         observeHeatmap()
+        startDreamModeClock()
     }
 
     private fun observeHeatmap() {
@@ -132,13 +138,35 @@ class HomeViewModel(
             ) { why, target, indicator ->
                 Triple(why, target, indicator)
             }.collect { (why, target, indicator) ->
+                val debt = _uiState.value.timeDebtMin
                 _uiState.update {
                     it.copy(
                         whyHere = why,
                         dailyTargetMin = target,
-                        behaviorIndicatorEnabled = indicator
+                        behaviorIndicatorEnabled = indicator,
+                        effectiveTargetMin = com.erluxman.focuslauncher.service.TimeDebt
+                            .effectiveTarget(target, debt)
                     )
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(prefs.timeDebtMin, prefs.dailyTargetMin) { debt, base -> debt to base }
+                .collect { (debt, base) ->
+                    _uiState.update {
+                        it.copy(
+                            timeDebtMin = debt,
+                            effectiveTargetMin = com.erluxman.focuslauncher.service.TimeDebt
+                                .effectiveTarget(base, debt)
+                        )
+                    }
+                }
+        }
+
+        viewModelScope.launch {
+            prefs.moodPings.collect { set ->
+                _uiState.update { it.copy(moodPings = set.sortedDescending()) }
             }
         }
         viewModelScope.launch {
@@ -265,7 +293,8 @@ class HomeViewModel(
 
     fun refreshUsage() {
         viewModelScope.launch {
-            val target = _uiState.value.dailyTargetMin.takeIf { it > 0 } ?: 180
+            val target = _uiState.value.effectiveTargetMin
+                .takeIf { it > 0 } ?: (_uiState.value.dailyTargetMin.takeIf { it > 0 } ?: 180)
             val minutes = runCatching { UsageStatsHelper.todayScreenMinutes(appContext) }
                 .getOrDefault(0)
             val reading = UsageStatsHelper.deriveBehaviorState(minutes, target)
@@ -313,6 +342,42 @@ class HomeViewModel(
 
     fun voteIdentity(isBuilder: Boolean) {
         viewModelScope.launch { prefs.voteIdentity(isBuilder, todayIso()) }
+    }
+
+    fun logMoodPing(emoji: String, note: String) {
+        viewModelScope.launch {
+            val stamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date())
+            prefs.addMoodPing(stamp, emoji, note)
+        }
+    }
+
+    private fun rollTimeDebtIfNewDay() {
+        viewModelScope.launch {
+            val today = todayIso()
+            val lastDebtDate = prefs.timeDebtDate.first()
+            if (lastDebtDate == today) return@launch
+            val baseTarget = prefs.dailyTargetMin.first().coerceAtLeast(1)
+            val currentDebt = prefs.timeDebtMin.first()
+            val yesterdaysEffective = com.erluxman.focuslauncher.service.TimeDebt
+                .effectiveTarget(baseTarget, currentDebt)
+            val yesterdayMin = runCatching {
+                UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = 1)
+            }.getOrDefault(yesterdaysEffective)
+            val newDebt = com.erluxman.focuslauncher.service.TimeDebt
+                .nextDebt(currentDebt, yesterdayMin, yesterdaysEffective)
+            prefs.setTimeDebt(newDebt, today)
+        }
+    }
+
+    private fun startDreamModeClock() {
+        viewModelScope.launch {
+            while (true) {
+                val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                val dream = hour >= DREAM_MODE_START_HOUR || hour < DREAM_MODE_END_HOUR
+                _uiState.update { it.copy(isDreamMode = dream) }
+                delay(60_000)
+            }
+        }
     }
 
     private fun seedInitialData() {
@@ -430,6 +495,9 @@ class HomeViewModel(
             "Set tomorrow's one thing",
             "One-line journal entry"
         )
+
+        const val DREAM_MODE_START_HOUR = 22  // 10pm
+        const val DREAM_MODE_END_HOUR = 5     // 5am
 
         fun provideFactory(
             todoRepository: TodoRepository,

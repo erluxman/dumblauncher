@@ -49,6 +49,11 @@ object PrefKeys {
     val IDENTITY_CONSUMER_COUNT = intPreferencesKey("identity_consumer_count")
     val IDENTITY_DATE = stringPreferencesKey("identity_date")
 
+    val TIME_DEBT_MIN = intPreferencesKey("time_debt_min")
+    val TIME_DEBT_DATE = stringPreferencesKey("time_debt_date")  // date the debt reflects
+
+    val MOOD_PINGS = stringSetPreferencesKey("mood_pings")  // "yyyy-MM-dd HH:mm|emoji|note"
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -109,6 +114,11 @@ class UserPrefs(private val context: Context) {
     val identityBuilderCount: Flow<Int> = store.data.map { it[PrefKeys.IDENTITY_BUILDER_COUNT] ?: 0 }
     val identityConsumerCount: Flow<Int> = store.data.map { it[PrefKeys.IDENTITY_CONSUMER_COUNT] ?: 0 }
     val identityDate: Flow<String> = store.data.map { it[PrefKeys.IDENTITY_DATE].orEmpty() }
+
+    val timeDebtMin: Flow<Int> = store.data.map { it[PrefKeys.TIME_DEBT_MIN] ?: 0 }
+    val timeDebtDate: Flow<String> = store.data.map { it[PrefKeys.TIME_DEBT_DATE].orEmpty() }
+
+    val moodPings: Flow<Set<String>> = store.data.map { it[PrefKeys.MOOD_PINGS] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -217,6 +227,24 @@ class UserPrefs(private val context: Context) {
             val next = if (step in current) current - step else current + step
             it[PrefKeys.SHUTDOWN_DONE_STEPS] = next
             it[PrefKeys.SHUTDOWN_DONE_DATE] = todayIso
+        }
+    }
+
+    suspend fun setTimeDebt(min: Int, todayIso: String) {
+        store.edit {
+            it[PrefKeys.TIME_DEBT_MIN] = min.coerceAtLeast(0)
+            it[PrefKeys.TIME_DEBT_DATE] = todayIso
+        }
+    }
+
+    suspend fun addMoodPing(timestamp: String, emoji: String, note: String) {
+        val sanitizedNote = note.replace("|", " ").trim()
+        val entry = "$timestamp|$emoji|$sanitizedNote"
+        store.edit {
+            val current = it[PrefKeys.MOOD_PINGS] ?: emptySet()
+            // Keep last 60 entries.
+            val merged = (current + entry).sortedDescending().take(60).toSet()
+            it[PrefKeys.MOOD_PINGS] = merged
         }
     }
 

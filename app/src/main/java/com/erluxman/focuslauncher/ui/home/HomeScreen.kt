@@ -105,6 +105,14 @@ fun HomeScreen(
     var showInterventionDialog by remember { mutableStateOf(false) }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
+    if (uiState.isDreamMode) {
+        DreamModeScreen(
+            oneThingText = uiState.oneThingText,
+            onExitDream = { /* leaves with next-day rollover */ }
+        )
+        return
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize().testTag("home"),
         color = MaterialTheme.colorScheme.background
@@ -187,6 +195,21 @@ fun HomeScreen(
                             best = uiState.streakBest,
                             focusSessionsToday = uiState.focusSessionsToday,
                             timeBankTotalMin = uiState.timeBankTotalMin
+                        )
+                    }
+                    if (uiState.timeDebtMin > 0) {
+                        item {
+                            TimeDebtCard(
+                                debtMin = uiState.timeDebtMin,
+                                effectiveTarget = uiState.effectiveTargetMin,
+                                baseTarget = uiState.dailyTargetMin
+                            )
+                        }
+                    }
+                    item {
+                        MoodPingCard(
+                            recentPings = uiState.moodPings,
+                            onLog = viewModel::logMoodPing
                         )
                     }
                     if (!uiState.isMorningDoneToday) {
@@ -1358,6 +1381,185 @@ fun SearchOverlay(
 
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimeDebtCard(debtMin: Int, effectiveTarget: Int, baseTarget: Int) {
+    Column(modifier = Modifier.testTag("time-debt-card")) {
+        SectionHeader("TIME DEBT")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Yesterday you overspent. Today's budget is tighter.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "Effective target: ${effectiveTarget}m  (base ${baseTarget}m − debt ${debtMin}m × 2)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MoodPingCard(
+    recentPings: List<String>,
+    onLog: (String, String) -> Unit
+) {
+    var note by remember { mutableStateOf("") }
+    var selectedEmoji by remember { mutableStateOf("") }
+    val emojis = listOf(":)", ":|", ":(", ":D", ":/", "<3")
+
+    Column(modifier = Modifier.testTag("mood-ping-card")) {
+        SectionHeader("MOOD PING")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "How are you right now?",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    emojis.forEach { e ->
+                        val active = e == selectedEmoji
+                        Surface(
+                            modifier = Modifier
+                                .clickable { selectedEmoji = e }
+                                .testTag("mood-emoji-${emojis.indexOf(e)}"),
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                    else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                        ) {
+                            Text(
+                                text = e,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it.take(40) },
+                    placeholder = { Text("One word") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().testTag("mood-note-input")
+                )
+                Spacer(Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        if (selectedEmoji.isNotBlank()) {
+                            onLog(selectedEmoji, note)
+                            selectedEmoji = ""
+                            note = ""
+                        }
+                    },
+                    enabled = selectedEmoji.isNotBlank(),
+                    modifier = Modifier.testTag("mood-log-button")
+                ) { Text("Log it") }
+                if (recentPings.isNotEmpty()) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = "Recent:",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    recentPings.take(3).forEach { line ->
+                        val parts = line.split("|")
+                        val stamp = parts.getOrNull(0).orEmpty()
+                        val emoji = parts.getOrNull(1).orEmpty()
+                        val n = parts.getOrNull(2).orEmpty()
+                        Text(
+                            text = "$stamp  $emoji  $n",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DreamModeScreen(oneThingText: String, onExitDream: () -> Unit) {
+    val quotes = listOf(
+        "Tomorrow is built tonight.",
+        "Rest is not the opposite of progress.",
+        "Sleep is the deal you made with reality.",
+        "What you let go of tonight, you wake up free of."
+    )
+    val quote = remember {
+        val day = (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt()
+        quotes[((day % quotes.size) + quotes.size) % quotes.size]
+    }
+    var breathIn by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(4000)
+            breathIn = !breathIn
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize().testTag("dream-mode"),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "DREAM MODE",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 4.sp
+            )
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = if (breathIn) "Breathe in…" else "…and out.",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.testTag("dream-breath")
+            )
+            Spacer(Modifier.height(32.dp))
+            Text(
+                text = quote,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.outline,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            if (oneThingText.isNotBlank()) {
+                Spacer(Modifier.height(40.dp))
+                Text(
+                    text = "Tomorrow's one thing:",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = oneThingText,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.testTag("dream-one-thing")
+                )
             }
         }
     }
