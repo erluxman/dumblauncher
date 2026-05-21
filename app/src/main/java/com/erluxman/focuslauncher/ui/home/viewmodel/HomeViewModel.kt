@@ -56,7 +56,11 @@ data class HomeUiState(
     val timeDebtMin: Int = 0,
     val effectiveTargetMin: Int = 180,
     val moodPings: List<String> = emptyList(),
-    val isDreamMode: Boolean = false
+    val isDreamMode: Boolean = false,
+    val graceDays: Set<String> = emptySet(),
+    val streakFreezes: Int = 0,
+    val afterFallDueDate: String = "",
+    val afterFallStepsDone: Set<String> = emptySet()
 )
 
 class HomeViewModel(
@@ -169,6 +173,32 @@ class HomeViewModel(
                 _uiState.update { it.copy(moodPings = set.sortedDescending()) }
             }
         }
+
+        viewModelScope.launch {
+            combine(
+                prefs.graceDays,
+                prefs.streakFreezes,
+                prefs.afterFallDue,
+                prefs.afterFallSteps
+            ) { grace, freezes, dueDate, steps ->
+                listOf(grace, freezes, dueDate, steps)
+            }.collect { vals ->
+                @Suppress("UNCHECKED_CAST")
+                val grace = vals[0] as Set<String>
+                val freezes = vals[1] as Int
+                val due = vals[2] as String
+                @Suppress("UNCHECKED_CAST")
+                val steps = vals[3] as Set<String>
+                _uiState.update {
+                    it.copy(
+                        graceDays = grace,
+                        streakFreezes = freezes,
+                        afterFallDueDate = due,
+                        afterFallStepsDone = steps
+                    )
+                }
+            }
+        }
         viewModelScope.launch {
             combine(
                 prefs.oneThingText,
@@ -258,17 +288,57 @@ class HomeViewModel(
             val yesterdayMinutes = runCatching {
                 UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = 1)
             }.getOrDefault(0)
-            val hit = yesterdayMinutes <= target
+            val rawHit = yesterdayMinutes <= target
+            val currentDays = prefs.streakDays.first()
+            val currentBest = prefs.streakBest.first()
+            val graceSet = prefs.graceDays.first()
+            val freezes = prefs.streakFreezes.first()
+
+            // If the user would have broken: try grace day, then freeze.
+            val hit = if (rawHit) true else when (
+                com.erluxman.focuslauncher.service.GraceLogic.resolveBreak(yesterday, graceSet, freezes)
+            ) {
+                com.erluxman.focuslauncher.service.GraceOutcome.GracedByDay -> true
+                com.erluxman.focuslauncher.service.GraceOutcome.GracedByFreeze -> {
+                    prefs.setStreakFreezes((freezes - 1).coerceAtLeast(0))
+                    true
+                }
+                com.erluxman.focuslauncher.service.GraceOutcome.Broken -> {
+                    prefs.setAfterFallDue(today)
+                    false
+                }
+            }
             val update = StreakLogic.update(
                 todayIso = today,
                 lastCheckIso = lastCheck,
-                currentDays = prefs.streakDays.first(),
-                currentBest = prefs.streakBest.first(),
+                currentDays = currentDays,
+                currentBest = currentBest,
                 yesterdayIso = yesterday,
                 yesterdayHitTarget = hit
             )
-            if (update.persist) prefs.applyStreak(update.days, update.best, today)
+            if (update.persist) {
+                prefs.applyStreak(update.days, update.best, today)
+                // Auto-grant freezes as user accumulates perfect days.
+                val earned = com.erluxman.focuslauncher.service.GraceLogic.earnedFreezes(update.days)
+                if (earned > freezes) prefs.setStreakFreezes(earned)
+            }
         }
+    }
+
+    fun declareGraceDay(dateIso: String) {
+        viewModelScope.launch { prefs.addGraceDay(dateIso) }
+    }
+
+    fun cancelGraceDay(dateIso: String) {
+        viewModelScope.launch { prefs.removeGraceDay(dateIso) }
+    }
+
+    fun toggleAfterFallStep(step: String) {
+        viewModelScope.launch { prefs.toggleAfterFallStep(step) }
+    }
+
+    fun dismissAfterFall() {
+        viewModelScope.launch { prefs.clearAfterFall() }
     }
 
     fun setOneThing(text: String) {
@@ -498,6 +568,12 @@ class HomeViewModel(
 
         const val DREAM_MODE_START_HOUR = 22  // 10pm
         const val DREAM_MODE_END_HOUR = 5     // 5am
+
+        val AFTER_FALL_STEPS = listOf(
+            "Reflect: write one line about what happened",
+            "Recommit: set tomorrow's one thing, smaller scope",
+            "Tell someone (optional)"
+        )
 
         fun provideFactory(
             todoRepository: TodoRepository,

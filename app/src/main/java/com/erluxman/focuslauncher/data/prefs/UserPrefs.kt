@@ -62,6 +62,11 @@ object PrefKeys {
 
     val UNLOCK_COUNTS = stringSetPreferencesKey("unlock_counts")  // "yyyy-MM-dd|pkg|count"
 
+    val GRACE_DAYS = stringSetPreferencesKey("grace_days")  // declared yyyy-MM-dd entries
+    val STREAK_FREEZES = intPreferencesKey("streak_freezes")
+    val AFTER_FALL_DUE = stringPreferencesKey("after_fall_due_date")  // ritual due on this iso date
+    val AFTER_FALL_STEPS = stringSetPreferencesKey("after_fall_steps")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -135,6 +140,11 @@ class UserPrefs(private val context: Context) {
     val lockedTodayDate: Flow<String> = store.data.map { it[PrefKeys.LOCKED_TODAY_DATE].orEmpty() }
 
     val unlockCounts: Flow<Set<String>> = store.data.map { it[PrefKeys.UNLOCK_COUNTS] ?: emptySet() }
+
+    val graceDays: Flow<Set<String>> = store.data.map { it[PrefKeys.GRACE_DAYS] ?: emptySet() }
+    val streakFreezes: Flow<Int> = store.data.map { it[PrefKeys.STREAK_FREEZES] ?: 0 }
+    val afterFallDue: Flow<String> = store.data.map { it[PrefKeys.AFTER_FALL_DUE].orEmpty() }
+    val afterFallSteps: Flow<Set<String>> = store.data.map { it[PrefKeys.AFTER_FALL_STEPS] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -277,6 +287,46 @@ class UserPrefs(private val context: Context) {
                 it.remove(PrefKeys.LOCKED_TODAY_PACKAGES)
                 it[PrefKeys.LOCKED_TODAY_DATE] = todayIso
             }
+        }
+    }
+
+    suspend fun addGraceDay(dateIso: String) {
+        store.edit {
+            val current = it[PrefKeys.GRACE_DAYS] ?: emptySet()
+            it[PrefKeys.GRACE_DAYS] = current + dateIso
+        }
+    }
+
+    suspend fun removeGraceDay(dateIso: String) {
+        store.edit {
+            val current = it[PrefKeys.GRACE_DAYS] ?: emptySet()
+            it[PrefKeys.GRACE_DAYS] = current - dateIso
+        }
+    }
+
+    suspend fun setStreakFreezes(n: Int) {
+        store.edit { it[PrefKeys.STREAK_FREEZES] = n.coerceIn(0, 3) }
+    }
+
+    suspend fun setAfterFallDue(dateIso: String) {
+        store.edit {
+            it[PrefKeys.AFTER_FALL_DUE] = dateIso
+            it[PrefKeys.AFTER_FALL_STEPS] = emptySet()
+        }
+    }
+
+    suspend fun clearAfterFall() {
+        store.edit {
+            it.remove(PrefKeys.AFTER_FALL_DUE)
+            it.remove(PrefKeys.AFTER_FALL_STEPS)
+        }
+    }
+
+    suspend fun toggleAfterFallStep(step: String) {
+        store.edit {
+            val current = it[PrefKeys.AFTER_FALL_STEPS] ?: emptySet()
+            val next = if (step in current) current - step else current + step
+            it[PrefKeys.AFTER_FALL_STEPS] = next
         }
     }
 

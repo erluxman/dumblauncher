@@ -198,6 +198,24 @@ fun HomeScreen(
                             timeBankTotalMin = uiState.timeBankTotalMin
                         )
                     }
+                    item {
+                        GraceRow(
+                            freezes = uiState.streakFreezes,
+                            graceDays = uiState.graceDays,
+                            onDeclareTomorrow = { iso -> viewModel.declareGraceDay(iso) },
+                            onCancelTomorrow = { iso -> viewModel.cancelGraceDay(iso) }
+                        )
+                    }
+                    if (uiState.afterFallDueDate.isNotBlank()) {
+                        item {
+                            AfterFallCard(
+                                steps = HomeViewModel.AFTER_FALL_STEPS,
+                                done = uiState.afterFallStepsDone,
+                                onToggle = viewModel::toggleAfterFallStep,
+                                onDismiss = viewModel::dismissAfterFall
+                            )
+                        }
+                    }
                     if (uiState.timeDebtMin > 0) {
                         item {
                             TimeDebtCard(
@@ -1394,6 +1412,120 @@ fun SearchOverlay(
 
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
+            }
+        }
+    }
+}
+
+@Composable
+private fun GraceRow(
+    freezes: Int,
+    graceDays: Set<String>,
+    onDeclareTomorrow: (String) -> Unit,
+    onCancelTomorrow: (String) -> Unit
+) {
+    val tomorrowIso = remember {
+        val cal = java.util.Calendar.getInstance().apply {
+            add(java.util.Calendar.DAY_OF_YEAR, 1)
+        }
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(cal.time)
+    }
+    val isTomorrowGrace = tomorrowIso in graceDays
+    val monthIso = remember { tomorrowIso.substring(0, 7) }
+    val canDeclare = com.erluxman.focuslauncher.service.GraceLogic.canAddGrace(monthIso, graceDays)
+
+    Column(modifier = Modifier.testTag("grace-row")) {
+        SectionHeader("GRACE")
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StatChip(
+                label = "FREEZES",
+                value = "$freezes",
+                sub = "in reserve",
+                modifier = Modifier.weight(1f).testTag("grace-freezes")
+            )
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(enabled = isTomorrowGrace || canDeclare) {
+                        if (isTomorrowGrace) onCancelTomorrow(tomorrowIso)
+                        else onDeclareTomorrow(tomorrowIso)
+                    }
+                    .testTag("grace-declare-tomorrow"),
+                shape = RoundedCornerShape(12.dp),
+                color = if (isTomorrowGrace)
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = "TOMORROW",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Text(
+                        text = if (isTomorrowGrace) "Grace ON" else "Declare grace",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = if (canDeclare || isTomorrowGrace) "tap to toggle"
+                        else "month limit reached",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AfterFallCard(
+    steps: List<String>,
+    done: Set<String>,
+    onToggle: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Column(modifier = Modifier.testTag("after-fall")) {
+        SectionHeader("AFTER THE FALL")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Your streak broke. That's information, not a verdict.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(8.dp))
+                steps.forEach { step ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggle(step) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(checked = step in done, onCheckedChange = { onToggle(step) })
+                        Text(
+                            text = step,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                Button(
+                    onClick = onDismiss,
+                    enabled = done.size >= steps.size,
+                    modifier = Modifier.fillMaxWidth().testTag("after-fall-done")
+                ) { Text("Recommit and continue") }
             }
         }
     }
