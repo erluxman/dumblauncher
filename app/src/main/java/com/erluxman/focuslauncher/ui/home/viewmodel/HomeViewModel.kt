@@ -41,7 +41,12 @@ data class HomeUiState(
     val oneThingIsForToday: Boolean = false,
     val streakDays: Int = 0,
     val streakBest: Int = 0,
-    val focusSessionsToday: Int = 0
+    val focusSessionsToday: Int = 0,
+    val timeBankTotalMin: Int = 0,
+    val phantomBuzzToday: Int = 0,
+    val morningStepsDone: Set<String> = emptySet(),
+    val heatmapPerDay: IntArray = IntArray(7),
+    val isMorningDoneToday: Boolean = false
 )
 
 class HomeViewModel(
@@ -63,6 +68,27 @@ class HomeViewModel(
         observePrefs()
         startUsagePolling()
         rollStreakIfNewDay()
+        observeHeatmap()
+    }
+
+    private fun observeHeatmap() {
+        viewModelScope.launch {
+            val sinceMs = System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000
+            todoRepository.completedSince(sinceMs).collect { timestamps ->
+                val now = System.currentTimeMillis()
+                val cal = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                }
+                val per = com.erluxman.focuslauncher.service.HeatmapAggregator.perDayCounts(
+                    completionsMs = timestamps,
+                    nowMs = now,
+                    dayStartLocalMs = cal.timeInMillis,
+                    days = 7
+                )
+                _uiState.update { it.copy(heatmapPerDay = per) }
+            }
+        }
     }
 
     private fun todayIso(): String = isoFmt.format(Date())
@@ -117,6 +143,34 @@ class HomeViewModel(
                         streakDays = days as Int,
                         streakBest = best as Int,
                         focusSessionsToday = sessions as Int
+                    )
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(
+                prefs.timeBankTotalMin,
+                prefs.phantomBuzzCount,
+                prefs.phantomBuzzDate,
+                prefs.morningDoneDate,
+                prefs.morningDoneSteps
+            ) { bank, phantom, phantomDate, mDate, mSteps ->
+                listOf(bank, phantom, phantomDate, mDate, mSteps)
+            }.collect { vals ->
+                val bank = vals[0] as Int
+                val phantom = vals[1] as Int
+                val phantomDate = vals[2] as String
+                val mDate = vals[3] as String
+                @Suppress("UNCHECKED_CAST")
+                val mSteps = vals[4] as Set<String>
+                val today = todayIso()
+                _uiState.update {
+                    it.copy(
+                        timeBankTotalMin = bank,
+                        phantomBuzzToday = if (phantomDate == today) phantom else 0,
+                        morningStepsDone = if (mDate == today) mSteps else emptySet(),
+                        isMorningDoneToday = mDate == today && mSteps.size >= MORNING_STEPS.size
                     )
                 }
             }
@@ -179,7 +233,27 @@ class HomeViewModel(
                     screenMinutesToday = reading.screenMinutes
                 )
             }
+            // Once-per-day deposit into the Time Bank for "minutes saved vs target"
+            // (yesterday's, computed from yesterday's usage). Pure: positive only.
+            val yesterday = yesterdayIso()
+            val lastDeposit = prefs.timeBankLastDate.first()
+            if (lastDeposit != todayIso()) {
+                val yMin = runCatching {
+                    UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = 1)
+                }.getOrDefault(target)
+                val saved = (target - yMin).coerceAtLeast(0)
+                prefs.depositTimeBank(saved, todayIso())
+            }
+            @Suppress("UNUSED_VARIABLE") val _y = yesterday
         }
+    }
+
+    fun bumpPhantomBuzz() {
+        viewModelScope.launch { prefs.bumpPhantomBuzz(todayIso()) }
+    }
+
+    fun toggleMorningStep(step: String) {
+        viewModelScope.launch { prefs.toggleMorningStep(step, todayIso()) }
     }
 
     private fun seedInitialData() {
@@ -244,7 +318,14 @@ class HomeViewModel(
 
     fun toggleTodo(todo: TodoEntity) {
         viewModelScope.launch {
-            todoRepository.update(todo.copy(isCompleted = !todo.isCompleted))
+            val now = System.currentTimeMillis()
+            val newCompleted = !todo.isCompleted
+            todoRepository.update(
+                todo.copy(
+                    isCompleted = newCompleted,
+                    completedAt = if (newCompleted) now else null
+                )
+            )
         }
     }
 
@@ -277,6 +358,11 @@ class HomeViewModel(
 
     companion object {
         private val isoFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val MORNING_STEPS = listOf(
+            "Drink a glass of water",
+            "Stretch for two minutes",
+            "No phone for 30 minutes after waking"
+        )
 
         fun provideFactory(
             todoRepository: TodoRepository,

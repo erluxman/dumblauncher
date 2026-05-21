@@ -6,8 +6,10 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -53,7 +55,8 @@ class HomeScreenTest {
             composeTestRule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
         val text = "UI test todo ${System.currentTimeMillis()}"
-        composeTestRule.onNodeWithText("Add task...").performTextInput(text)
+        composeTestRule.onNodeWithTag("home-list").performScrollToNode(hasTestTag("add-task-input"))
+        composeTestRule.onNodeWithTag("add-task-input").performTextInput(text)
         composeTestRule.onNodeWithText(text).assertIsDisplayed()
     }
 

@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 class TodoRepository(private val todoDao: TodoDao) {
     val allTodos: Flow<List<TodoEntity>> = todoDao.getAllTodos()
 
+    fun completedSince(sinceMs: Long): Flow<List<Long>> = todoDao.completedSince(sinceMs)
+
     suspend fun insert(todo: TodoEntity) {
         todoDao.insertTodo(todo)
     }

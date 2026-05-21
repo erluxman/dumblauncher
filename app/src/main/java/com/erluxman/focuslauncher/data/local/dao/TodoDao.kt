@@ -9,6 +9,9 @@ interface TodoDao {
     @Query("SELECT * FROM todos ORDER BY createdAt DESC")
     fun getAllTodos(): Flow<List<TodoEntity>>
 
+    @Query("SELECT completedAt FROM todos WHERE completedAt IS NOT NULL AND completedAt >= :sinceMs")
+    fun completedSince(sinceMs: Long): Flow<List<Long>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTodo(todo: TodoEntity)
 

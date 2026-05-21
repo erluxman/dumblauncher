@@ -165,7 +165,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag("home-list"),
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     contentPadding = PaddingValues(bottom = 120.dp)
                 ) {
@@ -181,7 +181,24 @@ fun HomeScreen(
                         StreakRow(
                             days = uiState.streakDays,
                             best = uiState.streakBest,
-                            focusSessionsToday = uiState.focusSessionsToday
+                            focusSessionsToday = uiState.focusSessionsToday,
+                            timeBankTotalMin = uiState.timeBankTotalMin
+                        )
+                    }
+                    if (!uiState.isMorningDoneToday) {
+                        item {
+                            MorningRoutineCard(
+                                steps = HomeViewModel.MORNING_STEPS,
+                                done = uiState.morningStepsDone,
+                                onToggle = viewModel::toggleMorningStep
+                            )
+                        }
+                    }
+                    item {
+                        HeatmapStrip(
+                            counts = uiState.heatmapPerDay,
+                            phantomBuzzToday = uiState.phantomBuzzToday,
+                            onBuzz = viewModel::bumpPhantomBuzz
                         )
                     }
                     item { ProjectSection(uiState.projects) }
@@ -438,13 +455,96 @@ private fun OneThingCard(
 }
 
 @Composable
-private fun StreakRow(days: Int, best: Int, focusSessionsToday: Int) {
+private fun StreakRow(days: Int, best: Int, focusSessionsToday: Int, timeBankTotalMin: Int) {
+    val bankLabel = when {
+        timeBankTotalMin >= 60 -> "${timeBankTotalMin / 60}h ${timeBankTotalMin % 60}m"
+        else -> "${timeBankTotalMin}m"
+    }
     Row(
         modifier = Modifier.fillMaxWidth().testTag("streak-row"),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         StatChip(label = "STREAK", value = "${days}d", sub = "best ${best}d", modifier = Modifier.weight(1f))
-        StatChip(label = "FOCUS", value = "${focusSessionsToday}", sub = "sessions today", modifier = Modifier.weight(1f))
+        StatChip(label = "FOCUS", value = "${focusSessionsToday}", sub = "sessions", modifier = Modifier.weight(1f))
+        StatChip(label = "BANK", value = bankLabel, sub = "saved", modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun MorningRoutineCard(
+    steps: List<String>,
+    done: Set<String>,
+    onToggle: (String) -> Unit
+) {
+    Column(modifier = Modifier.testTag("morning")) {
+        SectionHeader("MORNING ROUTINE")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                steps.forEach { step ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggle(step) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(checked = step in done, onCheckedChange = { onToggle(step) })
+                        Text(
+                            text = step,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (step in done) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeatmapStrip(counts: IntArray, phantomBuzzToday: Int, onBuzz: () -> Unit) {
+    Column(modifier = Modifier.testTag("heatmap")) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SectionHeader("LAST 7 DAYS")
+            TextButton(
+                onClick = onBuzz,
+                modifier = Modifier.testTag("phantom-buzz")
+            ) {
+                Text(if (phantomBuzzToday == 0) "Phantom buzz?" else "Buzz x$phantomBuzzToday")
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            counts.forEach { c ->
+                val level = com.erluxman.focuslauncher.service.HeatmapAggregator.level(c)
+                val alpha = when (level) {
+                    0 -> 0.15f
+                    1 -> 0.35f
+                    2 -> 0.55f
+                    3 -> 0.75f
+                    else -> 1f
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(28.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
+                )
+            }
+        }
     }
 }
 
@@ -806,7 +906,7 @@ fun TodoSection(
             TextField(
                 value = newTodoText,
                 onValueChange = { newTodoText = it },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).testTag("add-task-input"),
                 placeholder = { Text("Add task...") },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(

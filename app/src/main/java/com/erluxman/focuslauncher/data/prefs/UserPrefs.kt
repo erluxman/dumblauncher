@@ -33,6 +33,15 @@ object PrefKeys {
     val FOCUS_SESSIONS_TODAY = intPreferencesKey("focus_sessions_today")
     val FOCUS_SESSIONS_DATE = stringPreferencesKey("focus_sessions_date")
 
+    val TIME_BANK_TOTAL_MIN = intPreferencesKey("time_bank_total_min")
+    val TIME_BANK_LAST_DATE = stringPreferencesKey("time_bank_last_date")
+
+    val PHANTOM_BUZZ_COUNT = intPreferencesKey("phantom_buzz_count")
+    val PHANTOM_BUZZ_DATE = stringPreferencesKey("phantom_buzz_date")
+
+    val MORNING_DONE_DATE = stringPreferencesKey("morning_done_date")
+    val MORNING_DONE_STEPS = stringSetPreferencesKey("morning_done_steps")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -75,6 +84,15 @@ class UserPrefs(private val context: Context) {
     val mantraPhrase: Flow<String> = store.data.map { it[PrefKeys.MANTRA_PHRASE].orEmpty() }
     val focusSessionsToday: Flow<Int> = store.data.map { it[PrefKeys.FOCUS_SESSIONS_TODAY] ?: 0 }
     val focusSessionsDate: Flow<String> = store.data.map { it[PrefKeys.FOCUS_SESSIONS_DATE].orEmpty() }
+
+    val timeBankTotalMin: Flow<Int> = store.data.map { it[PrefKeys.TIME_BANK_TOTAL_MIN] ?: 0 }
+    val timeBankLastDate: Flow<String> = store.data.map { it[PrefKeys.TIME_BANK_LAST_DATE].orEmpty() }
+
+    val phantomBuzzCount: Flow<Int> = store.data.map { it[PrefKeys.PHANTOM_BUZZ_COUNT] ?: 0 }
+    val phantomBuzzDate: Flow<String> = store.data.map { it[PrefKeys.PHANTOM_BUZZ_DATE].orEmpty() }
+
+    val morningDoneDate: Flow<String> = store.data.map { it[PrefKeys.MORNING_DONE_DATE].orEmpty() }
+    val morningDoneSteps: Flow<Set<String>> = store.data.map { it[PrefKeys.MORNING_DONE_STEPS] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -143,6 +161,36 @@ class UserPrefs(private val context: Context) {
             val current = if (date == todayIso) (it[PrefKeys.FOCUS_SESSIONS_TODAY] ?: 0) else 0
             it[PrefKeys.FOCUS_SESSIONS_TODAY] = current + 1
             it[PrefKeys.FOCUS_SESSIONS_DATE] = todayIso
+        }
+    }
+
+    suspend fun depositTimeBank(minutes: Int, todayIso: String) {
+        if (minutes <= 0) return
+        store.edit {
+            val lastDate = it[PrefKeys.TIME_BANK_LAST_DATE]
+            if (lastDate == todayIso) return@edit  // already deposited today
+            val total = it[PrefKeys.TIME_BANK_TOTAL_MIN] ?: 0
+            it[PrefKeys.TIME_BANK_TOTAL_MIN] = total + minutes
+            it[PrefKeys.TIME_BANK_LAST_DATE] = todayIso
+        }
+    }
+
+    suspend fun bumpPhantomBuzz(todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.PHANTOM_BUZZ_DATE]
+            val current = if (date == todayIso) (it[PrefKeys.PHANTOM_BUZZ_COUNT] ?: 0) else 0
+            it[PrefKeys.PHANTOM_BUZZ_COUNT] = current + 1
+            it[PrefKeys.PHANTOM_BUZZ_DATE] = todayIso
+        }
+    }
+
+    suspend fun toggleMorningStep(step: String, todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.MORNING_DONE_DATE]
+            val current = if (date == todayIso) (it[PrefKeys.MORNING_DONE_STEPS] ?: emptySet()) else emptySet()
+            val next = if (step in current) current - step else current + step
+            it[PrefKeys.MORNING_DONE_STEPS] = next
+            it[PrefKeys.MORNING_DONE_DATE] = todayIso
         }
     }
 
