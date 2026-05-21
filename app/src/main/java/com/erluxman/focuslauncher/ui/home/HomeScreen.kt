@@ -69,7 +69,8 @@ fun HomeScreen(
     onOpenUninstall: () -> Unit = {},
     onOpenVip: () -> Unit = {},
     onOpenFocus: () -> Unit = {},
-    onOpenMantra: () -> Unit = {}
+    onOpenMantra: () -> Unit = {},
+    onOpenBoredom: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -325,6 +326,10 @@ fun HomeScreen(
                     onOpenMantra = {
                         showSetupDialog = false
                         onOpenMantra()
+                    },
+                    onOpenBoredom = {
+                        showSetupDialog = false
+                        onOpenBoredom()
                     },
                     onExport = {
                         showSetupDialog = false
@@ -773,6 +778,7 @@ fun SetupDialog(
     onOpenVip: () -> Unit = {},
     onOpenFocus: () -> Unit = {},
     onOpenMantra: () -> Unit = {},
+    onOpenBoredom: () -> Unit = {},
     onExport: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -905,6 +911,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-mantra")
                 ) { Text("Set Mantra") }
+
+                TextButton(
+                    onClick = onOpenBoredom,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-boredom")
+                ) { Text("Boredom Preservatory (2 min)") }
 
                 TextButton(
                     onClick = onExport,

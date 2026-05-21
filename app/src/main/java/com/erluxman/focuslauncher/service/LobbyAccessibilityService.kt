@@ -26,6 +26,8 @@ class LobbyAccessibilityService : AccessibilityService() {
     private val variableRatioEnabledFlow = MutableStateFlow(true)
     private val streakDaysFlow = MutableStateFlow(0)
     private val focusSessionsTodayFlow = MutableStateFlow(0)
+    private val lockedTodayFlow = MutableStateFlow<Set<String>>(emptySet())
+    private val unlockCountsFlow = MutableStateFlow<Set<String>>(emptySet())
     private var lastIntercept: Pair<String, Long>? = null
     private var lastDistractionPackage: String? = null
     private var lastDistractionStartMs: Long = 0L
@@ -50,7 +52,12 @@ class LobbyAccessibilityService : AccessibilityService() {
         scope.launch { prefs.technique(PrefKeys.TECH_VARIABLE_RATIO).collect { variableRatioEnabledFlow.value = it } }
         scope.launch { prefs.streakDays.collect { streakDaysFlow.value = it } }
         scope.launch { prefs.focusSessionsToday.collect { focusSessionsTodayFlow.value = it } }
+        scope.launch { prefs.lockedTodayPackages.collect { lockedTodayFlow.value = it } }
+        scope.launch { prefs.unlockCounts.collect { unlockCountsFlow.value = it } }
     }
+
+    private fun todayIsoLocal(): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 
     private fun bumpAndGetVisitOrdinal(pkg: String): Int {
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
@@ -71,13 +78,23 @@ class LobbyAccessibilityService : AccessibilityService() {
         val distractions = distractionsFlow.value
         val isDistraction = pkg in distractions
 
-        // Per-foreground transition handling: dimming + session receipts.
+        // Per-foreground transition handling: dimming + session receipts + overstay lockout.
         if (lastDistractionPackage != null && lastDistractionPackage != pkg) {
             // Leaving (or switching out of) a distraction app.
+            val exitedPkg = lastDistractionPackage!!
             val elapsed = System.currentTimeMillis() - lastDistractionStartMs
-            val toastText = SessionReceipt.format(elapsed, prettyLabel(lastDistractionPackage!!))
+            val toastText = SessionReceipt.format(elapsed, prettyLabel(exitedPkg))
             if (toastText != null) {
                 android.widget.Toast.makeText(this, toastText, android.widget.Toast.LENGTH_LONG).show()
+            }
+            if (IntentPromise.didOverstay(elapsed)) {
+                val today = todayIsoLocal()
+                scope.launch { UserPrefs(applicationContext).lockPackageForToday(exitedPkg, today) }
+                android.widget.Toast.makeText(
+                    this,
+                    "${prettyLabel(exitedPkg)} locked for the rest of today — you overstayed.",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
             }
             if (!isDistraction) {
                 DimmingOverlay.stop(this)
@@ -95,12 +112,30 @@ class LobbyAccessibilityService : AccessibilityService() {
         if (!lobbyEnabledFlow.value) return
         if (!isDistraction) return
 
+        // If this package is locked-for-today, redirect home and toast.
+        val today = todayIsoLocal()
+        if (pkg in lockedTodayFlow.value) {
+            android.widget.Toast.makeText(
+                this,
+                "${prettyLabel(pkg)} is locked until tomorrow.",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            val home = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_HOME)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(home)
+            return
+        }
+
         // Debounce: don't re-intercept the same package within 30s.
         val now = SystemClock.elapsedRealtime()
         val (lastPkg, lastTs) = lastIntercept ?: (null to 0L)
         if (lastPkg == pkg && now - lastTs < 30_000L) return
         lastIntercept = pkg to now
 
+        scope.launch { UserPrefs(applicationContext).bumpUnlockCount(pkg, today) }
+        val nextCount = UnlockIntervention.parseCount(unlockCountsFlow.value, today, pkg) + 1
         val visitOrdinal = bumpAndGetVisitOrdinal(pkg)
         val builderMinutes = LegacyCounter.totalBuilderMinutes(
             completedTodos = streakDaysFlow.value,
@@ -124,6 +159,8 @@ class LobbyAccessibilityService : AccessibilityService() {
             putExtra(LobbyActivity.EXTRA_TARGET_PACKAGE, pkg)
             putExtra(LobbyActivity.EXTRA_COUNTDOWN_SECONDS, seconds)
             putExtra(LobbyActivity.EXTRA_HARDER_MATH, harderMath)
+            putExtra(LobbyActivity.EXTRA_INTERVENTION_COUNT,
+                if (UnlockIntervention.shouldShow(nextCount)) nextCount else 0)
         }
         startActivity(intent)
     }

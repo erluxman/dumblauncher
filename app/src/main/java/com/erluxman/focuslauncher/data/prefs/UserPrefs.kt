@@ -57,6 +57,11 @@ object PrefKeys {
     val NUCLEAR_PASSPHRASE = stringPreferencesKey("nuclear_passphrase")
     val FUTURE_SELF_LETTER = stringPreferencesKey("future_self_letter")
 
+    val LOCKED_TODAY_PACKAGES = stringSetPreferencesKey("locked_today_packages")
+    val LOCKED_TODAY_DATE = stringPreferencesKey("locked_today_date")
+
+    val UNLOCK_COUNTS = stringSetPreferencesKey("unlock_counts")  // "yyyy-MM-dd|pkg|count"
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -125,6 +130,11 @@ class UserPrefs(private val context: Context) {
 
     val nuclearPassphrase: Flow<String> = store.data.map { it[PrefKeys.NUCLEAR_PASSPHRASE].orEmpty() }
     val futureSelfLetter: Flow<String> = store.data.map { it[PrefKeys.FUTURE_SELF_LETTER].orEmpty() }
+
+    val lockedTodayPackages: Flow<Set<String>> = store.data.map { it[PrefKeys.LOCKED_TODAY_PACKAGES] ?: emptySet() }
+    val lockedTodayDate: Flow<String> = store.data.map { it[PrefKeys.LOCKED_TODAY_DATE].orEmpty() }
+
+    val unlockCounts: Flow<Set<String>> = store.data.map { it[PrefKeys.UNLOCK_COUNTS] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -249,6 +259,38 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setFutureSelfLetter(text: String) {
         store.edit { it[PrefKeys.FUTURE_SELF_LETTER] = text }
+    }
+
+    suspend fun lockPackageForToday(pkg: String, todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.LOCKED_TODAY_DATE]
+            val current = if (date == todayIso) (it[PrefKeys.LOCKED_TODAY_PACKAGES] ?: emptySet()) else emptySet()
+            it[PrefKeys.LOCKED_TODAY_PACKAGES] = current + pkg
+            it[PrefKeys.LOCKED_TODAY_DATE] = todayIso
+        }
+    }
+
+    suspend fun resetLockedTodayIfStale(todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.LOCKED_TODAY_DATE]
+            if (date != todayIso) {
+                it.remove(PrefKeys.LOCKED_TODAY_PACKAGES)
+                it[PrefKeys.LOCKED_TODAY_DATE] = todayIso
+            }
+        }
+    }
+
+    suspend fun bumpUnlockCount(pkg: String, todayIso: String) {
+        store.edit {
+            val all = it[PrefKeys.UNLOCK_COUNTS] ?: emptySet()
+            // Drop entries from earlier days while we're here.
+            val sameDay = all.filter { e -> e.startsWith("$todayIso|") }
+            val key = "$todayIso|$pkg"
+            val existing = sameDay.firstOrNull { e -> e.startsWith("$key|") }
+            val nextCount = (existing?.substringAfterLast("|")?.toIntOrNull() ?: 0) + 1
+            val updated = sameDay.filterNot { e -> e.startsWith("$key|") }.toSet() + "$key|$nextCount"
+            it[PrefKeys.UNLOCK_COUNTS] = updated
+        }
     }
 
     suspend fun addMoodPing(timestamp: String, emoji: String, note: String) {

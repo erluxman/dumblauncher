@@ -43,6 +43,21 @@ class LobbyTest {
     }
 
     @Test
+    fun lobby_showsInterventionBanner_whenCountSet() {
+        rule.setContent {
+            FocusLauncherTheme {
+                LobbyContent(
+                    targetPackage = "com.example.distract",
+                    interventionCount = 14,
+                    onAcknowledged = {},
+                    onAborted = {}
+                )
+            }
+        }
+        rule.onNodeWithTag("lobby-intervention").assertIsDisplayed()
+    }
+
+    @Test
     fun lobby_typingIntentAlone_doesNotEnableContinue() {
         rule.setContent {
             FocusLauncherTheme {

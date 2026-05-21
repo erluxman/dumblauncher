@@ -20,6 +20,7 @@ import com.erluxman.focuslauncher.ui.mantra.MantraScreen
 import com.erluxman.focuslauncher.ui.transparency.TransparencyScreen
 import com.erluxman.focuslauncher.ui.uninstall.UninstallScreen
 import com.erluxman.focuslauncher.ui.vip.VipContactsScreen
+import com.erluxman.focuslauncher.ui.boredom.BoredomScreen
 
 sealed class Screen {
     data object Home : Screen()
@@ -29,6 +30,7 @@ sealed class Screen {
     data object Vip : Screen()
     data object Focus : Screen()
     data object Mantra : Screen()
+    data object Boredom : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -71,6 +73,9 @@ private fun AppRoot() {
         current == Screen.Mantra -> {
             MantraScreen(prefs = prefs, onBack = { current = Screen.Home })
         }
+        current == Screen.Boredom -> {
+            BoredomScreen(onBack = { current = Screen.Home })
+        }
         else -> {
             HomeScreen(
                 prefs = prefs,
@@ -79,7 +84,8 @@ private fun AppRoot() {
                 onOpenUninstall = { current = Screen.Uninstall },
                 onOpenVip = { current = Screen.Vip },
                 onOpenFocus = { current = Screen.Focus },
-                onOpenMantra = { current = Screen.Mantra }
+                onOpenMantra = { current = Screen.Mantra },
+                onOpenBoredom = { current = Screen.Boredom }
             )
         }
     }

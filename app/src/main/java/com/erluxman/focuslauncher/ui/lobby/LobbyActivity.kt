@@ -44,12 +44,14 @@ class LobbyActivity : ComponentActivity() {
     private var mantra: String = ""
     private var countdownSeconds: Int = LOBBY_SECONDS
     private var harderMath: Boolean = false
+    private var interventionCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         targetPackage = intent.getStringExtra(EXTRA_TARGET_PACKAGE)
         countdownSeconds = intent.getIntExtra(EXTRA_COUNTDOWN_SECONDS, LOBBY_SECONDS)
         harderMath = intent.getBooleanExtra(EXTRA_HARDER_MATH, false)
+        interventionCount = intent.getIntExtra(EXTRA_INTERVENTION_COUNT, 0)
         mantra = runBlocking {
             com.erluxman.focuslauncher.data.prefs.UserPrefs(applicationContext)
                 .mantraPhrase
@@ -68,6 +70,7 @@ class LobbyActivity : ComponentActivity() {
                     mantra = mantra,
                     countdownSeconds = countdownSeconds,
                     harderMath = harderMath,
+                    interventionCount = interventionCount,
                     onAcknowledged = ::finish,
                     onAborted = {
                         val home = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
@@ -86,6 +89,7 @@ class LobbyActivity : ComponentActivity() {
         const val EXTRA_TARGET_PACKAGE = "extra_target_package"
         const val EXTRA_COUNTDOWN_SECONDS = "extra_countdown_seconds"
         const val EXTRA_HARDER_MATH = "extra_harder_math"
+        const val EXTRA_INTERVENTION_COUNT = "extra_intervention_count"
         const val LOBBY_SECONDS = 10
     }
 }
@@ -96,6 +100,7 @@ internal fun LobbyContent(
     mantra: String = "",
     countdownSeconds: Int = LobbyActivity.LOBBY_SECONDS,
     harderMath: Boolean = false,
+    interventionCount: Int = 0,
     onAcknowledged: () -> Unit,
     onAborted: () -> Unit
 ) {
@@ -146,6 +151,29 @@ internal fun LobbyContent(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
+            if (interventionCount > 0) {
+                Spacer(Modifier.height(12.dp))
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("lobby-intervention"),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "This is attempt #$interventionCount today.",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "The phone is not your friend right now.",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(16.dp))
             Surface(
                 modifier = Modifier.fillMaxWidth(),
