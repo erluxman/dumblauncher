@@ -9,5 +9,7 @@ data class TodoEntity(
     val text: String,
     val isCompleted: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
-    val completedAt: Long? = null
+    val completedAt: Long? = null,
+    val estimatedMinutes: Int? = null,
+    val actualMinutes: Int? = null
 )

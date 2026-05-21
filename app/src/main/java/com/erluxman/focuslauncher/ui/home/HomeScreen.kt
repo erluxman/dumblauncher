@@ -205,6 +205,9 @@ fun HomeScreen(
                         DomainStreaksRow(streaks = uiState.domainStreaks)
                     }
                     item {
+                        FocusPointsChip(points = uiState.focusPoints)
+                    }
+                    item {
                         StreakRow(
                             days = uiState.streakDays,
                             best = uiState.streakBest,
@@ -291,7 +294,7 @@ fun HomeScreen(
                         )
                     }
                     item { ProjectSection(uiState.projects) }
-                    item { TodoSection(uiState.todos, onToggle = viewModel::toggleTodo, onAdd = viewModel::addTodo, onDelete = viewModel::deleteTodo) }
+                    item { TodoSection(uiState.todos, onToggle = viewModel::toggleTodo, onAdd = viewModel::addTodo, onAddWithEstimate = viewModel::addTodoWithEstimate, onDelete = viewModel::deleteTodo) }
                     item {
                         TombstoneSection(
                             entries = uiState.appTombstones,
@@ -1130,14 +1133,24 @@ fun TodoSection(
     todos: List<TodoEntity>,
     onToggle: (TodoEntity) -> Unit,
     onAdd: (String) -> Unit,
-    onDelete: (TodoEntity) -> Unit
+    onDelete: (TodoEntity) -> Unit,
+    onAddWithEstimate: (String, Int?) -> Unit = { t, _ -> onAdd(t) }
 ) {
     var newTodoText by remember { mutableStateOf("") }
+    var estimateText by remember { mutableStateOf("") }
+
+    fun submit() {
+        if (newTodoText.isNotBlank()) {
+            onAddWithEstimate(newTodoText.trim(), estimateText.toIntOrNull())
+            newTodoText = ""
+            estimateText = ""
+        }
+    }
 
     Column {
         SectionHeader("TODAY")
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         todos.forEach { todo ->
             TodoItem(todo, onToggle, onDelete)
         }
@@ -1156,20 +1169,26 @@ fun TodoSection(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent
                 ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (newTodoText.isNotBlank()) {
-                        onAdd(newTodoText)
-                        newTodoText = ""
-                    }
-                })
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onDone = { submit() })
             )
-            IconButton(onClick = {
-                if (newTodoText.isNotBlank()) {
-                    onAdd(newTodoText)
-                    newTodoText = ""
-                }
-            }) {
+            TextField(
+                value = estimateText,
+                onValueChange = { estimateText = it.filter { c -> c.isDigit() }.take(3) },
+                modifier = Modifier.width(80.dp).testTag("add-task-estimate"),
+                placeholder = { Text("min") },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { submit() })
+            )
+            IconButton(onClick = ::submit) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -1189,15 +1208,28 @@ fun TodoItem(todo: TodoEntity, onToggle: (TodoEntity) -> Unit, onDelete: (TodoEn
             onCheckedChange = { onToggle(todo) },
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
         )
-        Text(
-            text = todo.text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = if (todo.isCompleted) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface,
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .clickable { onToggle(todo) }
                 .padding(start = 8.dp)
-        )
+        ) {
+            Text(
+                text = todo.text,
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (todo.isCompleted) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
+            )
+            if (todo.estimatedMinutes != null) {
+                val actual = todo.actualMinutes
+                val tag = if (actual != null) "est ${todo.estimatedMinutes}m → actual ${actual}m"
+                else "est ${todo.estimatedMinutes}m"
+                Text(
+                    text = tag,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
         IconButton(onClick = { onDelete(todo) }, modifier = Modifier.size(24.dp)) {
             Icon(Icons.Default.Close, contentDescription = "Delete", tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
         }
@@ -1449,6 +1481,33 @@ fun SearchOverlay(
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
             }
+        }
+    }
+}
+
+@Composable
+private fun FocusPointsChip(points: Int) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("focus-points"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "FOCUS POINTS",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                "$points",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

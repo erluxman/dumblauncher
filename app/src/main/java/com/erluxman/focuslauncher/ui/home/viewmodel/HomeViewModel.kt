@@ -67,7 +67,8 @@ data class HomeUiState(
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
     val dueFutureLetter: String = "",
-    val domainStreaks: Map<String, Pair<Int, Int>> = emptyMap()
+    val domainStreaks: Map<String, Pair<Int, Int>> = emptyMap(),
+    val focusPoints: Int = 0
 )
 
 class HomeViewModel(
@@ -226,6 +227,12 @@ class HomeViewModel(
                     parts[0] to (days to best)
                 }.toMap()
                 _uiState.update { it.copy(domainStreaks = map) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.focusPoints.collect { p ->
+                _uiState.update { it.copy(focusPoints = p) }
             }
         }
 
@@ -651,12 +658,22 @@ class HomeViewModel(
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             val newCompleted = !todo.isCompleted
+            val actual = if (newCompleted) ((now - todo.createdAt) / (60 * 1000)).toInt() else null
             todoRepository.update(
                 todo.copy(
                     isCompleted = newCompleted,
-                    completedAt = if (newCompleted) now else null
+                    completedAt = if (newCompleted) now else null,
+                    actualMinutes = actual
                 )
             )
+            // Reward / refund a focus point on completion / uncompletion.
+            prefs.addFocusPoints(if (newCompleted) 1 else -1)
+        }
+    }
+
+    fun addTodoWithEstimate(text: String, estimateMin: Int?) {
+        viewModelScope.launch {
+            todoRepository.insert(TodoEntity(text = text, estimatedMinutes = estimateMin))
         }
     }
 

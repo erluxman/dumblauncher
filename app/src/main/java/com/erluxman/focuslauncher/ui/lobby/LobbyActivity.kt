@@ -6,9 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -281,6 +283,95 @@ internal fun LobbyContent(
                 modifier = Modifier.fillMaxWidth().testTag("lobby-abort")
             ) {
                 Text("Actually, no — go home")
+            }
+            Spacer(Modifier.height(24.dp))
+            TimeDilationClock()
+            Spacer(Modifier.height(16.dp))
+            ChoiceOverloadGrid(onChoice = onAborted)
+        }
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun TimeDilationClock() {
+    var elapsed by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000L / 3L)  // 3x speed
+            elapsed++
+        }
+    }
+    val seconds = elapsed % 60
+    val minutes = (elapsed / 60) % 60
+    val hours = elapsed / 3600
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("lobby-time-dilation"),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                "TIME SPENT HERE (3x)",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Text(
+                text = "%02d:%02d:%02d".format(hours, minutes, seconds),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+private val CHOICE_OVERLOAD_ITEMS = listOf(
+    "Read 1 page", "Push-ups × 10", "Drink water", "Stretch", "Make tea",
+    "Call mom", "Text a friend", "Plant care", "Tidy desk", "Walk 5 min",
+    "Breathe 4-7-8", "Journal 1 line", "Sketch", "Wash a dish", "Vacuum 1m",
+    "Stand up", "Eye gaze 20-20-20", "Floss one tooth", "Stretch neck", "Smile",
+    "Sip slowly", "Look outside", "Open window", "Step into sun", "Listen to a song",
+    "Hum a tune", "Refill bottle", "Take supplements", "Set tomorrow's intent",
+    "Send a thanks", "List 3 wins", "Recite mantra", "Inhale slow", "Exhale slow",
+    "Hug a pet", "Pet the wall", "Reorganize one shelf", "Pen a poem", "Fold a sock",
+    "Make bed", "Sit upright", "Roll shoulders", "Find a pen", "Wipe the screen",
+    "Adjust posture", "Greet yourself", "Drink water again"
+)
+
+@androidx.compose.runtime.Composable
+private fun ChoiceOverloadGrid(onChoice: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().testTag("lobby-choice-overload")) {
+        Text(
+            text = "OR DO ONE OF THESE 47 INSTEAD",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.outline,
+            letterSpacing = 1.5.sp
+        )
+        Spacer(Modifier.height(6.dp))
+        // Use Flow-style chunks of 3.
+        CHOICE_OVERLOAD_ITEMS.chunked(3).forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                row.forEach { activity ->
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onChoice() },
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    ) {
+                        Text(
+                            text = activity,
+                            modifier = Modifier.padding(6.dp),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+                repeat(3 - row.size) {
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }

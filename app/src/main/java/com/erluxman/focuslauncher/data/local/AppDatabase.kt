@@ -13,7 +13,7 @@ import com.erluxman.focuslauncher.data.local.entity.TodoEntity
 
 @Database(
     entities = [TodoEntity::class, ProjectEntity::class, JournalEntryEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

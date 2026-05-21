@@ -75,6 +75,8 @@ object PrefKeys {
 
     val DOMAIN_STREAKS = stringSetPreferencesKey("domain_streaks")  // "domain|days|best|lastDate"
 
+    val FOCUS_POINTS = intPreferencesKey("focus_points")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -161,6 +163,8 @@ class UserPrefs(private val context: Context) {
     val futureLetters: Flow<Set<String>> = store.data.map { it[PrefKeys.FUTURE_LETTERS] ?: emptySet() }
     val domainStreaks: Flow<Set<String>> = store.data.map { it[PrefKeys.DOMAIN_STREAKS] ?: emptySet() }
 
+    val focusPoints: Flow<Int> = store.data.map { it[PrefKeys.FOCUS_POINTS] ?: 0 }
+
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
 
@@ -228,6 +232,7 @@ class UserPrefs(private val context: Context) {
             val current = if (date == todayIso) (it[PrefKeys.FOCUS_SESSIONS_TODAY] ?: 0) else 0
             it[PrefKeys.FOCUS_SESSIONS_TODAY] = current + 1
             it[PrefKeys.FOCUS_SESSIONS_DATE] = todayIso
+            it[PrefKeys.FOCUS_POINTS] = (it[PrefKeys.FOCUS_POINTS] ?: 0) + 1
         }
     }
 
@@ -376,6 +381,13 @@ class UserPrefs(private val context: Context) {
             if (parts.size < 4) return@edit
             val replaced = "${parts[0]}|${parts[1]}|1|${parts[3]}"
             it[PrefKeys.FUTURE_LETTERS] = (current - entry) + replaced
+        }
+    }
+
+    suspend fun addFocusPoints(delta: Int) {
+        store.edit {
+            val current = it[PrefKeys.FOCUS_POINTS] ?: 0
+            it[PrefKeys.FOCUS_POINTS] = (current + delta).coerceAtLeast(0)
         }
     }
 
