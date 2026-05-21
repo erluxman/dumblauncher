@@ -46,6 +46,7 @@ class HomeScreenTest {
         composeTestRule.onNodeWithTag("behavior-indicator").assertIsDisplayed()
         composeTestRule.onNodeWithTag("why-here-card").assertIsDisplayed()
         composeTestRule.onNodeWithTag("one-thing").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("home-list").performScrollToNode(hasTestTag("streak-row"))
         composeTestRule.onNodeWithTag("streak-row").assertIsDisplayed()
     }
 

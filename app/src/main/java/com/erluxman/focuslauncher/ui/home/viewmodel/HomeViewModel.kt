@@ -68,7 +68,9 @@ data class HomeUiState(
     val appTombstones: List<String> = emptyList(),
     val dueFutureLetter: String = "",
     val domainStreaks: Map<String, Pair<Int, Int>> = emptyMap(),
-    val focusPoints: Int = 0
+    val focusPoints: Int = 0,
+    val energyZones: Set<String> = emptySet(),
+    val currentHour: Int = 0
 )
 
 class HomeViewModel(
@@ -233,6 +235,12 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.focusPoints.collect { p ->
                 _uiState.update { it.copy(focusPoints = p) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.energyZones.collect { set ->
+                _uiState.update { it.copy(energyZones = set) }
             }
         }
 
@@ -586,10 +594,14 @@ class HomeViewModel(
             while (true) {
                 val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
                 val dream = hour >= DREAM_MODE_START_HOUR || hour < DREAM_MODE_END_HOUR
-                _uiState.update { it.copy(isDreamMode = dream) }
+                _uiState.update { it.copy(isDreamMode = dream, currentHour = hour) }
                 delay(60_000)
             }
         }
+    }
+
+    fun setEnergyZone(window: String, energy: String) {
+        viewModelScope.launch { prefs.setEnergyZone(window, energy) }
     }
 
     private fun seedInitialData() {

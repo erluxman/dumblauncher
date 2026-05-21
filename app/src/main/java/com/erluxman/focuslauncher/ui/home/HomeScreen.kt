@@ -208,6 +208,13 @@ fun HomeScreen(
                         FocusPointsChip(points = uiState.focusPoints)
                     }
                     item {
+                        EnergyZoneCard(
+                            zones = uiState.energyZones,
+                            currentHour = uiState.currentHour,
+                            onSet = viewModel::setEnergyZone
+                        )
+                    }
+                    item {
                         StreakRow(
                             days = uiState.streakDays,
                             best = uiState.streakBest,
@@ -1480,6 +1487,63 @@ fun SearchOverlay(
 
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnergyZoneCard(
+    zones: Set<String>,
+    currentHour: Int,
+    onSet: (String, String) -> Unit
+) {
+    val ez = com.erluxman.focuslauncher.service.EnergyZones
+    val currentWindow = ez.WINDOW_LABELS[ez.windowIndex(currentHour)]
+    val currentEnergy = ez.activeEnergy(currentHour, zones)
+    val suggestion = ez.suggestion(currentEnergy)
+
+    Column(modifier = Modifier.testTag("energy-zone-card")) {
+        SectionHeader("ENERGY ZONE")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Now: $currentWindow • ${currentEnergy.name}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = suggestion,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Spacer(Modifier.height(12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("HIGH", "MED", "LOW").forEach { e ->
+                        val active = currentEnergy.name == e
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onSet(currentWindow, e) }
+                                .testTag("energy-set-$e"),
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                            else MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
+                        ) {
+                            Text(
+                                text = e,
+                                modifier = Modifier.padding(8.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
             }
         }
     }

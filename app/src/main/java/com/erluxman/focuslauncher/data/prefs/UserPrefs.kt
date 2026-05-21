@@ -76,6 +76,7 @@ object PrefKeys {
     val DOMAIN_STREAKS = stringSetPreferencesKey("domain_streaks")  // "domain|days|best|lastDate"
 
     val FOCUS_POINTS = intPreferencesKey("focus_points")
+    val ENERGY_ZONES = stringSetPreferencesKey("energy_zones")  // "0-4|HIGH"
 
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
@@ -164,6 +165,7 @@ class UserPrefs(private val context: Context) {
     val domainStreaks: Flow<Set<String>> = store.data.map { it[PrefKeys.DOMAIN_STREAKS] ?: emptySet() }
 
     val focusPoints: Flow<Int> = store.data.map { it[PrefKeys.FOCUS_POINTS] ?: 0 }
+    val energyZones: Flow<Set<String>> = store.data.map { it[PrefKeys.ENERGY_ZONES] ?: emptySet() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -381,6 +383,14 @@ class UserPrefs(private val context: Context) {
             if (parts.size < 4) return@edit
             val replaced = "${parts[0]}|${parts[1]}|1|${parts[3]}"
             it[PrefKeys.FUTURE_LETTERS] = (current - entry) + replaced
+        }
+    }
+
+    suspend fun setEnergyZone(window: String, energy: String) {
+        store.edit {
+            val current = it[PrefKeys.ENERGY_ZONES] ?: emptySet()
+            val others = current.filterNot { e -> e.startsWith("$window|") }.toSet()
+            it[PrefKeys.ENERGY_ZONES] = others + "$window|$energy"
         }
     }
 

@@ -36,6 +36,7 @@ class DisciplineTilesTest {
         rule.waitUntil(5_000) {
             rule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
+        rule.onNodeWithTag("home-list").performScrollToNode(hasTestTag("streak-row"))
         rule.onNodeWithTag("streak-row").assertIsDisplayed()
         rule.onNodeWithTag("home-list").performScrollToNode(hasTestTag("heatmap"))
         rule.onNodeWithTag("heatmap").assertIsDisplayed()
