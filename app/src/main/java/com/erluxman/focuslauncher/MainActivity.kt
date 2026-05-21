@@ -16,6 +16,7 @@ import com.erluxman.focuslauncher.ui.home.HomeScreen
 import com.erluxman.focuslauncher.ui.onboarding.OnboardingScreen
 import com.erluxman.focuslauncher.ui.theme.FocusLauncherTheme
 import com.erluxman.focuslauncher.ui.focus.FocusTimerScreen
+import com.erluxman.focuslauncher.ui.mantra.MantraScreen
 import com.erluxman.focuslauncher.ui.transparency.TransparencyScreen
 import com.erluxman.focuslauncher.ui.uninstall.UninstallScreen
 import com.erluxman.focuslauncher.ui.vip.VipContactsScreen
@@ -27,6 +28,7 @@ sealed class Screen {
     data object Uninstall : Screen()
     data object Vip : Screen()
     data object Focus : Screen()
+    data object Mantra : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +68,9 @@ private fun AppRoot() {
         current == Screen.Focus -> {
             FocusTimerScreen(prefs = prefs, onBack = { current = Screen.Home })
         }
+        current == Screen.Mantra -> {
+            MantraScreen(prefs = prefs, onBack = { current = Screen.Home })
+        }
         else -> {
             HomeScreen(
                 prefs = prefs,
@@ -73,7 +78,8 @@ private fun AppRoot() {
                 onReplayOnboarding = { current = Screen.Onboarding },
                 onOpenUninstall = { current = Screen.Uninstall },
                 onOpenVip = { current = Screen.Vip },
-                onOpenFocus = { current = Screen.Focus }
+                onOpenFocus = { current = Screen.Focus },
+                onOpenMantra = { current = Screen.Mantra }
             )
         }
     }

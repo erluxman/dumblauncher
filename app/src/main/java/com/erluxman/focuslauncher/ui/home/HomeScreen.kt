@@ -62,7 +62,8 @@ fun HomeScreen(
     onReplayOnboarding: () -> Unit,
     onOpenUninstall: () -> Unit = {},
     onOpenVip: () -> Unit = {},
-    onOpenFocus: () -> Unit = {}
+    onOpenFocus: () -> Unit = {},
+    onOpenMantra: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -245,6 +246,10 @@ fun HomeScreen(
                     onOpenFocus = {
                         showSetupDialog = false
                         onOpenFocus()
+                    },
+                    onOpenMantra = {
+                        showSetupDialog = false
+                        onOpenMantra()
                     }
                 )
             }
@@ -467,7 +472,8 @@ fun SetupDialog(
     onReplayOnboarding: () -> Unit = {},
     onOpenUninstall: () -> Unit = {},
     onOpenVip: () -> Unit = {},
-    onOpenFocus: () -> Unit = {}
+    onOpenFocus: () -> Unit = {},
+    onOpenMantra: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -589,6 +595,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-focus")
                 ) { Text("Focus Session (25/5)") }
+
+                TextButton(
+                    onClick = onOpenMantra,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-mantra")
+                ) { Text("Set Mantra") }
 
                 TextButton(
                     onClick = onOpenUninstall,

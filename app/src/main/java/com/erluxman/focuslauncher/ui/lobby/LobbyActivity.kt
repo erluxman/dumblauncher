@@ -4,6 +4,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,12 +41,18 @@ import kotlinx.coroutines.delay
 class LobbyActivity : ComponentActivity() {
 
     private var targetPackage: String? = null
+    private var mantra: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         targetPackage = intent.getStringExtra(EXTRA_TARGET_PACKAGE)
+        // Read mantra synchronously via runBlocking for activity startup; trivial size.
+        mantra = runBlocking {
+            com.erluxman.focuslauncher.data.prefs.UserPrefs(applicationContext)
+                .mantraPhrase
+                .first()
+        }
 
-        // Block the back button — user must either Continue (gated) or Abort.
         onBackPressedDispatcher.addCallback(this, object :
             androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = Unit
@@ -54,6 +62,7 @@ class LobbyActivity : ComponentActivity() {
             FocusLauncherTheme {
                 LobbyContent(
                     targetPackage = targetPackage ?: "this app",
+                    mantra = mantra,
                     onAcknowledged = ::finish,
                     onAborted = {
                         val home = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
@@ -77,6 +86,7 @@ class LobbyActivity : ComponentActivity() {
 @androidx.compose.runtime.Composable
 internal fun LobbyContent(
     targetPackage: String,
+    mantra: String = "",
     onAcknowledged: () -> Unit,
     onAborted: () -> Unit
 ) {
@@ -85,6 +95,9 @@ internal fun LobbyContent(
     var problem by remember { mutableStateOf(CognitiveTax.generate()) }
     var answer by remember { mutableStateOf("") }
     val solved = answer.toIntOrNull() == problem.answer
+    val mantraMode = mantra.isNotBlank()
+    val mantraOk = !mantraMode || com.erluxman.focuslauncher.ui.mantra.MantraMatcher.matches(intent, mantra)
+    val intentOk = if (mantraMode) mantraOk else intent.trim().length >= 3
 
     LaunchedEffect(Unit) {
         while (remaining > 0) {
@@ -131,16 +144,31 @@ internal fun LobbyContent(
             }
 
             Spacer(Modifier.height(32.dp))
-            Text(
-                text = "What are you opening this for?",
-                style = MaterialTheme.typography.titleMedium
-            )
+            if (mantraMode) {
+                Text(
+                    text = "Type your mantra:",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "\"$mantra\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            } else {
+                Text(
+                    text = "What are you opening this for?",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = intent,
                 onValueChange = { intent = it },
                 modifier = Modifier.fillMaxWidth().testTag("lobby-intent-input"),
-                placeholder = { Text("e.g. message Sam back") },
+                placeholder = {
+                    Text(if (mantraMode) "Type the mantra exactly" else "e.g. message Sam back")
+                },
                 minLines = 2
             )
 
@@ -166,7 +194,7 @@ internal fun LobbyContent(
 
             Button(
                 onClick = onAcknowledged,
-                enabled = remaining == 0 && intent.trim().length >= 3 && solved,
+                enabled = remaining == 0 && intentOk && solved,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("lobby-continue")
@@ -175,7 +203,8 @@ internal fun LobbyContent(
                     when {
                         remaining > 0 -> "Wait ${remaining}s"
                         !solved -> "Solve the math"
-                        intent.trim().length < 3 -> "Declare your intent"
+                        !intentOk && mantraMode -> "Type the mantra"
+                        !intentOk -> "Declare your intent"
                         else -> "Continue"
                     }
                 )
