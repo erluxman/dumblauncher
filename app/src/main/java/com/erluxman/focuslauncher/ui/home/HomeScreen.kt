@@ -153,6 +153,21 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(32.dp),
                     contentPadding = PaddingValues(bottom = 120.dp)
                 ) {
+                    item {
+                        OneThingCard(
+                            text = uiState.oneThingText,
+                            isForToday = uiState.oneThingIsForToday,
+                            onSet = viewModel::setOneThing,
+                            onClear = viewModel::clearOneThing
+                        )
+                    }
+                    item {
+                        StreakRow(
+                            days = uiState.streakDays,
+                            best = uiState.streakBest,
+                            focusSessionsToday = uiState.focusSessionsToday
+                        )
+                    }
                     item { ProjectSection(uiState.projects) }
                     item { TodoSection(uiState.todos, onToggle = viewModel::toggleTodo, onAdd = viewModel::addTodo, onDelete = viewModel::deleteTodo) }
                     item { WidgetSection() }
@@ -312,6 +327,108 @@ internal fun InterventionDialog(
             TextButton(onClick = onDismiss) { Text("Dismiss") }
         }
     )
+}
+
+@Composable
+private fun OneThingCard(
+    text: String,
+    isForToday: Boolean,
+    onSet: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    var draft by remember(text, isForToday) { mutableStateOf(if (isForToday) text else "") }
+    val showInput = !isForToday || text.isBlank()
+
+    Column {
+        SectionHeader("TODAY'S ONE THING")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth().testTag("one-thing"),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (showInput) {
+                    Text(
+                        text = "If you only do one thing today, what is it?",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = draft,
+                        onValueChange = { draft = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("one-thing-input"),
+                        placeholder = { Text("e.g. ship the onboarding refactor") },
+                        singleLine = true
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(
+                        onClick = { onSet(draft) },
+                        enabled = draft.trim().length >= 3,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .testTag("one-thing-save")
+                    ) { Text("Set as today's one thing") }
+                } else {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.testTag("one-thing-text")
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    TextButton(
+                        onClick = onClear,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .testTag("one-thing-clear")
+                    ) { Text("Change") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StreakRow(days: Int, best: Int, focusSessionsToday: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("streak-row"),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        StatChip(label = "STREAK", value = "${days}d", sub = "best ${best}d", modifier = Modifier.weight(1f))
+        StatChip(label = "FOCUS", value = "${focusSessionsToday}", sub = "sessions today", modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun StatChip(label: String, value: String, sub: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 1.5.sp
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = sub,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+    }
 }
 
 @Composable

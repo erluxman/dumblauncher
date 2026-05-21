@@ -16,10 +16,15 @@ import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
+import com.erluxman.focuslauncher.service.StreakLogic
 import com.erluxman.focuslauncher.service.UsageStatsHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 data class HomeUiState(
     val projects: List<ProjectEntity> = emptyList(),
@@ -31,7 +36,12 @@ data class HomeUiState(
     val behaviorIndicatorEnabled: Boolean = true,
     val screenMinutesToday: Int = 0,
     val dailyTargetMin: Int = 180,
-    val whyHere: String = ""
+    val whyHere: String = "",
+    val oneThingText: String = "",
+    val oneThingIsForToday: Boolean = false,
+    val streakDays: Int = 0,
+    val streakBest: Int = 0,
+    val focusSessionsToday: Int = 0
 )
 
 class HomeViewModel(
@@ -52,6 +62,13 @@ class HomeViewModel(
         seedInitialData()
         observePrefs()
         startUsagePolling()
+        rollStreakIfNewDay()
+    }
+
+    private fun todayIso(): String = isoFmt.format(Date())
+    private fun yesterdayIso(): String {
+        val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        return isoFmt.format(cal.time)
     }
 
     private fun loadData() {
@@ -83,7 +100,61 @@ class HomeViewModel(
                 }
             }
         }
+        viewModelScope.launch {
+            combine(
+                prefs.oneThingText,
+                prefs.oneThingDate,
+                prefs.streakDays,
+                prefs.streakBest,
+                prefs.focusSessionsToday
+            ) { text, date, days, best, sessions ->
+                listOf(text, date, days, best, sessions)
+            }.collect { (text, date, days, best, sessions) ->
+                _uiState.update {
+                    it.copy(
+                        oneThingText = text as String,
+                        oneThingIsForToday = (date as String) == todayIso(),
+                        streakDays = days as Int,
+                        streakBest = best as Int,
+                        focusSessionsToday = sessions as Int
+                    )
+                }
+            }
+        }
     }
+
+    private fun rollStreakIfNewDay() {
+        viewModelScope.launch {
+            val lastCheck = prefs.streakLastCheckDate.first()
+            val today = todayIso()
+            if (lastCheck == today) return@launch
+            val yesterday = yesterdayIso()
+            val target = prefs.dailyTargetMin.first().coerceAtLeast(1)
+            val yesterdayMinutes = runCatching {
+                UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = 1)
+            }.getOrDefault(0)
+            val hit = yesterdayMinutes <= target
+            val update = StreakLogic.update(
+                todayIso = today,
+                lastCheckIso = lastCheck,
+                currentDays = prefs.streakDays.first(),
+                currentBest = prefs.streakBest.first(),
+                yesterdayIso = yesterday,
+                yesterdayHitTarget = hit
+            )
+            if (update.persist) prefs.applyStreak(update.days, update.best, today)
+        }
+    }
+
+    fun setOneThing(text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch { prefs.setOneThing(text.trim(), todayIso()) }
+    }
+
+    fun clearOneThing() {
+        viewModelScope.launch { prefs.clearOneThing() }
+    }
+
 
     /** Polls usage stats every 30s and recomputes behavior reading. */
     private fun startUsagePolling() {
@@ -205,6 +276,8 @@ class HomeViewModel(
     }
 
     companion object {
+        private val isoFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+
         fun provideFactory(
             todoRepository: TodoRepository,
             projectRepository: ProjectRepository,

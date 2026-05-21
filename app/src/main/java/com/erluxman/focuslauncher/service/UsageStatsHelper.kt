@@ -71,6 +71,26 @@ object UsageStatsHelper {
             .mapValues { (_, list) -> (list.sumOf { it.totalTimeInForeground } / 60_000L).toInt() }
     }
 
+    /** Returns total foreground time for the day starting `daysAgo` days ago, in minutes. */
+    fun screenMinutesForDay(context: Context, daysAgo: Int): Int {
+        if (!hasPermission(context)) return 0
+        val usage = context.getSystemService(Context.USAGE_STATS_SERVICE) as? UsageStatsManager
+            ?: return 0
+        val cal = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_YEAR, -daysAgo)
+        }
+        val start = cal.timeInMillis
+        cal.add(Calendar.DAY_OF_YEAR, 1)
+        val end = cal.timeInMillis
+        val stats = usage.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end)
+            ?: return 0
+        return (stats.sumOf { it.totalTimeInForeground } / 60_000L).toInt()
+    }
+
     /** Computes the behavior state from today's screen-time relative to user's daily target (minutes). */
     fun deriveBehaviorState(screenMinutes: Int, targetMinutes: Int): BehaviorReading {
         // 5 buckets: THRIVING (<50%), NEUTRAL (50–100%), DRIFTING (100–150%), SINKING (150–200%), DROWNING (>200%)

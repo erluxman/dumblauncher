@@ -41,10 +41,9 @@ class HomeScreenTest {
         }
         composeTestRule.onNodeWithTag("home").assertIsDisplayed()
         composeTestRule.onNodeWithTag("behavior-indicator").assertIsDisplayed()
-        composeTestRule.onNodeWithText("ACTIVE PROJECTS").assertIsDisplayed()
-        composeTestRule.onNodeWithText("TODAY").assertIsDisplayed()
-        composeTestRule.onNodeWithText("WIDGETS").assertIsDisplayed()
         composeTestRule.onNodeWithTag("why-here-card").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("one-thing").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("streak-row").assertIsDisplayed()
     }
 
     @Test

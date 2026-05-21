@@ -22,6 +22,17 @@ object PrefKeys {
     val UNINSTALL_REQUESTED_AT = longPreferencesKey("uninstall_requested_at")
     val VIP_CONTACTS = stringSetPreferencesKey("vip_contacts")
 
+    val ONE_THING_TEXT = stringPreferencesKey("one_thing_text")
+    val ONE_THING_DATE = stringPreferencesKey("one_thing_date")  // yyyy-MM-dd
+
+    val STREAK_DAYS = intPreferencesKey("streak_days")
+    val STREAK_BEST = intPreferencesKey("streak_best")
+    val STREAK_LAST_CHECK_DATE = stringPreferencesKey("streak_last_check_date")
+
+    val MANTRA_PHRASE = stringPreferencesKey("mantra_phrase")
+    val FOCUS_SESSIONS_TODAY = intPreferencesKey("focus_sessions_today")
+    val FOCUS_SESSIONS_DATE = stringPreferencesKey("focus_sessions_date")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -49,6 +60,21 @@ class UserPrefs(private val context: Context) {
 
     val vipContacts: Flow<Set<String>> =
         store.data.map { it[PrefKeys.VIP_CONTACTS] ?: emptySet() }
+
+    val oneThingText: Flow<String> =
+        store.data.map { it[PrefKeys.ONE_THING_TEXT].orEmpty() }
+
+    val oneThingDate: Flow<String> =
+        store.data.map { it[PrefKeys.ONE_THING_DATE].orEmpty() }
+
+    val streakDays: Flow<Int> = store.data.map { it[PrefKeys.STREAK_DAYS] ?: 0 }
+    val streakBest: Flow<Int> = store.data.map { it[PrefKeys.STREAK_BEST] ?: 0 }
+    val streakLastCheckDate: Flow<String> =
+        store.data.map { it[PrefKeys.STREAK_LAST_CHECK_DATE].orEmpty() }
+
+    val mantraPhrase: Flow<String> = store.data.map { it[PrefKeys.MANTRA_PHRASE].orEmpty() }
+    val focusSessionsToday: Flow<Int> = store.data.map { it[PrefKeys.FOCUS_SESSIONS_TODAY] ?: 0 }
+    val focusSessionsDate: Flow<String> = store.data.map { it[PrefKeys.FOCUS_SESSIONS_DATE].orEmpty() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -83,6 +109,41 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setVipContacts(contacts: Set<String>) {
         store.edit { it[PrefKeys.VIP_CONTACTS] = contacts }
+    }
+
+    suspend fun setOneThing(text: String, todayIso: String) {
+        store.edit {
+            it[PrefKeys.ONE_THING_TEXT] = text
+            it[PrefKeys.ONE_THING_DATE] = todayIso
+        }
+    }
+
+    suspend fun clearOneThing() {
+        store.edit {
+            it.remove(PrefKeys.ONE_THING_TEXT)
+            it.remove(PrefKeys.ONE_THING_DATE)
+        }
+    }
+
+    suspend fun applyStreak(newDays: Int, newBest: Int, todayIso: String) {
+        store.edit {
+            it[PrefKeys.STREAK_DAYS] = newDays
+            it[PrefKeys.STREAK_BEST] = newBest
+            it[PrefKeys.STREAK_LAST_CHECK_DATE] = todayIso
+        }
+    }
+
+    suspend fun setMantraPhrase(phrase: String) {
+        store.edit { it[PrefKeys.MANTRA_PHRASE] = phrase }
+    }
+
+    suspend fun bumpFocusSession(todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.FOCUS_SESSIONS_DATE]
+            val current = if (date == todayIso) (it[PrefKeys.FOCUS_SESSIONS_TODAY] ?: 0) else 0
+            it[PrefKeys.FOCUS_SESSIONS_TODAY] = current + 1
+            it[PrefKeys.FOCUS_SESSIONS_DATE] = todayIso
+        }
     }
 
     companion object {
