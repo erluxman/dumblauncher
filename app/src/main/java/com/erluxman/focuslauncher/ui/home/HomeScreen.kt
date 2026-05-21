@@ -154,19 +154,37 @@ fun HomeScreen(
                 if (uiState.crisisActive) {
                     Spacer(Modifier.height(16.dp))
                     SoftenBanner()
-                } else if (uiState.behaviorState in setOf("SINKING", "DROWNING") && uiState.behaviorIndicatorEnabled) {
+                } else if (uiState.behaviorState in setOf("SINKING", "DROWNING")
+                    && uiState.behaviorIndicatorEnabled
+                    && System.currentTimeMillis() >= uiState.sadSuppressedUntilMs
+                ) {
                     Spacer(Modifier.height(16.dp))
-                    val sadSelfMessage = remember(uiState.behaviorState, uiState.whyHere) {
+                    val voice = remember(uiState.sadVoice) {
+                        runCatching {
+                            com.erluxman.focuslauncher.service.SadSelfEngine.Voice.valueOf(uiState.sadVoice)
+                        }.getOrDefault(com.erluxman.focuslauncher.service.SadSelfEngine.Voice.STERN)
+                    }
+                    val sadSelfMessage = remember(uiState.behaviorState, uiState.whyHere, voice) {
                         com.erluxman.focuslauncher.service.SadSelfEngine.pick(
                             state = uiState.behaviorState,
                             why = uiState.whyHere,
-                            seed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt()
+                            seed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt(),
+                            voice = voice
                         )
                     }
                     InterventionBanner(
                         state = uiState.behaviorState,
                         whyHere = sadSelfMessage,
-                        onPause = { showInterventionDialog = true }
+                        onPause = { showInterventionDialog = true },
+                        onDismiss = viewModel::dismissIntervention
+                    )
+                }
+
+                if (uiState.celebrationMessage.isNotBlank()) {
+                    Spacer(Modifier.height(16.dp))
+                    CelebrationBanner(
+                        message = uiState.celebrationMessage,
+                        onDismiss = viewModel::dismissCelebration
                     )
                 }
 
@@ -223,6 +241,12 @@ fun HomeScreen(
                                 onAck = viewModel::ackTrackRecalibration
                             )
                         }
+                    }
+                    item {
+                        SadVoicePicker(
+                            current = uiState.sadVoice,
+                            onPick = viewModel::setSadVoice
+                        )
                     }
                     item {
                         EnergyZoneCard(
@@ -415,18 +439,7 @@ fun HomeScreen(
                     onExport = {
                         showSetupDialog = false
                         scope.launch {
-                            val snapshot = ExportSnapshot(
-                                whyHere = prefs.whyHere.first(),
-                                mantra = prefs.mantraPhrase.first(),
-                                dailyTargetMin = prefs.dailyTargetMin.first(),
-                                streakDays = prefs.streakDays.first(),
-                                streakBest = prefs.streakBest.first(),
-                                vipContacts = prefs.vipContacts.first(),
-                                distractionPackages = prefs.distractionPackages.first(),
-                                todos = todoRepository.allTodos.first(),
-                                projects = projectRepository.activeProjects.first(),
-                                journal = journalRepository.recent.first()
-                            )
+                            val snapshot = buildExportSnapshot(prefs, todoRepository, projectRepository, journalRepository)
                             val json = ExportBuilder.buildJson(snapshot, System.currentTimeMillis())
                             val send = Intent(Intent.ACTION_SEND).apply {
                                 type = "application/json"
@@ -434,6 +447,19 @@ fun HomeScreen(
                                 putExtra(Intent.EXTRA_SUBJECT, "FocusLauncher export")
                             }
                             context.startActivity(Intent.createChooser(send, "Export data"))
+                        }
+                    },
+                    onExportCsv = {
+                        showSetupDialog = false
+                        scope.launch {
+                            val snapshot = buildExportSnapshot(prefs, todoRepository, projectRepository, journalRepository)
+                            val csv = ExportBuilder.buildCsv(snapshot, System.currentTimeMillis())
+                            val send = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/csv"
+                                putExtra(Intent.EXTRA_TEXT, csv)
+                                putExtra(Intent.EXTRA_SUBJECT, "FocusLauncher export (CSV)")
+                            }
+                            context.startActivity(Intent.createChooser(send, "Export data (CSV)"))
                         }
                     }
                 )
@@ -475,7 +501,12 @@ internal fun SoftenBanner() {
 }
 
 @Composable
-internal fun InterventionBanner(state: String, whyHere: String, onPause: () -> Unit) {
+internal fun InterventionBanner(
+    state: String,
+    whyHere: String,
+    onPause: () -> Unit,
+    onDismiss: () -> Unit = {}
+) {
     val color = if (state == "DROWNING") MaterialTheme.colorScheme.error else Color(0xFFF57C00)
     Surface(
         modifier = Modifier.fillMaxWidth().testTag("intervention-banner"),
@@ -496,11 +527,48 @@ internal fun InterventionBanner(state: String, whyHere: String, onPause: () -> U
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(Modifier.height(8.dp))
+            Row {
+                TextButton(
+                    onClick = onPause,
+                    modifier = Modifier.testTag("intervention-pause")
+                ) {
+                    Text("What are you actually doing?")
+                }
+                Spacer(Modifier.weight(1f))
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.testTag("intervention-dismiss")
+                ) {
+                    Text("Not now")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CelebrationBanner(message: String, onDismiss: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("celebration-banner"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "CELEBRATE",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(text = message, style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(8.dp))
             TextButton(
-                onClick = onPause,
-                modifier = Modifier.testTag("intervention-pause")
+                onClick = onDismiss,
+                modifier = Modifier.testTag("celebration-dismiss")
             ) {
-                Text("What are you actually doing?")
+                Text("Thanks")
             }
         }
     }
@@ -860,7 +928,8 @@ fun SetupDialog(
     onOpenFocus: () -> Unit = {},
     onOpenMantra: () -> Unit = {},
     onOpenBoredom: () -> Unit = {},
-    onExport: () -> Unit = {}
+    onExport: () -> Unit = {},
+    onExportCsv: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val devicePolicyManager = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -1008,6 +1077,13 @@ fun SetupDialog(
                 ) { Text("Export data (JSON)") }
 
                 TextButton(
+                    onClick = onExportCsv,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-export-csv")
+                ) { Text("Export data (CSV)") }
+
+                TextButton(
                     onClick = onOpenUninstall,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1025,6 +1101,24 @@ fun SetupDialog(
         }
     )
 }
+
+private suspend fun buildExportSnapshot(
+    prefs: UserPrefs,
+    todoRepository: TodoRepository,
+    projectRepository: ProjectRepository,
+    journalRepository: JournalRepository
+): ExportSnapshot = ExportSnapshot(
+    whyHere = prefs.whyHere.first(),
+    mantra = prefs.mantraPhrase.first(),
+    dailyTargetMin = prefs.dailyTargetMin.first(),
+    streakDays = prefs.streakDays.first(),
+    streakBest = prefs.streakBest.first(),
+    vipContacts = prefs.vipContacts.first(),
+    distractionPackages = prefs.distractionPackages.first(),
+    todos = todoRepository.allTodos.first(),
+    projects = projectRepository.activeProjects.first(),
+    journal = journalRepository.recent.first()
+)
 
 private fun isDefaultLauncher(context: Context): Boolean {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -1504,6 +1598,37 @@ fun SearchOverlay(
 
             Button(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) {
                 Text("Close")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SadVoicePicker(current: String, onPick: (String) -> Unit) {
+    val voices = listOf("STERN", "COMPASSIONATE", "WITTY", "DRILL")
+    Column(modifier = Modifier.testTag("sad-voice-picker")) {
+        SectionHeader("SAD-SELF VOICE")
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            voices.forEach { v ->
+                val active = current == v
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onPick(v) }
+                        .testTag("sad-voice-$v"),
+                    shape = RoundedCornerShape(10.dp),
+                    color = if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ) {
+                    Text(
+                        text = v.take(4),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
             }
         }
     }

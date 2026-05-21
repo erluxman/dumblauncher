@@ -84,6 +84,12 @@ object PrefKeys {
     val TRACK_RECALIBRATED = booleanPreferencesKey("track_recalibrated")
     val BUILDER_MODE = booleanPreferencesKey("builder_mode")
 
+    val SAD_VOICE = stringPreferencesKey("sad_voice")  // STERN / COMPASSIONATE / WITTY / DRILL
+    val SAD_DISMISS_COUNT = intPreferencesKey("sad_dismiss_count")
+    val SAD_SUPPRESSED_UNTIL = longPreferencesKey("sad_suppressed_until")
+    val CELEBRATION_LAST_STREAK = intPreferencesKey("celebration_last_streak")
+    val CELEBRATION_LAST_LEVEL = intPreferencesKey("celebration_last_level")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -178,6 +184,12 @@ class UserPrefs(private val context: Context) {
     val trackMisses: Flow<Int> = store.data.map { it[PrefKeys.TRACK_MISSES] ?: 0 }
     val trackRecalibrated: Flow<Boolean> = store.data.map { it[PrefKeys.TRACK_RECALIBRATED] ?: false }
     val builderMode: Flow<Boolean> = store.data.map { it[PrefKeys.BUILDER_MODE] ?: false }
+
+    val sadVoice: Flow<String> = store.data.map { it[PrefKeys.SAD_VOICE] ?: "STERN" }
+    val sadDismissCount: Flow<Int> = store.data.map { it[PrefKeys.SAD_DISMISS_COUNT] ?: 0 }
+    val sadSuppressedUntil: Flow<Long> = store.data.map { it[PrefKeys.SAD_SUPPRESSED_UNTIL] ?: 0L }
+    val celebrationLastStreak: Flow<Int> = store.data.map { it[PrefKeys.CELEBRATION_LAST_STREAK] ?: 0 }
+    val celebrationLastLevel: Flow<Int> = store.data.map { it[PrefKeys.CELEBRATION_LAST_LEVEL] ?: 0 }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -413,6 +425,35 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setBuilderMode(value: Boolean) {
         store.edit { it[PrefKeys.BUILDER_MODE] = value }
+    }
+
+    suspend fun setSadVoice(voice: String) {
+        store.edit { it[PrefKeys.SAD_VOICE] = voice }
+    }
+
+    suspend fun bumpSadDismissAndSuppress(nowMs: Long) {
+        store.edit {
+            val n = (it[PrefKeys.SAD_DISMISS_COUNT] ?: 0) + 1
+            it[PrefKeys.SAD_DISMISS_COUNT] = n
+            // Back off: 30m * 2^(n-1), capped at 8 hours.
+            val backoff = (30L * 60_000L * (1L shl (n - 1).coerceAtMost(4)))
+                .coerceAtMost(8L * 60 * 60 * 1000)
+            it[PrefKeys.SAD_SUPPRESSED_UNTIL] = nowMs + backoff
+        }
+    }
+
+    suspend fun resetSadDismiss() {
+        store.edit {
+            it[PrefKeys.SAD_DISMISS_COUNT] = 0
+            it[PrefKeys.SAD_SUPPRESSED_UNTIL] = 0L
+        }
+    }
+
+    suspend fun setCelebrationLast(streak: Int, level: Int) {
+        store.edit {
+            it[PrefKeys.CELEBRATION_LAST_STREAK] = streak
+            it[PrefKeys.CELEBRATION_LAST_LEVEL] = level
+        }
     }
 
     suspend fun setEnergyZone(window: String, energy: String) {

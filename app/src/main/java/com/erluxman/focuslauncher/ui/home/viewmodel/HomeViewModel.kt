@@ -75,7 +75,10 @@ data class HomeUiState(
     val trackPoints: Int = 0,
     val trackMisses: Int = 0,
     val trackRecalibrated: Boolean = false,
-    val builderMode: Boolean = false
+    val builderMode: Boolean = false,
+    val sadVoice: String = "STERN",
+    val sadSuppressedUntilMs: Long = 0L,
+    val celebrationMessage: String = ""
 )
 
 class HomeViewModel(
@@ -268,7 +271,15 @@ class HomeViewModel(
                         builderMode = vals[4] as Boolean
                     )
                 }
+                checkCelebration()
             }
+        }
+
+        viewModelScope.launch {
+            combine(prefs.sadVoice, prefs.sadSuppressedUntil) { v, until -> v to until }
+                .collect { (v, until) ->
+                    _uiState.update { it.copy(sadVoice = v, sadSuppressedUntilMs = until) }
+                }
         }
 
         viewModelScope.launch {
@@ -437,6 +448,38 @@ class HomeViewModel(
 
     fun setBuilderMode(value: Boolean) {
         viewModelScope.launch { prefs.setBuilderMode(value) }
+    }
+
+    fun setSadVoice(voice: String) {
+        viewModelScope.launch { prefs.setSadVoice(voice) }
+    }
+
+    fun dismissIntervention() {
+        viewModelScope.launch { prefs.bumpSadDismissAndSuppress(System.currentTimeMillis()) }
+    }
+
+    fun dismissCelebration() {
+        _uiState.update { it.copy(celebrationMessage = "") }
+    }
+
+    private fun checkCelebration() {
+        viewModelScope.launch {
+            val streak = prefs.streakDays.first()
+            val level = prefs.trackLevel.first()
+            val lastStreak = prefs.celebrationLastStreak.first()
+            val lastLevel = prefs.celebrationLastLevel.first()
+            val levelUp = level > lastLevel
+            val milestone = com.erluxman.focuslauncher.service.CelebrationSelf
+                .milestone(streak, levelUp)
+                ?.takeIf { streak != lastStreak || levelUp }
+            if (milestone != null) {
+                val msg = com.erluxman.focuslauncher.service.CelebrationSelf.pick(
+                    milestone, (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt()
+                )
+                _uiState.update { it.copy(celebrationMessage = msg) }
+                prefs.setCelebrationLast(streak, level)
+            }
+        }
     }
 
     fun declareGraceDay(dateIso: String) {
