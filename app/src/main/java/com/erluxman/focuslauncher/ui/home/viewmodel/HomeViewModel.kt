@@ -45,8 +45,12 @@ data class HomeUiState(
     val timeBankTotalMin: Int = 0,
     val phantomBuzzToday: Int = 0,
     val morningStepsDone: Set<String> = emptySet(),
+    val shutdownStepsDone: Set<String> = emptySet(),
     val heatmapPerDay: IntArray = IntArray(7),
-    val isMorningDoneToday: Boolean = false
+    val isMorningDoneToday: Boolean = false,
+    val isShutdownDoneToday: Boolean = false,
+    val identityBuilderToday: Int = 0,
+    val identityConsumerToday: Int = 0
 )
 
 class HomeViewModel(
@@ -175,6 +179,34 @@ class HomeViewModel(
                 }
             }
         }
+
+        viewModelScope.launch {
+            combine(
+                prefs.shutdownDoneDate,
+                prefs.shutdownDoneSteps,
+                prefs.identityBuilderCount,
+                prefs.identityConsumerCount,
+                prefs.identityDate
+            ) { sDate, sSteps, builder, consumer, iDate ->
+                listOf(sDate, sSteps, builder, consumer, iDate)
+            }.collect { vals ->
+                val today = todayIso()
+                val sDate = vals[0] as String
+                @Suppress("UNCHECKED_CAST")
+                val sSteps = vals[1] as Set<String>
+                val builder = vals[2] as Int
+                val consumer = vals[3] as Int
+                val iDate = vals[4] as String
+                _uiState.update {
+                    it.copy(
+                        shutdownStepsDone = if (sDate == today) sSteps else emptySet(),
+                        isShutdownDoneToday = sDate == today && sSteps.size >= SHUTDOWN_STEPS.size,
+                        identityBuilderToday = if (iDate == today) builder else 0,
+                        identityConsumerToday = if (iDate == today) consumer else 0
+                    )
+                }
+            }
+        }
     }
 
     private fun rollStreakIfNewDay() {
@@ -256,6 +288,14 @@ class HomeViewModel(
         viewModelScope.launch { prefs.toggleMorningStep(step, todayIso()) }
     }
 
+    fun toggleShutdownStep(step: String) {
+        viewModelScope.launch { prefs.toggleShutdownStep(step, todayIso()) }
+    }
+
+    fun voteIdentity(isBuilder: Boolean) {
+        viewModelScope.launch { prefs.voteIdentity(isBuilder, todayIso()) }
+    }
+
     private fun seedInitialData() {
         viewModelScope.launch {
             val currentProjects = projectRepository.activeProjects.first()
@@ -304,7 +344,9 @@ class HomeViewModel(
             smsApp?.let { dock.add(it) }
 
             val others = allApps.filter { it.packageName != phoneApp?.packageName && it.packageName != smsApp?.packageName }
-            dock.addAll(others.take(3))
+            val rouletteSeed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000))
+            val rotated = com.erluxman.focuslauncher.service.RouletteShuffler.shuffle(others, rouletteSeed)
+            dock.addAll(rotated.take(3))
 
             _uiState.update { it.copy(apps = allApps, dockApps = dock.take(5)) }
         }
@@ -362,6 +404,12 @@ class HomeViewModel(
             "Drink a glass of water",
             "Stretch for two minutes",
             "No phone for 30 minutes after waking"
+        )
+
+        val SHUTDOWN_STEPS = listOf(
+            "Review tomorrow's calendar",
+            "Set tomorrow's one thing",
+            "One-line journal entry"
         )
 
         fun provideFactory(

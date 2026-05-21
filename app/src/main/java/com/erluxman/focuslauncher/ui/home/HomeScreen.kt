@@ -195,6 +195,23 @@ fun HomeScreen(
                         }
                     }
                     item {
+                        IdentityVoteCard(
+                            builder = uiState.identityBuilderToday,
+                            consumer = uiState.identityConsumerToday,
+                            onVoteBuilder = { viewModel.voteIdentity(true) },
+                            onVoteConsumer = { viewModel.voteIdentity(false) }
+                        )
+                    }
+                    if (!uiState.isShutdownDoneToday) {
+                        item {
+                            ShutdownRitualCard(
+                                steps = HomeViewModel.SHUTDOWN_STEPS,
+                                done = uiState.shutdownStepsDone,
+                                onToggle = viewModel::toggleShutdownStep
+                            )
+                        }
+                    }
+                    item {
                         HeatmapStrip(
                             counts = uiState.heatmapPerDay,
                             phantomBuzzToday = uiState.phantomBuzzToday,
@@ -478,6 +495,94 @@ private fun MorningRoutineCard(
 ) {
     Column(modifier = Modifier.testTag("morning")) {
         SectionHeader("MORNING ROUTINE")
+        Spacer(Modifier.height(8.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                steps.forEach { step ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggle(step) }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(checked = step in done, onCheckedChange = { onToggle(step) })
+                        Text(
+                            text = step,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (step in done) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IdentityVoteCard(
+    builder: Int,
+    consumer: Int,
+    onVoteBuilder: () -> Unit,
+    onVoteConsumer: () -> Unit
+) {
+    Column(modifier = Modifier.testTag("identity")) {
+        SectionHeader("WHO ARE YOU RIGHT NOW?")
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            IdentityChoice(
+                label = "Builder",
+                count = builder,
+                onClick = onVoteBuilder,
+                modifier = Modifier.weight(1f).testTag("identity-builder")
+            )
+            IdentityChoice(
+                label = "Consumer",
+                count = consumer,
+                onClick = onVoteConsumer,
+                modifier = Modifier.weight(1f).testTag("identity-consumer")
+            )
+        }
+    }
+}
+
+@Composable
+private fun IdentityChoice(
+    label: String,
+    count: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = "$count votes today", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+        }
+    }
+}
+
+@Composable
+private fun ShutdownRitualCard(
+    steps: List<String>,
+    done: Set<String>,
+    onToggle: (String) -> Unit
+) {
+    Column(modifier = Modifier.testTag("shutdown")) {
+        SectionHeader("SHUTDOWN RITUAL")
         Spacer(Modifier.height(8.dp))
         Surface(
             modifier = Modifier.fillMaxWidth(),

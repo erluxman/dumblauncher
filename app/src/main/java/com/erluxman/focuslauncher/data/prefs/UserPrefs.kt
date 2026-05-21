@@ -42,6 +42,13 @@ object PrefKeys {
     val MORNING_DONE_DATE = stringPreferencesKey("morning_done_date")
     val MORNING_DONE_STEPS = stringSetPreferencesKey("morning_done_steps")
 
+    val SHUTDOWN_DONE_DATE = stringPreferencesKey("shutdown_done_date")
+    val SHUTDOWN_DONE_STEPS = stringSetPreferencesKey("shutdown_done_steps")
+
+    val IDENTITY_BUILDER_COUNT = intPreferencesKey("identity_builder_count")
+    val IDENTITY_CONSUMER_COUNT = intPreferencesKey("identity_consumer_count")
+    val IDENTITY_DATE = stringPreferencesKey("identity_date")
+
     // Transparency toggles (ETHICS-001): each technique opt-out-able
     val TECH_LOBBY = booleanPreferencesKey("tech_lobby")
     val TECH_DIMMING = booleanPreferencesKey("tech_dimming")
@@ -93,6 +100,13 @@ class UserPrefs(private val context: Context) {
 
     val morningDoneDate: Flow<String> = store.data.map { it[PrefKeys.MORNING_DONE_DATE].orEmpty() }
     val morningDoneSteps: Flow<Set<String>> = store.data.map { it[PrefKeys.MORNING_DONE_STEPS] ?: emptySet() }
+
+    val shutdownDoneDate: Flow<String> = store.data.map { it[PrefKeys.SHUTDOWN_DONE_DATE].orEmpty() }
+    val shutdownDoneSteps: Flow<Set<String>> = store.data.map { it[PrefKeys.SHUTDOWN_DONE_STEPS] ?: emptySet() }
+
+    val identityBuilderCount: Flow<Int> = store.data.map { it[PrefKeys.IDENTITY_BUILDER_COUNT] ?: 0 }
+    val identityConsumerCount: Flow<Int> = store.data.map { it[PrefKeys.IDENTITY_CONSUMER_COUNT] ?: 0 }
+    val identityDate: Flow<String> = store.data.map { it[PrefKeys.IDENTITY_DATE].orEmpty() }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
@@ -191,6 +205,30 @@ class UserPrefs(private val context: Context) {
             val next = if (step in current) current - step else current + step
             it[PrefKeys.MORNING_DONE_STEPS] = next
             it[PrefKeys.MORNING_DONE_DATE] = todayIso
+        }
+    }
+
+    suspend fun toggleShutdownStep(step: String, todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.SHUTDOWN_DONE_DATE]
+            val current = if (date == todayIso) (it[PrefKeys.SHUTDOWN_DONE_STEPS] ?: emptySet()) else emptySet()
+            val next = if (step in current) current - step else current + step
+            it[PrefKeys.SHUTDOWN_DONE_STEPS] = next
+            it[PrefKeys.SHUTDOWN_DONE_DATE] = todayIso
+        }
+    }
+
+    suspend fun voteIdentity(isBuilder: Boolean, todayIso: String) {
+        store.edit {
+            val date = it[PrefKeys.IDENTITY_DATE]
+            val sameDay = date == todayIso
+            val builder = if (sameDay) (it[PrefKeys.IDENTITY_BUILDER_COUNT] ?: 0) else 0
+            val consumer = if (sameDay) (it[PrefKeys.IDENTITY_CONSUMER_COUNT] ?: 0) else 0
+            if (isBuilder) it[PrefKeys.IDENTITY_BUILDER_COUNT] = builder + 1
+            else it[PrefKeys.IDENTITY_BUILDER_COUNT] = builder
+            if (!isBuilder) it[PrefKeys.IDENTITY_CONSUMER_COUNT] = consumer + 1
+            else it[PrefKeys.IDENTITY_CONSUMER_COUNT] = consumer
+            it[PrefKeys.IDENTITY_DATE] = todayIso
         }
     }
 
