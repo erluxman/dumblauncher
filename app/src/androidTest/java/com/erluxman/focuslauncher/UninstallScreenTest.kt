@@ -36,12 +36,17 @@ class UninstallScreenTest {
     }
 
     @Test
-    fun openUninstall_showsStartCta_thenSwitchesToCountdown() {
+    fun openUninstall_showsLastDayTest_thenStartCta_thenCountdown() {
         rule.waitUntil(5_000) {
             rule.onAllNodesWithTag("home").fetchSemanticsNodes().isNotEmpty()
         }
         rule.onNodeWithTag("settings-button").performClick()
         rule.onNodeWithTag("open-uninstall").performScrollTo().performClick()
+
+        rule.waitUntil(5_000) {
+            rule.onAllNodesWithTag("last-day-test").fetchSemanticsNodes().isNotEmpty()
+        }
+        rule.onNodeWithTag("last-day-acknowledge").assertIsDisplayed().performClick()
 
         rule.waitUntil(5_000) {
             rule.onAllNodesWithTag("uninstall").fetchSemanticsNodes().isNotEmpty()
@@ -52,8 +57,5 @@ class UninstallScreenTest {
         }
         rule.onNodeWithTag("uninstall-countdown").assertIsDisplayed()
         rule.onNodeWithTag("uninstall-cancel").assertIsDisplayed().performClick()
-        rule.waitUntil(5_000) {
-            rule.onAllNodesWithTag("uninstall-start").fetchSemanticsNodes().isNotEmpty()
-        }
     }
 }

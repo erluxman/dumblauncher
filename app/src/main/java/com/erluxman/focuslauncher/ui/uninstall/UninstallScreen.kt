@@ -50,12 +50,20 @@ fun UninstallScreen(prefs: UserPrefs, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val startedAt by prefs.uninstallRequestedAt.collectAsState(initial = null)
     var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
+    // Last Day Test: gate this whole screen behind a reflection unless cooldown already started.
+    var lastDayAcknowledged by remember { mutableStateOf(false) }
+    val showLastDayTest = startedAt == null && !lastDayAcknowledged
 
     LaunchedEffect(startedAt) {
         while (true) {
             nowMs = System.currentTimeMillis()
             delay(1000)
         }
+    }
+
+    if (showLastDayTest) {
+        LastDayTest(onAcknowledged = { lastDayAcknowledged = true }, onBack = onBack)
+        return
     }
 
     Surface(
@@ -185,6 +193,60 @@ private fun ElapsedState(onUninstall: () -> Unit, onCancel: () -> Unit) {
             onClick = onCancel,
             modifier = Modifier.fillMaxWidth()
         ) { Text("Cancel — keep using") }
+    }
+}
+
+@Composable
+private fun LastDayTest(onAcknowledged: () -> Unit, onBack: () -> Unit) {
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxSize().testTag("last-day-test"),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+            Spacer(Modifier.height(40.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) {
+                    androidx.compose.material3.Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+                Text(
+                    text = "PAUSE",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.outline,
+                    letterSpacing = 2.sp
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "If today was your last day…",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Would the thing you're about to do — uninstall this discipline launcher — " +
+                    "be the thing you'd want to be remembered for?",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Take a breath. Re-read your declaration. Talk to a friend. Then come back here if you still want to.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.outline
+            )
+            Spacer(Modifier.height(24.dp))
+            Button(
+                onClick = onAcknowledged,
+                modifier = Modifier.fillMaxWidth().testTag("last-day-acknowledge")
+            ) { Text("I've reflected. Continue.") }
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth().testTag("last-day-go-back")
+            ) { Text("Back — I'll stay") }
+        }
     }
 }
 

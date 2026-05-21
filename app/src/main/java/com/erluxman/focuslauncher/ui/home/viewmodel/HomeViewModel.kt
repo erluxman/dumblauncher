@@ -50,7 +50,9 @@ data class HomeUiState(
     val isMorningDoneToday: Boolean = false,
     val isShutdownDoneToday: Boolean = false,
     val identityBuilderToday: Int = 0,
-    val identityConsumerToday: Int = 0
+    val identityConsumerToday: Int = 0,
+    val legacyBuilderMinutes: Int = 0,
+    val crisisActive: Boolean = false
 )
 
 class HomeViewModel(
@@ -90,7 +92,16 @@ class HomeViewModel(
                     dayStartLocalMs = cal.timeInMillis,
                     days = 7
                 )
-                _uiState.update { it.copy(heatmapPerDay = per) }
+                // Legacy: cumulative builder minutes across all-time completions + focus sessions.
+                // todos completed in the last 7 days is a decent proxy until we add a sums query;
+                // for total we re-use the same flow size (cheap, scoped to recent activity).
+                val totalTodos = timestamps.size
+                val totalSessions = _uiState.value.focusSessionsToday  // today only; placeholder
+                val legacy = com.erluxman.focuslauncher.service.LegacyCounter.totalBuilderMinutes(
+                    completedTodos = totalTodos,
+                    focusSessions = totalSessions
+                )
+                _uiState.update { it.copy(heatmapPerDay = per, legacyBuilderMinutes = legacy) }
             }
         }
     }
@@ -258,16 +269,25 @@ class HomeViewModel(
             val minutes = runCatching { UsageStatsHelper.todayScreenMinutes(appContext) }
                 .getOrDefault(0)
             val reading = UsageStatsHelper.deriveBehaviorState(minutes, target)
+            // Recent behavior states (today + 3 prior) → crisis detection.
+            val recent = buildList {
+                add(reading.state)
+                for (d in 1..3) {
+                    val m = runCatching {
+                        UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = d)
+                    }.getOrDefault(0)
+                    add(UsageStatsHelper.deriveBehaviorState(m, target).state)
+                }
+            }
+            val crisis = com.erluxman.focuslauncher.service.CrisisDetector.isCrisis(recent)
             _uiState.update {
                 it.copy(
                     behaviorState = reading.state,
                     behaviorProgress = reading.progress,
-                    screenMinutesToday = reading.screenMinutes
+                    screenMinutesToday = reading.screenMinutes,
+                    crisisActive = crisis
                 )
             }
-            // Once-per-day deposit into the Time Bank for "minutes saved vs target"
-            // (yesterday's, computed from yesterday's usage). Pure: positive only.
-            val yesterday = yesterdayIso()
             val lastDeposit = prefs.timeBankLastDate.first()
             if (lastDeposit != todayIso()) {
                 val yMin = runCatching {
@@ -276,7 +296,6 @@ class HomeViewModel(
                 val saved = (target - yMin).coerceAtLeast(0)
                 prefs.depositTimeBank(saved, todayIso())
             }
-            @Suppress("UNUSED_VARIABLE") val _y = yesterday
         }
     }
 

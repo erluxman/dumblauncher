@@ -128,6 +128,7 @@ fun HomeScreen(
                             progress = uiState.behaviorProgress,
                             screenMinutes = uiState.screenMinutesToday,
                             targetMinutes = uiState.dailyTargetMin,
+                            legacyMinutes = uiState.legacyBuilderMinutes,
                             modifier = Modifier.weight(1f)
                         )
                     } else {
@@ -141,7 +142,10 @@ fun HomeScreen(
                     }
                 }
 
-                if (uiState.behaviorState in setOf("SINKING", "DROWNING") && uiState.behaviorIndicatorEnabled) {
+                if (uiState.crisisActive) {
+                    Spacer(Modifier.height(16.dp))
+                    SoftenBanner()
+                } else if (uiState.behaviorState in setOf("SINKING", "DROWNING") && uiState.behaviorIndicatorEnabled) {
                     Spacer(Modifier.height(16.dp))
                     val sadSelfMessage = remember(uiState.behaviorState, uiState.whyHere) {
                         com.erluxman.focuslauncher.service.SadSelfEngine.pick(
@@ -325,6 +329,38 @@ fun HomeScreen(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun SoftenBanner() {
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("soften-banner"),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "HEY",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "You've been DROWNING for a few days. The discipline mechanics are paused. " +
+                    "If you're not okay, please talk to someone.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "988 — US Suicide & Crisis Lifeline",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -896,6 +932,7 @@ fun BehaviorIndicator(
     progress: Float,
     screenMinutes: Int,
     targetMinutes: Int,
+    legacyMinutes: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val stateColor = when(state) {
@@ -908,12 +945,23 @@ fun BehaviorIndicator(
     }
 
     Column(modifier = modifier.testTag("behavior-indicator")) {
-        Text(
-            text = "CURRENT STATE",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.outline,
-            letterSpacing = 2.sp
-        )
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = "CURRENT STATE",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline,
+                letterSpacing = 2.sp,
+                modifier = Modifier.weight(1f)
+            )
+            if (legacyMinutes > 0) {
+                Text(
+                    text = "legacy ${com.erluxman.focuslauncher.service.LegacyCounter.format(legacyMinutes)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.testTag("legacy-label")
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
