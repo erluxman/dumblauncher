@@ -130,6 +130,9 @@ object PrefKeys {
 
     /** PROD-009 idea parking lot. Each entry: "epochMs|text". */
     val IDEA_PARKING = stringSetPreferencesKey("idea_parking")
+
+    /** READ-001 reading log. Each entry: "iso|minutes". */
+    val READING_LOG = stringSetPreferencesKey("reading_log")
 }
 
 class UserPrefs(private val context: Context) {
@@ -337,6 +340,21 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearParkedIdeas() {
         store.edit { it.remove(PrefKeys.IDEA_PARKING) }
+    }
+
+    val readingLog: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.READING_LOG] ?: emptySet() }
+
+    suspend fun logReading(isoDate: String, minutes: Int) {
+        if (minutes <= 0) return
+        store.edit {
+            val current = it[PrefKeys.READING_LOG] ?: emptySet()
+            it[PrefKeys.READING_LOG] = current + "$isoDate|$minutes"
+        }
+    }
+
+    suspend fun clearReadingLog() {
+        store.edit { it.remove(PrefKeys.READING_LOG) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
