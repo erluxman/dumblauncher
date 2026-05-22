@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.ActuarialMath
+import com.erluxman.focuslauncher.service.mortality.ActuarialMath
 
 /**
  * LIFE-009 Beach Days Remaining + LIFE-012 Death Clock.

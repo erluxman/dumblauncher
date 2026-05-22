@@ -1,4 +1,8 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.mortality
+
+import com.erluxman.focuslauncher.service.MeditationLog
+import com.erluxman.focuslauncher.service.ReadingLog
+import com.erluxman.focuslauncher.service.WorkoutLog
 
 /**
  * LIFE-004 Quarterly Self-Audit aggregator.

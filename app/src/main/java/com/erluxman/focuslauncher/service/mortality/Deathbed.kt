@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.mortality
 
 /**
  * PSYCH-009 Deathbed Simulator.

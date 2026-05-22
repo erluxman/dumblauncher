@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.mortality
 
 /**
  * Pure aggregator that tallies today's wins across modules into a

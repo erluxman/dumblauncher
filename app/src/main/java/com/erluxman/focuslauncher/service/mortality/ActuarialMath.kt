@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.mortality
 
 import java.util.Calendar
 import java.util.GregorianCalendar

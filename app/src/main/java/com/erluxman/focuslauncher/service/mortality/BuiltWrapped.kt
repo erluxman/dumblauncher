@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.mortality
 
 /**
  * LIFE-006 Built Wrapped — pure aggregator + headline.
