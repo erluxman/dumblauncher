@@ -327,6 +327,14 @@ fun HomeScreen(
                         )
                     }
                     item { CompoundCurveCard() }
+                    item {
+                        SleepWindowCard(
+                            cutoffHour = uiState.sleepCutoffHour,
+                            wakeHour = uiState.sleepWakeHour,
+                            onSetCutoff = { h -> scope.launch { prefs.setSleepCutoffHour(h) } },
+                            onSetWake = { h -> scope.launch { prefs.setSleepWakeHour(h) } }
+                        )
+                    }
                     if (uiState.afterFallDueDate.isNotBlank()) {
                         item {
                             AfterFallCard(

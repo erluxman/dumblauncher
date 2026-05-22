@@ -116,6 +116,10 @@ object PrefKeys {
 
     /** SUB-003 caffeine log. Each entry: "epochMs|mg". Trimmed to last 24h on write. */
     val CAFFEINE_DOSES = stringSetPreferencesKey("caffeine_doses")
+
+    /** SLEEP-003 sleep window guardrails. 24h ints, 0..23. */
+    val SLEEP_CUTOFF_HOUR = intPreferencesKey("sleep_cutoff_hour")
+    val SLEEP_WAKE_HOUR = intPreferencesKey("sleep_wake_hour")
 }
 
 class UserPrefs(private val context: Context) {
@@ -246,6 +250,26 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearCaffeineLog() {
         store.edit { it.remove(PrefKeys.CAFFEINE_DOSES) }
+    }
+
+    val sleepCutoffHour: Flow<Int> =
+        store.data.map {
+            (it[PrefKeys.SLEEP_CUTOFF_HOUR] ?: com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_CUTOFF_HOUR)
+                .coerceIn(0, 23)
+        }
+
+    val sleepWakeHour: Flow<Int> =
+        store.data.map {
+            (it[PrefKeys.SLEEP_WAKE_HOUR] ?: com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_WAKE_HOUR)
+                .coerceIn(0, 23)
+        }
+
+    suspend fun setSleepCutoffHour(h: Int) {
+        store.edit { it[PrefKeys.SLEEP_CUTOFF_HOUR] = h.coerceIn(0, 23) }
+    }
+
+    suspend fun setSleepWakeHour(h: Int) {
+        store.edit { it[PrefKeys.SLEEP_WAKE_HOUR] = h.coerceIn(0, 23) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
