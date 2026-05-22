@@ -408,6 +408,12 @@ fun HomeScreen(
                     item { CompoundCurveCard() }
                     item { EstimationCard(todos = uiState.todos) }
                     item {
+                        PatternCard(
+                            hourlyMinutes = uiState.hourlyMinutes,
+                            nowHour = uiState.currentHour
+                        )
+                    }
+                    item {
                         IdeaParkingCard(
                             items = uiState.parkedIdeas,
                             onAdd = { text -> scope.launch { prefs.addParkedIdea(text) } },
