@@ -72,6 +72,7 @@ data class HomeUiState(
     val meditationSessions: List<com.erluxman.focuslauncher.service.MeditationLog.Session> = emptyList(),
     val parkedIdeas: List<com.erluxman.focuslauncher.service.ParkedIdea.Item> = emptyList(),
     val readingSessions: List<com.erluxman.focuslauncher.service.ReadingLog.Session> = emptyList(),
+    val workoutSessions: List<com.erluxman.focuslauncher.service.WorkoutLog.Session> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -305,6 +306,14 @@ class HomeViewModel(
             prefs.readingLog.collect { set ->
                 _uiState.update {
                     it.copy(readingSessions = com.erluxman.focuslauncher.service.ReadingLog.parse(set))
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.workoutLog.collect { set ->
+                _uiState.update {
+                    it.copy(workoutSessions = com.erluxman.focuslauncher.service.WorkoutLog.parse(set))
                 }
             }
         }

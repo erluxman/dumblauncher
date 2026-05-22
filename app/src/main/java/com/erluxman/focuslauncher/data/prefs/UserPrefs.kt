@@ -133,6 +133,9 @@ object PrefKeys {
 
     /** READ-001 reading log. Each entry: "iso|minutes". */
     val READING_LOG = stringSetPreferencesKey("reading_log")
+
+    /** FIT-002 workout log. Each entry: "iso|minutes|kind". */
+    val WORKOUT_LOG = stringSetPreferencesKey("workout_log")
 }
 
 class UserPrefs(private val context: Context) {
@@ -355,6 +358,22 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearReadingLog() {
         store.edit { it.remove(PrefKeys.READING_LOG) }
+    }
+
+    val workoutLog: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.WORKOUT_LOG] ?: emptySet() }
+
+    suspend fun logWorkout(isoDate: String, minutes: Int, kind: String) {
+        if (minutes <= 0) return
+        val safe = kind.replace("|", " ").ifBlank { "Strength" }
+        store.edit {
+            val current = it[PrefKeys.WORKOUT_LOG] ?: emptySet()
+            it[PrefKeys.WORKOUT_LOG] = current + "$isoDate|$minutes|$safe"
+        }
+    }
+
+    suspend fun clearWorkoutLog() {
+        store.edit { it.remove(PrefKeys.WORKOUT_LOG) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =

@@ -386,6 +386,25 @@ fun HomeScreen(
                             onClear = { scope.launch { prefs.clearReadingLog() } }
                         )
                     }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        val last7 = remember(today) {
+                            val cal = java.util.Calendar.getInstance()
+                            val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                            (0..6).map { offset ->
+                                val c = cal.clone() as java.util.Calendar
+                                c.add(java.util.Calendar.DAY_OF_MONTH, -offset)
+                                fmt.format(c.time)
+                            }
+                        }
+                        WorkoutCard(
+                            todayIso = today,
+                            last7DaysIso = last7,
+                            sessions = uiState.workoutSessions,
+                            onLog = { mins, kind -> scope.launch { prefs.logWorkout(today, mins, kind) } },
+                            onClear = { scope.launch { prefs.clearWorkoutLog() } }
+                        )
+                    }
                     item { CompoundCurveCard() }
                     item { EstimationCard(todos = uiState.todos) }
                     item {
