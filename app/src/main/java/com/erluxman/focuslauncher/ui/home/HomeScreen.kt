@@ -327,6 +327,7 @@ fun HomeScreen(
                         )
                     }
                     item { CompoundCurveCard() }
+                    item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {
                         SleepWindowCard(
                             cutoffHour = uiState.sleepCutoffHour,
