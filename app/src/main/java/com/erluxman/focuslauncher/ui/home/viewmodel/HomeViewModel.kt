@@ -44,6 +44,7 @@ data class HomeUiState(
     val focusSessionsToday: Int = 0,
     val timeBankTotalMin: Int = 0,
     val phantomBuzzToday: Int = 0,
+    val unlocksToday: Int = 0,
     val morningStepsDone: Set<String> = emptySet(),
     val shutdownStepsDone: Set<String> = emptySet(),
     val heatmapPerDay: IntArray = IntArray(7),
@@ -325,6 +326,15 @@ class HomeViewModel(
                 _uiState.update {
                     it.copy(commitEntries = com.erluxman.focuslauncher.service.CommitLog.parse(set))
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.unlockCounts.collect { set ->
+                val today = todayIso()
+                val count = set.filter { it.startsWith("$today|") }
+                    .sumOf { e -> e.substringAfterLast("|").toIntOrNull() ?: 0 }
+                _uiState.update { it.copy(unlocksToday = count) }
             }
         }
 

@@ -267,6 +267,12 @@ fun HomeScreen(
                                 steps = uiState.stepsToday
                             )
                         }
+                        item {
+                            StressCard(
+                                unlocksToday = uiState.unlocksToday,
+                                sleepMinutesLastNight = uiState.sleepMinutesLastNight
+                            )
+                        }
                     }
                     item {
                         com.erluxman.focuslauncher.ui.mirror.MirrorWidget()
