@@ -7,9 +7,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.erluxman.focuslauncher.service.mortality.CompoundCurve
 import com.erluxman.focuslauncher.service.EarnedPixels
 import com.erluxman.focuslauncher.service.GraduateState
-import com.erluxman.focuslauncher.service.MeditationLog
+import com.erluxman.focuslauncher.service.habits.MeditationLog
 import com.erluxman.focuslauncher.service.PatternDetect
-import com.erluxman.focuslauncher.service.ReadingLog
+import com.erluxman.focuslauncher.service.habits.ReadingLog
 import com.erluxman.focuslauncher.service.StressIndex
 import com.erluxman.focuslauncher.service.WeeklyReview
 import com.erluxman.focuslauncher.service.fitness.WorkoutLog

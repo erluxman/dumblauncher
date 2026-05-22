@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.Disappointment
+import com.erluxman.focuslauncher.service.social.Disappointment
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

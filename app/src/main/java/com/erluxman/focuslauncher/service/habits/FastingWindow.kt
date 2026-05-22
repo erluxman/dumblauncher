@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.habits
 
 /**
  * NUT-002 Fasting Window — pure-fn.

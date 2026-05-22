@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 /**
  * SOCIAL-012 Receipt Wall — classifier.

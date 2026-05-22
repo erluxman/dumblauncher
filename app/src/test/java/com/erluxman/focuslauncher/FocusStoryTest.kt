@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.FocusStory
+import com.erluxman.focuslauncher.service.social.FocusStory
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

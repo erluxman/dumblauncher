@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.CaffeineMath
+import com.erluxman.focuslauncher.service.habits.CaffeineMath
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale

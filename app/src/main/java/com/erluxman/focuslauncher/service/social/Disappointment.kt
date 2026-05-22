@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 /**
  * SOCIAL-005 Disappointment API — pure-fn that summarises the worst

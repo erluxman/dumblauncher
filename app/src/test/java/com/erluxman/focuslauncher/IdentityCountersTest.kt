@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.IdentityCounters
+import com.erluxman.focuslauncher.service.social.IdentityCounters
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

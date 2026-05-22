@@ -68,15 +68,15 @@ data class HomeUiState(
     val userAge: Int = 0,
     val mortalityWidgetsOptIn: Boolean = false,
     val anchoringEnabled: Boolean = true,
-    val caffeineDoses: List<com.erluxman.focuslauncher.service.CaffeineMath.Dose> = emptyList(),
-    val drinks: List<com.erluxman.focuslauncher.service.HangoverMath.Drink> = emptyList(),
-    val meditationSessions: List<com.erluxman.focuslauncher.service.MeditationLog.Session> = emptyList(),
+    val caffeineDoses: List<com.erluxman.focuslauncher.service.habits.CaffeineMath.Dose> = emptyList(),
+    val drinks: List<com.erluxman.focuslauncher.service.habits.HangoverMath.Drink> = emptyList(),
+    val meditationSessions: List<com.erluxman.focuslauncher.service.habits.MeditationLog.Session> = emptyList(),
     val parkedIdeas: List<com.erluxman.focuslauncher.service.ParkedIdea.Item> = emptyList(),
-    val readingSessions: List<com.erluxman.focuslauncher.service.ReadingLog.Session> = emptyList(),
+    val readingSessions: List<com.erluxman.focuslauncher.service.habits.ReadingLog.Session> = emptyList(),
     val workoutSessions: List<com.erluxman.focuslauncher.service.fitness.WorkoutLog.Session> = emptyList(),
     val commitEntries: List<com.erluxman.focuslauncher.service.CommitLog.Entry> = emptyList(),
     val personalRecords: List<String> = emptyList(),
-    val travelVisits: List<com.erluxman.focuslauncher.service.TravelAtlas.Visit> = emptyList(),
+    val travelVisits: List<com.erluxman.focuslauncher.service.places.TravelAtlas.Visit> = emptyList(),
     val subscriptions: List<com.erluxman.focuslauncher.service.money.SubscriptionMath.Item> = emptyList(),
     val moneyIncome: Int = 0,
     val moneyExpense: Int = 0,
@@ -300,7 +300,7 @@ class HomeViewModel(
 
         viewModelScope.launch {
             prefs.meditationLog.collect { set ->
-                val sessions = com.erluxman.focuslauncher.service.MeditationLog.parse(set)
+                val sessions = com.erluxman.focuslauncher.service.habits.MeditationLog.parse(set)
                 _uiState.update { it.copy(meditationSessions = sessions) }
             }
         }
@@ -316,7 +316,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.readingLog.collect { set ->
                 _uiState.update {
-                    it.copy(readingSessions = com.erluxman.focuslauncher.service.ReadingLog.parse(set))
+                    it.copy(readingSessions = com.erluxman.focuslauncher.service.habits.ReadingLog.parse(set))
                 }
             }
         }
@@ -355,7 +355,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.travelAtlas.collect { set ->
                 _uiState.update {
-                    it.copy(travelVisits = com.erluxman.focuslauncher.service.TravelAtlas.parse(set))
+                    it.copy(travelVisits = com.erluxman.focuslauncher.service.places.TravelAtlas.parse(set))
                 }
             }
         }
@@ -398,7 +398,7 @@ class HomeViewModel(
                     if (parts.size != 2) return@mapNotNull null
                     val ts = parts[0].toLongOrNull() ?: return@mapNotNull null
                     val units = parts[1].toDoubleOrNull() ?: return@mapNotNull null
-                    com.erluxman.focuslauncher.service.HangoverMath.Drink(units = units, takenAtMs = ts)
+                    com.erluxman.focuslauncher.service.habits.HangoverMath.Drink(units = units, takenAtMs = ts)
                 }.sortedBy { it.takenAtMs }
                 _uiState.update { it.copy(drinks = drinks) }
             }
@@ -413,7 +413,7 @@ class HomeViewModel(
                     }
                     val ts = tsStr.toLongOrNull() ?: return@mapNotNull null
                     val mg = mgStr.toIntOrNull() ?: return@mapNotNull null
-                    com.erluxman.focuslauncher.service.CaffeineMath.Dose(mg = mg, takenAtMs = ts)
+                    com.erluxman.focuslauncher.service.habits.CaffeineMath.Dose(mg = mg, takenAtMs = ts)
                 }.sortedBy { it.takenAtMs }
                 _uiState.update { it.copy(caffeineDoses = doses) }
             }

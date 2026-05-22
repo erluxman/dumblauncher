@@ -1,6 +1,8 @@
 package com.erluxman.focuslauncher.service
 
 import com.erluxman.focuslauncher.service.fitness.WorkoutLog
+import com.erluxman.focuslauncher.service.habits.MeditationLog
+import com.erluxman.focuslauncher.service.habits.ReadingLog
 
 /**
  * LIFE-003 Sunday Life Review — aggregator only.

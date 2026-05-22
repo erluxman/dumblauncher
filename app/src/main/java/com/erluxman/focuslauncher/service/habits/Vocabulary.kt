@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.habits
 
 /**
  * READ-003 Vocabulary Growth Curve — pure-fn.

@@ -1,7 +1,7 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.MeditationLog
-import com.erluxman.focuslauncher.service.ReadingLog
+import com.erluxman.focuslauncher.service.habits.MeditationLog
+import com.erluxman.focuslauncher.service.habits.ReadingLog
 import com.erluxman.focuslauncher.service.WeeklyReview
 import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import org.junit.Assert.assertEquals

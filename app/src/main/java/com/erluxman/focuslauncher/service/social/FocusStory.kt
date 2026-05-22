@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 /**
  * SOCIAL-021 Focus Story — headline generator.

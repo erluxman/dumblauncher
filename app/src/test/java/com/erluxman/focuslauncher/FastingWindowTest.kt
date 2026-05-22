@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.FastingWindow
+import com.erluxman.focuslauncher.service.habits.FastingWindow
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

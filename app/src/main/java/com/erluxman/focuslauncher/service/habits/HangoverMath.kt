@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.habits
 
 /**
  * SUB-001 Hangover Calculus.

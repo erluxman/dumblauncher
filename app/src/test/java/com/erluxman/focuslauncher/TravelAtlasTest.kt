@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.TravelAtlas
+import com.erluxman.focuslauncher.service.places.TravelAtlas
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

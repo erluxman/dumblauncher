@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
 

@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.ExposureLedger
+import com.erluxman.focuslauncher.service.places.ExposureLedger
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

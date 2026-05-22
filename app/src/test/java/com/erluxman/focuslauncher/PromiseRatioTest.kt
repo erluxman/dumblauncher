@@ -1,7 +1,7 @@
 package com.erluxman.focuslauncher
 
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
-import com.erluxman.focuslauncher.service.PromiseRatio
+import com.erluxman.focuslauncher.service.social.PromiseRatio
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

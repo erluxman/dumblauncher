@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 /**
  * Three small identity counters that share a parse/count shape:

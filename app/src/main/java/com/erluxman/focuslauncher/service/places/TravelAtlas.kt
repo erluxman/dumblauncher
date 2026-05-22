@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.places
 
 /**
  * LOC-006 Travel Atlas — manual entries.

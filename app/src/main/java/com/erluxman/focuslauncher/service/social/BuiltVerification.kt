@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.social
 
 /**
  * SOCIAL-011 Built Verification Badge — eligibility check.

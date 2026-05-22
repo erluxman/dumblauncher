@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher.service.fitness
 
-import com.erluxman.focuslauncher.service.MeditationLog
+import com.erluxman.focuslauncher.service.habits.MeditationLog
 
 /**
  * FIT-002 Workout Log (manual entry).
