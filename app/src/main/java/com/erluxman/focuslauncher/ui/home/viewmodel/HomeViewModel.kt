@@ -64,6 +64,7 @@ data class HomeUiState(
     val hourlyRateUsd: Int = 0,
     val userAge: Int = 0,
     val mortalityWidgetsOptIn: Boolean = false,
+    val caffeineDoses: List<com.erluxman.focuslauncher.service.CaffeineMath.Dose> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -262,6 +263,21 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.mortalityWidgetsOptIn.collect { v ->
                 _uiState.update { it.copy(mortalityWidgetsOptIn = v) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.caffeineDoses.collect { set ->
+                val doses = set.mapNotNull { entry ->
+                    val (tsStr, mgStr) = entry.split("|", limit = 2).let {
+                        if (it.size != 2) return@mapNotNull null
+                        it[0] to it[1]
+                    }
+                    val ts = tsStr.toLongOrNull() ?: return@mapNotNull null
+                    val mg = mgStr.toIntOrNull() ?: return@mapNotNull null
+                    com.erluxman.focuslauncher.service.CaffeineMath.Dose(mg = mg, takenAtMs = ts)
+                }.sortedBy { it.takenAtMs }
+                _uiState.update { it.copy(caffeineDoses = doses) }
             }
         }
 

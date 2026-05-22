@@ -318,6 +318,14 @@ fun HomeScreen(
                             MortalityCard(userAge = uiState.userAge)
                         }
                     }
+                    item {
+                        CaffeineCard(
+                            doses = uiState.caffeineDoses,
+                            nowMs = System.currentTimeMillis(),
+                            onLog = { mg -> scope.launch { prefs.logCaffeine(mg) } },
+                            onClear = { scope.launch { prefs.clearCaffeineLog() } }
+                        )
+                    }
                     if (uiState.afterFallDueDate.isNotBlank()) {
                         item {
                             AfterFallCard(

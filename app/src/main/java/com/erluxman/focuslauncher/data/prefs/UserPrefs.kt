@@ -113,6 +113,9 @@ object PrefKeys {
 
     /** LIFE-009 + LIFE-012 mortality widgets. Opt-in. */
     val MORTALITY_WIDGETS_OPT_IN = booleanPreferencesKey("mortality_widgets_opt_in")
+
+    /** SUB-003 caffeine log. Each entry: "epochMs|mg". Trimmed to last 24h on write. */
+    val CAFFEINE_DOSES = stringSetPreferencesKey("caffeine_doses")
 }
 
 class UserPrefs(private val context: Context) {
@@ -223,6 +226,26 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setMortalityWidgetsOptIn(value: Boolean) {
         store.edit { it[PrefKeys.MORTALITY_WIDGETS_OPT_IN] = value }
+    }
+
+    val caffeineDoses: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.CAFFEINE_DOSES] ?: emptySet() }
+
+    /** Append a dose and prune anything older than 24h. */
+    suspend fun logCaffeine(mg: Int, nowMs: Long = System.currentTimeMillis()) {
+        if (mg <= 0) return
+        store.edit {
+            val cutoff = nowMs - 24L * 3_600_000L
+            val current = it[PrefKeys.CAFFEINE_DOSES] ?: emptySet()
+            val pruned = current.filter { entry ->
+                entry.substringBefore("|").toLongOrNull()?.let { ts -> ts >= cutoff } ?: false
+            }.toSet()
+            it[PrefKeys.CAFFEINE_DOSES] = pruned + "$nowMs|$mg"
+        }
+    }
+
+    suspend fun clearCaffeineLog() {
+        store.edit { it.remove(PrefKeys.CAFFEINE_DOSES) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
