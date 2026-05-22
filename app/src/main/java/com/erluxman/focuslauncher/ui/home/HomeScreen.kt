@@ -326,6 +326,7 @@ fun HomeScreen(
                             onClear = { scope.launch { prefs.clearCaffeineLog() } }
                         )
                     }
+                    item { CompoundCurveCard() }
                     if (uiState.afterFallDueDate.isNotBlank()) {
                         item {
                             AfterFallCard(
