@@ -406,6 +406,25 @@ fun HomeScreen(
                         )
                     }
                     item { CompoundCurveCard() }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        val last7 = remember(today) {
+                            val cal = java.util.Calendar.getInstance()
+                            val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                            (0..6).map { offset ->
+                                val c = cal.clone() as java.util.Calendar
+                                c.add(java.util.Calendar.DAY_OF_MONTH, -offset)
+                                fmt.format(c.time)
+                            }
+                        }
+                        val summary = com.erluxman.focuslauncher.service.WeeklyReview.summarize(
+                            last7DaysIso = last7,
+                            meditation = uiState.meditationSessions,
+                            reading = uiState.readingSessions,
+                            workout = uiState.workoutSessions,
+                        )
+                        WeeklyReviewCard(summary = summary)
+                    }
                     item { EstimationCard(todos = uiState.todos) }
                     item {
                         PatternCard(
