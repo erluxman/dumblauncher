@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.CelebrationSelf
+import com.erluxman.focuslauncher.service.sad.CelebrationSelf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

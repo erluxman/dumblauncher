@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.FocusEconomy
+import com.erluxman.focuslauncher.service.tracks.FocusEconomy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * GAMIFY-007 Earned Pixels (V1 progress bar).

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.sad
 
 /**
  * ABSURD-001 Kazoo Mode — line generator.

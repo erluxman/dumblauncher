@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.ParkedIdea
+import com.erluxman.focuslauncher.service.insights.ParkedIdea
 
 /**
  * PROD-009 Idea Parking Lot.

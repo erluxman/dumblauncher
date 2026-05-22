@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * TRACK-004 Smart Baseline.

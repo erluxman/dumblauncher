@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.Narrator
+import com.erluxman.focuslauncher.service.sad.Narrator
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

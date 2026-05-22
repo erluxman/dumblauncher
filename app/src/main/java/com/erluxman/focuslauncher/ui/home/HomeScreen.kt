@@ -163,11 +163,11 @@ fun HomeScreen(
                     Spacer(Modifier.height(16.dp))
                     val voice = remember(uiState.sadVoice) {
                         runCatching {
-                            com.erluxman.focuslauncher.service.SadSelfEngine.Voice.valueOf(uiState.sadVoice)
-                        }.getOrDefault(com.erluxman.focuslauncher.service.SadSelfEngine.Voice.STERN)
+                            com.erluxman.focuslauncher.service.sad.SadSelfEngine.Voice.valueOf(uiState.sadVoice)
+                        }.getOrDefault(com.erluxman.focuslauncher.service.sad.SadSelfEngine.Voice.STERN)
                     }
                     val sadSelfMessage = remember(uiState.behaviorState, uiState.whyHere, voice) {
-                        com.erluxman.focuslauncher.service.SadSelfEngine.pick(
+                        com.erluxman.focuslauncher.service.sad.SadSelfEngine.pick(
                             state = uiState.behaviorState,
                             why = uiState.whyHere,
                             seed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt(),
@@ -489,7 +489,7 @@ fun HomeScreen(
                                 fmt.format(c.time)
                             }
                         }
-                        val summary = com.erluxman.focuslauncher.service.WeeklyReview.summarize(
+                        val summary = com.erluxman.focuslauncher.service.insights.WeeklyReview.summarize(
                             last7DaysIso = last7,
                             meditation = uiState.meditationSessions,
                             reading = uiState.readingSessions,
@@ -1156,7 +1156,7 @@ private fun HeatmapStrip(counts: IntArray, phantomBuzzToday: Int, onBuzz: () -> 
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             counts.forEach { c ->
-                val level = com.erluxman.focuslauncher.service.HeatmapAggregator.level(c)
+                val level = com.erluxman.focuslauncher.service.insights.HeatmapAggregator.level(c)
                 val alpha = when (level) {
                     0 -> 0.15f
                     1 -> 0.35f
@@ -1500,7 +1500,7 @@ fun BehaviorIndicator(
             )
             if (legacyMinutes > 0) {
                 Text(
-                    text = "legacy ${com.erluxman.focuslauncher.service.LegacyCounter.format(legacyMinutes)}",
+                    text = "legacy ${com.erluxman.focuslauncher.service.insights.LegacyCounter.format(legacyMinutes)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier.testTag("legacy-label")
@@ -1976,7 +1976,7 @@ private fun TrackCard(
     builderMode: Boolean,
     onToggleBuilder: (Boolean) -> Unit
 ) {
-    val target = com.erluxman.focuslauncher.service.TrackSystem.POINTS_PER_LEVEL
+    val target = com.erluxman.focuslauncher.service.tracks.TrackSystem.POINTS_PER_LEVEL
     Column(modifier = Modifier.testTag("track-card")) {
         SectionHeader("TRACK")
         Spacer(Modifier.height(8.dp))
@@ -2036,7 +2036,7 @@ private fun TrackCard(
 @Composable
 private fun DomainTracksCard(tracks: Map<String, Triple<Int, Int, Int>>) {
     if (tracks.isEmpty()) return
-    val targetPts = com.erluxman.focuslauncher.service.TrackSystem.POINTS_PER_LEVEL
+    val targetPts = com.erluxman.focuslauncher.service.tracks.TrackSystem.POINTS_PER_LEVEL
     Column(modifier = Modifier.testTag("domain-tracks-card")) {
         SectionHeader("DOMAIN TRACKS")
         Spacer(Modifier.height(8.dp))
@@ -2233,7 +2233,7 @@ private fun EnergyZoneCard(
     currentHour: Int,
     onSet: (String, String) -> Unit
 ) {
-    val ez = com.erluxman.focuslauncher.service.EnergyZones
+    val ez = com.erluxman.focuslauncher.service.tracks.EnergyZones
     val currentWindow = ez.WINDOW_LABELS[ez.windowIndex(currentHour)]
     val currentEnergy = ez.activeEnergy(currentHour, zones)
     val suggestion = ez.suggestion(currentEnergy)
@@ -2313,7 +2313,7 @@ private fun FocusPointsChip(points: Int) {
 
 @Composable
 private fun AnchorChip(distractionMinutes: Int) {
-    val delta = com.erluxman.focuslauncher.service.AnchorMath.delta(distractionMinutes)
+    val delta = com.erluxman.focuslauncher.service.insights.AnchorMath.delta(distractionMinutes)
     val tone = if (delta <= 0) MaterialTheme.colorScheme.primary
                else MaterialTheme.colorScheme.error
     Surface(
@@ -2329,7 +2329,7 @@ private fun AnchorChip(distractionMinutes: Int) {
                 letterSpacing = 1.5.sp
             )
             Text(
-                text = "${com.erluxman.focuslauncher.service.AnchorMath.ANCHOR_MINUTES} min today",
+                text = "${com.erluxman.focuslauncher.service.insights.AnchorMath.ANCHOR_MINUTES} min today",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -2484,7 +2484,7 @@ private fun HourlyHeatmapCard(hourly: IntArray) {
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     for (h in 0 until 24) {
-                        val level = com.erluxman.focuslauncher.service.HourlyHeatmap.level(hourly[h])
+                        val level = com.erluxman.focuslauncher.service.insights.HourlyHeatmap.level(hourly[h])
                         val color = when (level) {
                             0 -> MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
                             1 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
@@ -2692,13 +2692,13 @@ private fun InsightsCard(
     onSetHourlyRate: (Int) -> Unit = {},
     onSetAge: (Int) -> Unit = {}
 ) {
-    val cost = com.erluxman.focuslauncher.service.InsightMath
+    val cost = com.erluxman.focuslauncher.service.insights.InsightMath
         .opportunityCost(distractionMinutes, hourlyRate.toDouble())
-    val lifeHours = com.erluxman.focuslauncher.service.InsightMath
+    val lifeHours = com.erluxman.focuslauncher.service.insights.InsightMath
         .lifetimeHoursOnScreen(distractionMinutes, userAge)
-    val ratio = com.erluxman.focuslauncher.service.InsightMath
+    val ratio = com.erluxman.focuslauncher.service.insights.InsightMath
         .ioRatio(distractionMinutes, todosCompletedToday, focusSessionsToday)
-    val projection = com.erluxman.focuslauncher.service.InsightMath
+    val projection = com.erluxman.focuslauncher.service.insights.InsightMath
         .compoundedBalance(timeBankTotalMin, days = 365)
 
     Column(modifier = Modifier.testTag("insights-card")) {
@@ -2735,7 +2735,7 @@ private fun InsightsCard(
                 InsightLine(
                     label = "Bank in 1 year",
                     value = formatBankProjection(projection),
-                    sub = "compounded at ${"%.1f".format(com.erluxman.focuslauncher.service.InsightMath.DAILY_RATE * 100)}%/day"
+                    sub = "compounded at ${"%.1f".format(com.erluxman.focuslauncher.service.insights.InsightMath.DAILY_RATE * 100)}%/day"
                 )
                 if (hourlyRate == 0 || userAge == 0) {
                     Spacer(Modifier.height(12.dp))
@@ -2814,7 +2814,7 @@ private fun GraceRow(
     }
     val isTomorrowGrace = tomorrowIso in graceDays
     val monthIso = remember { tomorrowIso.substring(0, 7) }
-    val canDeclare = com.erluxman.focuslauncher.service.GraceLogic.canAddGrace(monthIso, graceDays)
+    val canDeclare = com.erluxman.focuslauncher.service.tracks.GraceLogic.canAddGrace(monthIso, graceDays)
 
     Column(modifier = Modifier.testTag("grace-row")) {
         SectionHeader("GRACE")

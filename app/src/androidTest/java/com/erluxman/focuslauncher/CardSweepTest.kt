@@ -5,13 +5,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.erluxman.focuslauncher.service.mortality.CompoundCurve
-import com.erluxman.focuslauncher.service.EarnedPixels
+import com.erluxman.focuslauncher.service.tracks.EarnedPixels
 import com.erluxman.focuslauncher.service.GraduateState
 import com.erluxman.focuslauncher.service.habits.MeditationLog
-import com.erluxman.focuslauncher.service.PatternDetect
+import com.erluxman.focuslauncher.service.insights.PatternDetect
 import com.erluxman.focuslauncher.service.habits.ReadingLog
-import com.erluxman.focuslauncher.service.StressIndex
-import com.erluxman.focuslauncher.service.WeeklyReview
+import com.erluxman.focuslauncher.service.insights.StressIndex
+import com.erluxman.focuslauncher.service.insights.WeeklyReview
 import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import com.erluxman.focuslauncher.ui.home.AnchorCard
 import com.erluxman.focuslauncher.ui.home.CompoundCurveCard

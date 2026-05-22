@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.SessionReceipt
+import com.erluxman.focuslauncher.service.insights.SessionReceipt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.StreakLogic
+import com.erluxman.focuslauncher.service.tracks.StreakLogic
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

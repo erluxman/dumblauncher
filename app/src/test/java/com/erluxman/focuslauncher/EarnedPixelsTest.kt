@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.EarnedPixels
+import com.erluxman.focuslauncher.service.tracks.EarnedPixels
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

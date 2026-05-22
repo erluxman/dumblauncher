@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * MIND-002 Stress Weather Report (V1 lite).

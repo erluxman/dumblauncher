@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.PatternDetect
+import com.erluxman.focuslauncher.service.insights.PatternDetect
 
 /**
  * PSYCH-012 Pattern Detection (today-scoped, simple weakest-hour).

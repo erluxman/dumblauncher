@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * Pure math helpers powering the V1 "insight" surfaces — opportunity cost,

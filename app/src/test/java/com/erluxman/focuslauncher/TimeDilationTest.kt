@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.TimeDilation
+import com.erluxman.focuslauncher.service.insights.TimeDilation
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

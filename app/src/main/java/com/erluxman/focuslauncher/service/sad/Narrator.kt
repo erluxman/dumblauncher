@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.sad
 
 /**
  * ABSURD-002 Narrator — pure line generator.

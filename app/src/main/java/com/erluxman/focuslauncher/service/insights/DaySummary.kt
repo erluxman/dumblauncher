@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * Pure formatter for the auto-generated Day Summary journal entry (PROD-004).

@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.ParkedIdea
+import com.erluxman.focuslauncher.service.insights.ParkedIdea
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

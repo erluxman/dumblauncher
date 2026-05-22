@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.EnergyZones
+import com.erluxman.focuslauncher.service.tracks.EnergyZones
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.BaselineDetector
+import com.erluxman.focuslauncher.service.tracks.BaselineDetector
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

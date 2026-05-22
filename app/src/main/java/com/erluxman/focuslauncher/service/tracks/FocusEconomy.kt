@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * GAMIFY-003 Focus Score Economy — pure exchange math.

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * ABSURD-003 Time Dilation.

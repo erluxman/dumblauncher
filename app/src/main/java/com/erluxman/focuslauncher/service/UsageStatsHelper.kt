@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher.service
+import com.erluxman.focuslauncher.service.insights.HourlyHeatmap
 
 import android.app.AppOpsManager
 import android.app.usage.UsageStatsManager

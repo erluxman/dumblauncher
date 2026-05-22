@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         faceDownDetector = com.erluxman.focuslauncher.service.FaceDownDetector(
             applicationContext
         ) {
-            val line = com.erluxman.focuslauncher.service.Applause
+            val line = com.erluxman.focuslauncher.service.sad.Applause
                 .maybeLine(elapsedMs = 0L, seed = System.currentTimeMillis())
                 ?: "phone down. that's a win."
             android.widget.Toast.makeText(applicationContext, line, android.widget.Toast.LENGTH_SHORT).show()

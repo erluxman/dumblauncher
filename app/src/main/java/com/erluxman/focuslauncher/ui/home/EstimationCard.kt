@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
-import com.erluxman.focuslauncher.service.EstimationAccuracy
+import com.erluxman.focuslauncher.service.insights.EstimationAccuracy
 
 @Composable
 fun EstimationCard(

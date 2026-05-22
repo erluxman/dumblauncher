@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * Pure logic for Grace Day (GRACE-001) and Streak Freeze (GRACE-002).

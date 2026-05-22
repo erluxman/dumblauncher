@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.sad
 
 /**
  * SAD-001/002: personalised "sad self" templates. Four voice styles, each with

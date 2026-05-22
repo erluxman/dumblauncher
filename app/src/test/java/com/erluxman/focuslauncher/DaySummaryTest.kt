@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.DaySummary
+import com.erluxman.focuslauncher.service.insights.DaySummary
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

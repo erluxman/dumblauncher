@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.UserLevel
+import com.erluxman.focuslauncher.service.tracks.UserLevel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

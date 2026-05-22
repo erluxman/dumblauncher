@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import com.erluxman.focuslauncher.service.habits.MeditationLog

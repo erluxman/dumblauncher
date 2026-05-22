@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.LegacyCounter
+import com.erluxman.focuslauncher.service.insights.LegacyCounter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

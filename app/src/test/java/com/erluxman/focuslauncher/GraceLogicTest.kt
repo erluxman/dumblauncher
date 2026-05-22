@@ -1,7 +1,7 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.GraceLogic
-import com.erluxman.focuslauncher.service.GraceOutcome
+import com.erluxman.focuslauncher.service.tracks.GraceLogic
+import com.erluxman.focuslauncher.service.tracks.GraceOutcome
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

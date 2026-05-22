@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.AnchorMath
+import com.erluxman.focuslauncher.service.insights.AnchorMath
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

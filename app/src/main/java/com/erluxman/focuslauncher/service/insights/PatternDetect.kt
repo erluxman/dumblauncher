@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * PSYCH-012 Pattern Detection (today-scoped V1).

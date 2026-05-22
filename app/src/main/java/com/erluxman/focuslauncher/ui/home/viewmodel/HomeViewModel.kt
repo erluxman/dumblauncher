@@ -16,7 +16,7 @@ import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
-import com.erluxman.focuslauncher.service.StreakLogic
+import com.erluxman.focuslauncher.service.tracks.StreakLogic
 import com.erluxman.focuslauncher.service.UsageStatsHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -71,7 +71,7 @@ data class HomeUiState(
     val caffeineDoses: List<com.erluxman.focuslauncher.service.habits.CaffeineMath.Dose> = emptyList(),
     val drinks: List<com.erluxman.focuslauncher.service.habits.HangoverMath.Drink> = emptyList(),
     val meditationSessions: List<com.erluxman.focuslauncher.service.habits.MeditationLog.Session> = emptyList(),
-    val parkedIdeas: List<com.erluxman.focuslauncher.service.ParkedIdea.Item> = emptyList(),
+    val parkedIdeas: List<com.erluxman.focuslauncher.service.insights.ParkedIdea.Item> = emptyList(),
     val readingSessions: List<com.erluxman.focuslauncher.service.habits.ReadingLog.Session> = emptyList(),
     val workoutSessions: List<com.erluxman.focuslauncher.service.fitness.WorkoutLog.Session> = emptyList(),
     val commitEntries: List<com.erluxman.focuslauncher.service.CommitLog.Entry> = emptyList(),
@@ -150,8 +150,8 @@ class HomeViewModel(
             prefs.addBaselineSample(yIso, mins)
             val samples = prefs.baselineSamples.first()
                 .mapNotNull { it.split("|").getOrNull(1)?.toIntOrNull() }
-            if (com.erluxman.focuslauncher.service.BaselineDetector.isComplete(samples)) {
-                val target = com.erluxman.focuslauncher.service.BaselineDetector
+            if (com.erluxman.focuslauncher.service.tracks.BaselineDetector.isComplete(samples)) {
+                val target = com.erluxman.focuslauncher.service.tracks.BaselineDetector
                     .proposedTarget(samples)
                 if (target != null) {
                     _uiState.update { it.copy(baselineProposedTarget = target) }
@@ -184,7 +184,7 @@ class HomeViewModel(
                     set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
                     set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
                 }
-                val per = com.erluxman.focuslauncher.service.HeatmapAggregator.perDayCounts(
+                val per = com.erluxman.focuslauncher.service.insights.HeatmapAggregator.perDayCounts(
                     completionsMs = timestamps,
                     nowMs = now,
                     dayStartLocalMs = cal.timeInMillis,
@@ -195,7 +195,7 @@ class HomeViewModel(
                 // for total we re-use the same flow size (cheap, scoped to recent activity).
                 val totalTodos = timestamps.size
                 val totalSessions = _uiState.value.focusSessionsToday  // today only; placeholder
-                val legacy = com.erluxman.focuslauncher.service.LegacyCounter.totalBuilderMinutes(
+                val legacy = com.erluxman.focuslauncher.service.insights.LegacyCounter.totalBuilderMinutes(
                     completedTodos = totalTodos,
                     focusSessions = totalSessions
                 )
@@ -308,7 +308,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.ideaParking.collect { set ->
                 _uiState.update {
-                    it.copy(parkedIdeas = com.erluxman.focuslauncher.service.ParkedIdea.parse(set))
+                    it.copy(parkedIdeas = com.erluxman.focuslauncher.service.insights.ParkedIdea.parse(set))
                 }
             }
         }
@@ -639,14 +639,14 @@ class HomeViewModel(
 
             // If the user would have broken: try grace day, then freeze.
             val hit = if (rawHit) true else when (
-                com.erluxman.focuslauncher.service.GraceLogic.resolveBreak(yesterday, graceSet, freezes)
+                com.erluxman.focuslauncher.service.tracks.GraceLogic.resolveBreak(yesterday, graceSet, freezes)
             ) {
-                com.erluxman.focuslauncher.service.GraceOutcome.GracedByDay -> true
-                com.erluxman.focuslauncher.service.GraceOutcome.GracedByFreeze -> {
+                com.erluxman.focuslauncher.service.tracks.GraceOutcome.GracedByDay -> true
+                com.erluxman.focuslauncher.service.tracks.GraceOutcome.GracedByFreeze -> {
                     prefs.setStreakFreezes((freezes - 1).coerceAtLeast(0))
                     true
                 }
-                com.erluxman.focuslauncher.service.GraceOutcome.Broken -> {
+                com.erluxman.focuslauncher.service.tracks.GraceOutcome.Broken -> {
                     prefs.setAfterFallDue(today)
                     false
                 }
@@ -662,16 +662,16 @@ class HomeViewModel(
             if (update.persist) {
                 prefs.applyStreak(update.days, update.best, today)
                 // Auto-grant freezes as user accumulates perfect days.
-                val earned = com.erluxman.focuslauncher.service.GraceLogic.earnedFreezes(update.days)
+                val earned = com.erluxman.focuslauncher.service.tracks.GraceLogic.earnedFreezes(update.days)
                 if (earned > freezes) prefs.setStreakFreezes(earned)
 
                 // Track System rollover: one day at a time.
-                val snap = com.erluxman.focuslauncher.service.TrackSystem.Snapshot(
+                val snap = com.erluxman.focuslauncher.service.tracks.TrackSystem.Snapshot(
                     level = prefs.trackLevel.first(),
                     pointsToward = prefs.trackPoints.first(),
                     missStreak = prefs.trackMisses.first()
                 )
-                val next = com.erluxman.focuslauncher.service.TrackSystem.applyDay(snap, hit)
+                val next = com.erluxman.focuslauncher.service.tracks.TrackSystem.applyDay(snap, hit)
                 prefs.applyTrackSnapshot(next.level, next.pointsToward, next.missStreak, next.recalibrated)
             }
         }
@@ -704,11 +704,11 @@ class HomeViewModel(
             val lastStreak = prefs.celebrationLastStreak.first()
             val lastLevel = prefs.celebrationLastLevel.first()
             val levelUp = level > lastLevel
-            val milestone = com.erluxman.focuslauncher.service.CelebrationSelf
+            val milestone = com.erluxman.focuslauncher.service.sad.CelebrationSelf
                 .milestone(streak, levelUp)
                 ?.takeIf { streak != lastStreak || levelUp }
             if (milestone != null) {
-                val msg = com.erluxman.focuslauncher.service.CelebrationSelf.pick(
+                val msg = com.erluxman.focuslauncher.service.sad.CelebrationSelf.pick(
                     milestone, (System.currentTimeMillis() / (24L * 60 * 60 * 1000)).toInt()
                 )
                 _uiState.update { it.copy(celebrationMessage = msg) }
@@ -764,21 +764,21 @@ class HomeViewModel(
                 return Triple(parts[1].toIntOrNull() ?: 0, parts[2].toIntOrNull() ?: 0, parts[3])
             }
 
-            fun trackFor(domain: String): com.erluxman.focuslauncher.service.TrackSystem.Snapshot {
+            fun trackFor(domain: String): com.erluxman.focuslauncher.service.tracks.TrackSystem.Snapshot {
                 val entry = currentTracks.firstOrNull { it.startsWith("$domain|") }
                 val parts = entry?.split("|", limit = 5)
                 return if (parts != null && parts.size == 5) {
-                    com.erluxman.focuslauncher.service.TrackSystem.Snapshot(
+                    com.erluxman.focuslauncher.service.tracks.TrackSystem.Snapshot(
                         level = parts[1].toIntOrNull() ?: 1,
                         pointsToward = parts[2].toIntOrNull() ?: 0,
                         missStreak = parts[3].toIntOrNull() ?: 0
                     )
-                } else com.erluxman.focuslauncher.service.TrackSystem.Snapshot(1, 0, 0)
+                } else com.erluxman.focuslauncher.service.tracks.TrackSystem.Snapshot(1, 0, 0)
             }
 
             suspend fun rollTrack(domain: String, hit: Boolean, lastDate: String) {
                 if (lastDate == today) return
-                val next = com.erluxman.focuslauncher.service.TrackSystem.applyDay(trackFor(domain), hit)
+                val next = com.erluxman.focuslauncher.service.tracks.TrackSystem.applyDay(trackFor(domain), hit)
                 prefs.updateDomainTrack(domain, next.level, next.pointsToward, next.missStreak, today)
             }
 
@@ -934,7 +934,7 @@ class HomeViewModel(
             val alreadySummarized = today in prefs.daySummaryDates.first()
             if (isDone && !alreadySummarized) {
                 val state = _uiState.value
-                val text = com.erluxman.focuslauncher.service.DaySummary.build(
+                val text = com.erluxman.focuslauncher.service.insights.DaySummary.build(
                     dateIso = today,
                     screenMinutes = state.screenMinutesToday,
                     distractionMinutes = state.distractionMinutesToday,

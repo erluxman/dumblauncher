@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.EarnedPixels
+import com.erluxman.focuslauncher.service.tracks.EarnedPixels
 
 @Composable
 fun EarnedPixelsCard(

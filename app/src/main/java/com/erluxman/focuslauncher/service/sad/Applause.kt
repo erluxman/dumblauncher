@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.sad
 
 /**
  * GAMIFY-001 The Applause.

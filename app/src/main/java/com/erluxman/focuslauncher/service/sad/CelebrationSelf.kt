@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.sad
 
 /**
  * SAD-003: opposite-of-sad-self. Picks a celebratory line on milestones.

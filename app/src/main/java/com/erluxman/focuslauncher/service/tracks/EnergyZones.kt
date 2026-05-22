@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * Pure logic for PROD-014 Energy Zones.

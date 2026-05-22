@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.WeeklyReview
+import com.erluxman.focuslauncher.service.insights.WeeklyReview
 
 @Composable
 fun WeeklyReviewCard(

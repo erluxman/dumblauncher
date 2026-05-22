@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.HourlyHeatmap
+import com.erluxman.focuslauncher.service.insights.HourlyHeatmap
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

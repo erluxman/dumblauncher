@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 object ParkedIdea {
     data class Item(val timestampMs: Long, val text: String, val raw: String)

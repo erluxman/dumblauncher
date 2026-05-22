@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * Pure logic for the V1 Track System (TRACK-001 + TRACK-002 + GRACE-003).

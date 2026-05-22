@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher.service
+import com.erluxman.focuslauncher.service.tracks.UserLevel
 
 object LobbyTuner {
 

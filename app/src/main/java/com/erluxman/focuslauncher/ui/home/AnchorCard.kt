@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.Anchoring
+import com.erluxman.focuslauncher.service.sad.Anchoring
 
 /**
  * PSYCH-013 Anchoring Attack — surfaced honestly.

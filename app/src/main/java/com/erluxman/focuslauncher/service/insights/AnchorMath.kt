@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.insights
 
 /**
  * Pure logic for PSYCH-013 Anchoring Attack: surface a deliberately
