@@ -142,6 +142,9 @@ object PrefKeys {
 
     /** FIT-003 personal records. Each entry: "isoFirstSet|label|value|unit". */
     val PR_WALL = stringSetPreferencesKey("pr_wall")
+
+    /** LOC-006 travel atlas. Each entry: "year|location". */
+    val TRAVEL_ATLAS = stringSetPreferencesKey("travel_atlas")
 }
 
 class UserPrefs(private val context: Context) {
@@ -417,6 +420,25 @@ class UserPrefs(private val context: Context) {
         store.edit {
             val current = it[PrefKeys.PR_WALL] ?: emptySet()
             it[PrefKeys.PR_WALL] = current - entry
+        }
+    }
+
+    val travelAtlas: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.TRAVEL_ATLAS] ?: emptySet() }
+
+    suspend fun addTravel(year: Int, location: String) {
+        val safeLoc = location.replace("|", " ").trim().ifBlank { return }
+        if (year !in 1900..2100) return
+        store.edit {
+            val current = it[PrefKeys.TRAVEL_ATLAS] ?: emptySet()
+            it[PrefKeys.TRAVEL_ATLAS] = current + "$year|$safeLoc"
+        }
+    }
+
+    suspend fun removeTravel(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.TRAVEL_ATLAS] ?: emptySet()
+            it[PrefKeys.TRAVEL_ATLAS] = current - entry
         }
     }
 

@@ -439,6 +439,13 @@ fun HomeScreen(
                             onRemove = { entry -> scope.launch { prefs.removePersonalRecord(entry) } }
                         )
                     }
+                    item {
+                        TravelAtlasCard(
+                            visits = uiState.travelVisits,
+                            onAdd = { y, loc -> scope.launch { prefs.addTravel(y, loc) } },
+                            onRemove = { entry -> scope.launch { prefs.removeTravel(entry) } }
+                        )
+                    }
                     item { CompoundCurveCard() }
                     item {
                         val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }

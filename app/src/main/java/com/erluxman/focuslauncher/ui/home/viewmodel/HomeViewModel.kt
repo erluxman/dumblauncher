@@ -76,6 +76,7 @@ data class HomeUiState(
     val workoutSessions: List<com.erluxman.focuslauncher.service.WorkoutLog.Session> = emptyList(),
     val commitEntries: List<com.erluxman.focuslauncher.service.CommitLog.Entry> = emptyList(),
     val personalRecords: List<String> = emptyList(),
+    val travelVisits: List<com.erluxman.focuslauncher.service.TravelAtlas.Visit> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -341,6 +342,14 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.prWall.collect { set ->
                 _uiState.update { it.copy(personalRecords = set.sortedDescending()) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.travelAtlas.collect { set ->
+                _uiState.update {
+                    it.copy(travelVisits = com.erluxman.focuslauncher.service.TravelAtlas.parse(set))
+                }
             }
         }
 
