@@ -313,6 +313,7 @@ fun HomeScreen(
                             timeBankTotalMin = uiState.timeBankTotalMin
                         )
                     }
+                    item { EarnedPixelsCard(focusPoints = uiState.focusPoints) }
                     item {
                         GraceRow(
                             freezes = uiState.streakFreezes,
