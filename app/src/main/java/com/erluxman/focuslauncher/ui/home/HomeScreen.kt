@@ -362,6 +362,7 @@ fun HomeScreen(
                         )
                     }
                     item { CompoundCurveCard() }
+                    item { EstimationCard(todos = uiState.todos) }
                     item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {
                         AnchorCard(
