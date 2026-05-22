@@ -261,6 +261,12 @@ fun HomeScreen(
                                 sleepMinutes = uiState.sleepMinutesLastNight
                             )
                         }
+                        item {
+                            RecoveryCard(
+                                sleepMinutes = uiState.sleepMinutesLastNight,
+                                steps = uiState.stepsToday
+                            )
+                        }
                     }
                     item {
                         com.erluxman.focuslauncher.ui.mirror.MirrorWidget()
