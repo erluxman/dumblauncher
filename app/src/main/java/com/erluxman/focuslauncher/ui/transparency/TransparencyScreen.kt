@@ -86,6 +86,12 @@ private val TECHNIQUES = listOf(
         "Replaces home with a breathing screen + tomorrow's One Thing between 10pm and 5am. Disable if you don't want the takeover (handy while inspecting the launcher).",
         PrefKeys.TECH_DREAM
     ),
+    Technique(
+        "Anchoring",
+        "Shows a small \"most disciplined user\" stat next to yours.",
+        "A textbook anchoring tactic — the comparison number is computed from your own stats, not real users. If that bothers you (or if comparison is unhelpful), disable.",
+        PrefKeys.TECH_ANCHORING
+    ),
 )
 
 @Composable

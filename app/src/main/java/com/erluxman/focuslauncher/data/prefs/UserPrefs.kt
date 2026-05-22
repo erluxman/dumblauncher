@@ -110,6 +110,7 @@ object PrefKeys {
     val TECH_VARIABLE_RATIO = booleanPreferencesKey("tech_variable_ratio")
     val TECH_ESCALATING = booleanPreferencesKey("tech_escalating")
     val TECH_DREAM = booleanPreferencesKey("tech_dream")
+    val TECH_ANCHORING = booleanPreferencesKey("tech_anchoring")
 
     /** LIFE-009 + LIFE-012 mortality widgets. Opt-in. */
     val MORTALITY_WIDGETS_OPT_IN = booleanPreferencesKey("mortality_widgets_opt_in")

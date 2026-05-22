@@ -66,6 +66,7 @@ data class HomeUiState(
     val hourlyRateUsd: Int = 0,
     val userAge: Int = 0,
     val mortalityWidgetsOptIn: Boolean = false,
+    val anchoringEnabled: Boolean = true,
     val caffeineDoses: List<com.erluxman.focuslauncher.service.CaffeineMath.Dose> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
@@ -265,6 +266,12 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.mortalityWidgetsOptIn.collect { v ->
                 _uiState.update { it.copy(mortalityWidgetsOptIn = v) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.technique(com.erluxman.focuslauncher.data.prefs.PrefKeys.TECH_ANCHORING).collect { v ->
+                _uiState.update { it.copy(anchoringEnabled = v) }
             }
         }
 
