@@ -318,6 +318,13 @@ fun HomeScreen(
                         item {
                             MortalityCard(userAge = uiState.userAge)
                         }
+                        item {
+                            DeathbedCard(
+                                userAge = uiState.userAge,
+                                dailyDistractionMinutes = uiState.distractionMinutesToday,
+                                enabled = uiState.mortalityWidgetsOptIn
+                            )
+                        }
                     }
                     item {
                         CaffeineCard(
