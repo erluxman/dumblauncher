@@ -160,6 +160,9 @@ object PrefKeys {
 
     /** LIFECYCLE-001 onboarding completion timestamp (ms). */
     val ONBOARDING_COMPLETED_AT = longPreferencesKey("onboarding_completed_at")
+
+    /** SOCIAL-013 anti-bio: what the user has chosen NOT to do. */
+    val ANTI_BIO = stringPreferencesKey("anti_bio")
 }
 
 class UserPrefs(private val context: Context) {
@@ -521,6 +524,13 @@ class UserPrefs(private val context: Context) {
 
     val onboardingCompletedAt: Flow<Long> =
         store.data.map { it[PrefKeys.ONBOARDING_COMPLETED_AT] ?: 0L }
+
+    val antiBio: Flow<String> =
+        store.data.map { it[PrefKeys.ANTI_BIO].orEmpty() }
+
+    suspend fun setAntiBio(text: String) {
+        store.edit { it[PrefKeys.ANTI_BIO] = text.take(280) }
+    }
 
     suspend fun setWhyHere(text: String) {
         store.edit { it[PrefKeys.WHY_HERE] = text }

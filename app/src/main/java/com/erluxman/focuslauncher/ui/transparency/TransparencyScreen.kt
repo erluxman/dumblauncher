@@ -166,6 +166,54 @@ fun TransparencyScreen(prefs: UserPrefs, onBack: () -> Unit) {
                         onToggle = { v -> scope.launch { prefs.setMortalityWidgetsOptIn(v) } }
                     )
                 }
+                item {
+                    AntiBioField(
+                        flow = prefs.antiBio,
+                        onSet = { v -> scope.launch { prefs.setAntiBio(v) } }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AntiBioField(
+    flow: kotlinx.coroutines.flow.Flow<String>,
+    onSet: (String) -> Unit
+) {
+    val current by flow.collectAsState(initial = "")
+    val draftState = androidx.compose.runtime.remember(current) { androidx.compose.runtime.mutableStateOf(current) }
+    val draft = draftState.value
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag("anti-bio-card"),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("ANTI-BIO", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(
+                "Describe what you've chosen NOT to do. Local-only for now; surfaces socially once profile lands.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+            )
+            Spacer(Modifier.height(8.dp))
+            androidx.compose.material3.OutlinedTextField(
+                value = draft,
+                onValueChange = { draftState.value = it.take(280) },
+                placeholder = { Text("I'm not the person who scrolls at 1am.") },
+                modifier = Modifier.fillMaxWidth().testTag("anti-bio-input"),
+                minLines = 2,
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                androidx.compose.material3.Button(
+                    onClick = { onSet(draft.trim()) },
+                    modifier = Modifier.testTag("anti-bio-save"),
+                ) { Text("Save") }
             }
         }
     }
