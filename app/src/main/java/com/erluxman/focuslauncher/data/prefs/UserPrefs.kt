@@ -127,6 +127,9 @@ object PrefKeys {
 
     /** MIND-001 meditation log. Each entry: "iso|minutes|technique". */
     val MEDITATION_LOG = stringSetPreferencesKey("meditation_log")
+
+    /** PROD-009 idea parking lot. Each entry: "epochMs|text". */
+    val IDEA_PARKING = stringSetPreferencesKey("idea_parking")
 }
 
 class UserPrefs(private val context: Context) {
@@ -311,6 +314,29 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearMeditationLog() {
         store.edit { it.remove(PrefKeys.MEDITATION_LOG) }
+    }
+
+    val ideaParking: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.IDEA_PARKING] ?: emptySet() }
+
+    suspend fun addParkedIdea(text: String, nowMs: Long = System.currentTimeMillis()) {
+        val safe = text.trim().replace("|", " ")
+        if (safe.isEmpty()) return
+        store.edit {
+            val current = it[PrefKeys.IDEA_PARKING] ?: emptySet()
+            it[PrefKeys.IDEA_PARKING] = current + "$nowMs|$safe"
+        }
+    }
+
+    suspend fun removeParkedIdea(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.IDEA_PARKING] ?: emptySet()
+            it[PrefKeys.IDEA_PARKING] = current - entry
+        }
+    }
+
+    suspend fun clearParkedIdeas() {
+        store.edit { it.remove(PrefKeys.IDEA_PARKING) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =

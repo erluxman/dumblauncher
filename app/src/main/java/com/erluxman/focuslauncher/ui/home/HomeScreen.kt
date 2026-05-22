@@ -369,6 +369,19 @@ fun HomeScreen(
                     }
                     item { CompoundCurveCard() }
                     item { EstimationCard(todos = uiState.todos) }
+                    item {
+                        IdeaParkingCard(
+                            items = uiState.parkedIdeas,
+                            onAdd = { text -> scope.launch { prefs.addParkedIdea(text) } },
+                            onConvert = { item ->
+                                viewModel.addTodo(item.text)
+                                scope.launch { prefs.removeParkedIdea(item.raw) }
+                            },
+                            onDiscard = { item ->
+                                scope.launch { prefs.removeParkedIdea(item.raw) }
+                            }
+                        )
+                    }
                     item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {
                         AnchorCard(
