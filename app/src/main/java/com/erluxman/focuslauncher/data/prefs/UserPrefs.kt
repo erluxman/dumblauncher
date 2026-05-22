@@ -148,6 +148,12 @@ object PrefKeys {
 
     /** FIN-003 subscription log. Each entry: "name|monthlyUsd". */
     val SUBSCRIPTIONS = stringSetPreferencesKey("subscriptions")
+
+    /** FIN-002 + FIN-004 manual money snapshot. All whole USD. */
+    val MONEY_INCOME = intPreferencesKey("money_income_usd")
+    val MONEY_EXPENSE = intPreferencesKey("money_expense_usd")
+    val MONEY_ASSETS = intPreferencesKey("money_assets_usd")
+    val MONEY_LIABILITIES = intPreferencesKey("money_liabilities_usd")
 }
 
 class UserPrefs(private val context: Context) {
@@ -465,6 +471,16 @@ class UserPrefs(private val context: Context) {
             it[PrefKeys.SUBSCRIPTIONS] = current - entry
         }
     }
+
+    val moneyIncome: Flow<Int> = store.data.map { it[PrefKeys.MONEY_INCOME] ?: 0 }
+    val moneyExpense: Flow<Int> = store.data.map { it[PrefKeys.MONEY_EXPENSE] ?: 0 }
+    val moneyAssets: Flow<Int> = store.data.map { it[PrefKeys.MONEY_ASSETS] ?: 0 }
+    val moneyLiabilities: Flow<Int> = store.data.map { it[PrefKeys.MONEY_LIABILITIES] ?: 0 }
+
+    suspend fun setMoneyIncome(v: Int) { store.edit { it[PrefKeys.MONEY_INCOME] = v.coerceAtLeast(0) } }
+    suspend fun setMoneyExpense(v: Int) { store.edit { it[PrefKeys.MONEY_EXPENSE] = v.coerceAtLeast(0) } }
+    suspend fun setMoneyAssets(v: Int) { store.edit { it[PrefKeys.MONEY_ASSETS] = v.coerceAtLeast(0) } }
+    suspend fun setMoneyLiabilities(v: Int) { store.edit { it[PrefKeys.MONEY_LIABILITIES] = v.coerceAtLeast(0) } }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }

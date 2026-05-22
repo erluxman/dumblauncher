@@ -334,6 +334,22 @@ fun HomeScreen(
                             onRemove = { entry -> scope.launch { prefs.removeSubscription(entry) } }
                         )
                     }
+                    item {
+                        MoneyMirrorCard(
+                            income = uiState.moneyIncome,
+                            expense = uiState.moneyExpense,
+                            assets = uiState.moneyAssets,
+                            liabilities = uiState.moneyLiabilities,
+                            onSet = { i, e, a, l ->
+                                scope.launch {
+                                    if (i != null) prefs.setMoneyIncome(i)
+                                    if (e != null) prefs.setMoneyExpense(e)
+                                    if (a != null) prefs.setMoneyAssets(a)
+                                    if (l != null) prefs.setMoneyLiabilities(l)
+                                }
+                            }
+                        )
+                    }
                     if (uiState.mortalityWidgetsOptIn && uiState.userAge in 1..120) {
                         item {
                             MortalityCard(userAge = uiState.userAge)

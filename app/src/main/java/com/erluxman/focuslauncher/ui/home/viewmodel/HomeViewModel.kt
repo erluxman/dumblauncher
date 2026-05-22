@@ -78,6 +78,10 @@ data class HomeUiState(
     val personalRecords: List<String> = emptyList(),
     val travelVisits: List<com.erluxman.focuslauncher.service.TravelAtlas.Visit> = emptyList(),
     val subscriptions: List<com.erluxman.focuslauncher.service.SubscriptionMath.Item> = emptyList(),
+    val moneyIncome: Int = 0,
+    val moneyExpense: Int = 0,
+    val moneyAssets: Int = 0,
+    val moneyLiabilities: Int = 0,
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -359,6 +363,17 @@ class HomeViewModel(
                 _uiState.update {
                     it.copy(subscriptions = com.erluxman.focuslauncher.service.SubscriptionMath.parse(set))
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            combine(
+                prefs.moneyIncome, prefs.moneyExpense, prefs.moneyAssets, prefs.moneyLiabilities
+            ) { i, e, a, l -> intArrayOf(i, e, a, l) }.collect { arr ->
+                _uiState.update { it.copy(
+                    moneyIncome = arr[0], moneyExpense = arr[1],
+                    moneyAssets = arr[2], moneyLiabilities = arr[3]
+                ) }
             }
         }
 
