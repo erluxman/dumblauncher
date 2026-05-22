@@ -29,6 +29,7 @@ class MeditationCardTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.clearMeditationLog()
         }
     }

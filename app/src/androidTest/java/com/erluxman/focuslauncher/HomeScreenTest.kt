@@ -33,6 +33,7 @@ class HomeScreenTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.setWhyHere("Build, don't scroll.")
         }
     }

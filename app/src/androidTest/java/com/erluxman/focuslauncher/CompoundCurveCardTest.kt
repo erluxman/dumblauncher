@@ -26,7 +26,7 @@ class CompoundCurveCardTest {
 
     @Before
     fun skipOnboarding() {
-        runBlocking { UserPrefs(ctx.applicationContext).setOnboardingComplete(true) }
+        runBlocking { UserPrefs(ctx.applicationContext).apply { setOnboardingComplete(true); setLegacyHome(true) } }
     }
 
     @Test

@@ -29,6 +29,7 @@ class VipScreenTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.setVipContacts(emptySet())
         }
     }

@@ -31,6 +31,7 @@ class UninstallScreenTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.setWhyHere("Build, don't scroll.")
             prefs.cancelUninstallRequest()
             prefs.setNuclearPassphrase("twenty_chars_or_more_passphrase")

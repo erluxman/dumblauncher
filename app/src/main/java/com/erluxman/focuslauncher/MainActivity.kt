@@ -72,6 +72,7 @@ import com.erluxman.focuslauncher.ui.boredom.BoredomScreen
 
 sealed class Screen {
     data object Home : Screen()
+    data object Dashboard : Screen()  // the full ~50-card legacy home (swipe-down from Home)
     data object Onboarding : Screen()
     data object Transparency : Screen()
     data object Uninstall : Screen()
@@ -122,6 +123,7 @@ private fun AppRoot() {
     val context = LocalContext.current
     val prefs = remember { UserPrefs(context.applicationContext) }
     val onboardingComplete by prefs.onboardingComplete.collectAsState(initial = null)
+    val legacyHome by prefs.legacyHome.collectAsState(initial = false)
 
     var current: Screen by remember { mutableStateOf(Screen.Home) }
 
@@ -158,7 +160,7 @@ private fun AppRoot() {
                 onBack = { current = Screen.Home }
             )
         }
-        else -> {
+        current == Screen.Dashboard || (current == Screen.Home && legacyHome) -> {
             HomeScreen(
                 prefs = prefs,
                 onOpenTransparency = { current = Screen.Transparency },
@@ -170,6 +172,13 @@ private fun AppRoot() {
                 onOpenBoredom = { current = Screen.Boredom },
                 onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo },
                 onOpenBreath = { current = Screen.Breath }
+            )
+        }
+        else -> {
+            com.erluxman.focuslauncher.ui.home.minimal.MinimalHomeScreen(
+                prefs = prefs,
+                onOpenDashboard = { current = Screen.Dashboard },
+                onOpenTransparency = { current = Screen.Transparency },
             )
         }
     }

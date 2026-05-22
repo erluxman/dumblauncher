@@ -30,6 +30,7 @@ class CaffeineCardTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.clearCaffeineLog()
         }
     }

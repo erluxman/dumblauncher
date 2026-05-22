@@ -161,6 +161,14 @@ object PrefKeys {
     /** LIFECYCLE-001 onboarding completion timestamp (ms). */
     val ONBOARDING_COMPLETED_AT = longPreferencesKey("onboarding_completed_at")
 
+    /**
+     * If true, the home screen renders the legacy ~50-card dashboard
+     * instead of the minimal home. Default false (minimal is the new
+     * default). Tests that target dashboard-specific tags flip this on
+     * in their @Before.
+     */
+    val LEGACY_HOME = booleanPreferencesKey("legacy_home")
+
     /** SOCIAL-013 anti-bio: what the user has chosen NOT to do. */
     val ANTI_BIO = stringPreferencesKey("anti_bio")
 }
@@ -281,6 +289,14 @@ class UserPrefs(private val context: Context) {
 
     val onboardingCompletedAt: Flow<Long> =
         store.data.map { it[PrefKeys.ONBOARDING_COMPLETED_AT] ?: 0L }
+
+    /** True if the user has opted back to the legacy ~50-card dashboard surface. Default false. */
+    val legacyHome: Flow<Boolean> =
+        store.data.map { it[PrefKeys.LEGACY_HOME] ?: false }
+
+    suspend fun setLegacyHome(value: Boolean) {
+        store.edit { it[PrefKeys.LEGACY_HOME] = value }
+    }
 
     suspend fun setWhyHere(text: String) {
         store.edit { it[PrefKeys.WHY_HERE] = text }

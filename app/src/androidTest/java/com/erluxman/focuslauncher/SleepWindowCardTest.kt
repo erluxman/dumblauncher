@@ -33,6 +33,7 @@ class SleepWindowCardTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.setSleepCutoffHour(22)
             prefs.setSleepWakeHour(5)
         }

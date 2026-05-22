@@ -29,6 +29,7 @@ class MortalityCardTest {
         runBlocking {
             val prefs = UserPrefs(ctx.applicationContext)
             prefs.setOnboardingComplete(true)
+            prefs.setLegacyHome(true)
             prefs.setUserAge(35)
             prefs.setMortalityWidgetsOptIn(true)
         }

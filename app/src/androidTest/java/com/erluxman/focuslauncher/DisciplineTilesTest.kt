@@ -27,7 +27,7 @@ class DisciplineTilesTest {
     @Before
     fun seed() {
         runBlocking {
-            UserPrefs(ctx.applicationContext).setOnboardingComplete(true)
+            UserPrefs(ctx.applicationContext).apply { setOnboardingComplete(true); setLegacyHome(true) }
         }
     }
 
