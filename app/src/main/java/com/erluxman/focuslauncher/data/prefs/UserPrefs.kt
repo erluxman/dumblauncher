@@ -121,6 +121,9 @@ object PrefKeys {
     /** SLEEP-003 sleep window guardrails. 24h ints, 0..23. */
     val SLEEP_CUTOFF_HOUR = intPreferencesKey("sleep_cutoff_hour")
     val SLEEP_WAKE_HOUR = intPreferencesKey("sleep_wake_hour")
+
+    /** SUB-001 hangover calculus drink log. Each entry: "epochMs|units (e.g. 1.0)". */
+    val DRINK_LOG = stringSetPreferencesKey("drink_log")
 }
 
 class UserPrefs(private val context: Context) {
@@ -271,6 +274,24 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setSleepWakeHour(h: Int) {
         store.edit { it[PrefKeys.SLEEP_WAKE_HOUR] = h.coerceIn(0, 23) }
+    }
+
+    val drinkLog: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.DRINK_LOG] ?: emptySet() }
+
+    suspend fun logDrink(units: Double, nowMs: Long = System.currentTimeMillis()) {
+        if (units <= 0.0) return
+        store.edit {
+            val cutoff = nowMs - 24L * 3_600_000L
+            val pruned = (it[PrefKeys.DRINK_LOG] ?: emptySet()).filter { entry ->
+                entry.substringBefore("|").toLongOrNull()?.let { ts -> ts >= cutoff } ?: false
+            }.toSet()
+            it[PrefKeys.DRINK_LOG] = pruned + "$nowMs|$units"
+        }
+    }
+
+    suspend fun clearDrinkLog() {
+        store.edit { it.remove(PrefKeys.DRINK_LOG) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =

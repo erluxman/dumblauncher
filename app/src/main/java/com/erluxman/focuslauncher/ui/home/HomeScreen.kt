@@ -334,6 +334,14 @@ fun HomeScreen(
                             onClear = { scope.launch { prefs.clearCaffeineLog() } }
                         )
                     }
+                    item {
+                        HangoverCard(
+                            drinks = uiState.drinks,
+                            nowMs = System.currentTimeMillis(),
+                            onLog = { units -> scope.launch { prefs.logDrink(units) } },
+                            onClear = { scope.launch { prefs.clearDrinkLog() } }
+                        )
+                    }
                     item { CompoundCurveCard() }
                     item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {

@@ -68,6 +68,7 @@ data class HomeUiState(
     val mortalityWidgetsOptIn: Boolean = false,
     val anchoringEnabled: Boolean = true,
     val caffeineDoses: List<com.erluxman.focuslauncher.service.CaffeineMath.Dose> = emptyList(),
+    val drinks: List<com.erluxman.focuslauncher.service.HangoverMath.Drink> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -280,6 +281,19 @@ class HomeViewModel(
                 .collect { (c, w) ->
                     _uiState.update { it.copy(sleepCutoffHour = c, sleepWakeHour = w) }
                 }
+        }
+
+        viewModelScope.launch {
+            prefs.drinkLog.collect { set ->
+                val drinks = set.mapNotNull { entry ->
+                    val parts = entry.split("|", limit = 2)
+                    if (parts.size != 2) return@mapNotNull null
+                    val ts = parts[0].toLongOrNull() ?: return@mapNotNull null
+                    val units = parts[1].toDoubleOrNull() ?: return@mapNotNull null
+                    com.erluxman.focuslauncher.service.HangoverMath.Drink(units = units, takenAtMs = ts)
+                }.sortedBy { it.takenAtMs }
+                _uiState.update { it.copy(drinks = drinks) }
+            }
         }
 
         viewModelScope.launch {
