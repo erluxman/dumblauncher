@@ -136,6 +136,12 @@ object PrefKeys {
 
     /** FIT-002 workout log. Each entry: "iso|minutes|kind". */
     val WORKOUT_LOG = stringSetPreferencesKey("workout_log")
+
+    /** INTEG-008 commit log. Each entry: "iso|commitCount". */
+    val COMMIT_LOG = stringSetPreferencesKey("commit_log")
+
+    /** FIT-003 personal records. Each entry: "isoFirstSet|label|value|unit". */
+    val PR_WALL = stringSetPreferencesKey("pr_wall")
 }
 
 class UserPrefs(private val context: Context) {
@@ -374,6 +380,44 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearWorkoutLog() {
         store.edit { it.remove(PrefKeys.WORKOUT_LOG) }
+    }
+
+    val commitLog: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.COMMIT_LOG] ?: emptySet() }
+
+    suspend fun addCommits(isoDate: String, count: Int) {
+        if (count <= 0) return
+        store.edit {
+            val current = it[PrefKeys.COMMIT_LOG] ?: emptySet()
+            val existing = current.firstOrNull { e -> e.startsWith("$isoDate|") }
+            val prev = existing?.substringAfter("|")?.toIntOrNull() ?: 0
+            val without = current.filterNot { e -> e == existing }.toSet()
+            it[PrefKeys.COMMIT_LOG] = without + "$isoDate|${prev + count}"
+        }
+    }
+
+    suspend fun clearCommitLog() {
+        store.edit { it.remove(PrefKeys.COMMIT_LOG) }
+    }
+
+    val prWall: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.PR_WALL] ?: emptySet() }
+
+    suspend fun addPersonalRecord(isoDate: String, label: String, value: String, unit: String) {
+        val safeLabel = label.replace("|", " ").trim().ifBlank { return }
+        val safeValue = value.replace("|", " ").trim().ifBlank { return }
+        val safeUnit = unit.replace("|", " ").trim()
+        store.edit {
+            val current = it[PrefKeys.PR_WALL] ?: emptySet()
+            it[PrefKeys.PR_WALL] = current + "$isoDate|$safeLabel|$safeValue|$safeUnit"
+        }
+    }
+
+    suspend fun removePersonalRecord(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.PR_WALL] ?: emptySet()
+            it[PrefKeys.PR_WALL] = current - entry
+        }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =

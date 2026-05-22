@@ -406,6 +406,33 @@ fun HomeScreen(
                             onClear = { scope.launch { prefs.clearWorkoutLog() } }
                         )
                     }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        val last7 = remember(today) {
+                            val cal = java.util.Calendar.getInstance()
+                            val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                            (0..6).map { offset ->
+                                val c = cal.clone() as java.util.Calendar
+                                c.add(java.util.Calendar.DAY_OF_MONTH, -offset)
+                                fmt.format(c.time)
+                            }
+                        }
+                        CommitCard(
+                            todayIso = today,
+                            last7DaysIso = last7,
+                            entries = uiState.commitEntries,
+                            onAdd = { n -> scope.launch { prefs.addCommits(today, n) } },
+                            onClear = { scope.launch { prefs.clearCommitLog() } }
+                        )
+                    }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        PrWallCard(
+                            records = uiState.personalRecords,
+                            onAdd = { l, v, u -> scope.launch { prefs.addPersonalRecord(today, l, v, u) } },
+                            onRemove = { entry -> scope.launch { prefs.removePersonalRecord(entry) } }
+                        )
+                    }
                     item { CompoundCurveCard() }
                     item {
                         val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
