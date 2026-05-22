@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.money
 
 /**
  * FIN-008 Regret Receipts — pure aggregator.

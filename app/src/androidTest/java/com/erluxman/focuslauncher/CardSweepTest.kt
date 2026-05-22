@@ -12,7 +12,7 @@ import com.erluxman.focuslauncher.service.PatternDetect
 import com.erluxman.focuslauncher.service.ReadingLog
 import com.erluxman.focuslauncher.service.StressIndex
 import com.erluxman.focuslauncher.service.WeeklyReview
-import com.erluxman.focuslauncher.service.WorkoutLog
+import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import com.erluxman.focuslauncher.ui.home.AnchorCard
 import com.erluxman.focuslauncher.ui.home.CompoundCurveCard
 import com.erluxman.focuslauncher.ui.home.DeathbedCard

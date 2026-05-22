@@ -73,11 +73,11 @@ data class HomeUiState(
     val meditationSessions: List<com.erluxman.focuslauncher.service.MeditationLog.Session> = emptyList(),
     val parkedIdeas: List<com.erluxman.focuslauncher.service.ParkedIdea.Item> = emptyList(),
     val readingSessions: List<com.erluxman.focuslauncher.service.ReadingLog.Session> = emptyList(),
-    val workoutSessions: List<com.erluxman.focuslauncher.service.WorkoutLog.Session> = emptyList(),
+    val workoutSessions: List<com.erluxman.focuslauncher.service.fitness.WorkoutLog.Session> = emptyList(),
     val commitEntries: List<com.erluxman.focuslauncher.service.CommitLog.Entry> = emptyList(),
     val personalRecords: List<String> = emptyList(),
     val travelVisits: List<com.erluxman.focuslauncher.service.TravelAtlas.Visit> = emptyList(),
-    val subscriptions: List<com.erluxman.focuslauncher.service.SubscriptionMath.Item> = emptyList(),
+    val subscriptions: List<com.erluxman.focuslauncher.service.money.SubscriptionMath.Item> = emptyList(),
     val moneyIncome: Int = 0,
     val moneyExpense: Int = 0,
     val moneyAssets: Int = 0,
@@ -324,7 +324,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.workoutLog.collect { set ->
                 _uiState.update {
-                    it.copy(workoutSessions = com.erluxman.focuslauncher.service.WorkoutLog.parse(set))
+                    it.copy(workoutSessions = com.erluxman.focuslauncher.service.fitness.WorkoutLog.parse(set))
                 }
             }
         }
@@ -363,7 +363,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.subscriptions.collect { set ->
                 _uiState.update {
-                    it.copy(subscriptions = com.erluxman.focuslauncher.service.SubscriptionMath.parse(set))
+                    it.copy(subscriptions = com.erluxman.focuslauncher.service.money.SubscriptionMath.parse(set))
                 }
             }
         }

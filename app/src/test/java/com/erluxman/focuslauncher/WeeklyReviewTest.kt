@@ -3,7 +3,7 @@ package com.erluxman.focuslauncher
 import com.erluxman.focuslauncher.service.MeditationLog
 import com.erluxman.focuslauncher.service.ReadingLog
 import com.erluxman.focuslauncher.service.WeeklyReview
-import com.erluxman.focuslauncher.service.WorkoutLog
+import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

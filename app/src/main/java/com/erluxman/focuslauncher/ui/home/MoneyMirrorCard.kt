@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.MoneyMath
+import com.erluxman.focuslauncher.service.money.MoneyMath
 
 /**
  * Combined FIN-002 net worth + FIN-004 savings rate. Pure manual entry.

@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.RepsCurrency
+import com.erluxman.focuslauncher.service.fitness.RepsCurrency
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.money
 
 /**
  * Combines FIN-002 (net worth) + FIN-004 (savings rate %) on a single

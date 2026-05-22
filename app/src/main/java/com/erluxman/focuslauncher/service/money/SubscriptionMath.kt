@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.money
 
 /**
  * FIN-003 Subscription Hunter — manual.

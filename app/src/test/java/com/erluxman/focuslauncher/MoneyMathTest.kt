@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.MoneyMath
+import com.erluxman.focuslauncher.service.money.MoneyMath
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

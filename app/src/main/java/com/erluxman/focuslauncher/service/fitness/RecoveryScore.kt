@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.fitness
 
 /**
  * FIT-005 Recovery Score (Synthesized).

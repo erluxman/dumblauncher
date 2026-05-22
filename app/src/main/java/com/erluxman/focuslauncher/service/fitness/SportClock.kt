@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.fitness
 
 import java.text.SimpleDateFormat
 import java.util.Calendar

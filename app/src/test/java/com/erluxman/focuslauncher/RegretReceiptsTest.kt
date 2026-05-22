@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.RegretReceipts
+import com.erluxman.focuslauncher.service.money.RegretReceipts
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

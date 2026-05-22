@@ -1,7 +1,7 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.SportClock
-import com.erluxman.focuslauncher.service.WorkoutLog
+import com.erluxman.focuslauncher.service.fitness.SportClock
+import com.erluxman.focuslauncher.service.fitness.WorkoutLog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

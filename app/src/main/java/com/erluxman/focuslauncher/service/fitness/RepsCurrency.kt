@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.fitness
 
 /**
  * FIT-006 Reps-as-Currency.
