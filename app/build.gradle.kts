@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,6 +63,15 @@ dependencies {
 
     // HealthConnect (steps, sleep, etc.)
     implementation(libs.androidx.health.connect)
+
+    // CameraX for Mirror Widget + Future Self Video
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.video)
+    // CameraX returns ListenableFuture; satisfy Kotlin's classpath for it.
+    implementation("com.google.guava:guava:33.0.0-android")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -115,13 +115,19 @@ fun UninstallScreen(prefs: UserPrefs, onBack: () -> Unit) {
                     onStart = { scope.launch { prefs.startUninstallRequest() } }
                 )
                 CooldownMath.isElapsed(start, nowMs) -> {
-                    if (!letterShown && futureLetter.isNotBlank()) {
-                        FutureSelfLetterPage(
+                    val videoFile = com.erluxman.focuslauncher.ui.futureself.futureSelfVideoFile(context)
+                    val hasVideo = com.erluxman.focuslauncher.ui.futureself.hasFutureSelfVideo(context)
+                    var videoWatched by remember { mutableStateOf(!hasVideo) }
+                    when {
+                        !videoWatched -> com.erluxman.focuslauncher.ui.futureself.FutureSelfVideoPlayer(
+                            file = videoFile,
+                            onCompleted = { videoWatched = true }
+                        )
+                        !letterShown && futureLetter.isNotBlank() -> FutureSelfLetterPage(
                             letter = futureLetter,
                             onDone = { letterShown = true }
                         )
-                    } else {
-                        ElapsedState(
+                        else -> ElapsedState(
                             onUninstall = { startUninstall(context) },
                             onCancel = { scope.launch { prefs.cancelUninstallRequest() } }
                         )

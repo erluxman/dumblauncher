@@ -70,7 +70,8 @@ fun HomeScreen(
     onOpenVip: () -> Unit = {},
     onOpenFocus: () -> Unit = {},
     onOpenMantra: () -> Unit = {},
-    onOpenBoredom: () -> Unit = {}
+    onOpenBoredom: () -> Unit = {},
+    onOpenFutureSelfVideo: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -259,6 +260,9 @@ fun HomeScreen(
                                 sleepMinutes = uiState.sleepMinutesLastNight
                             )
                         }
+                    }
+                    item {
+                        com.erluxman.focuslauncher.ui.mirror.MirrorWidget()
                     }
                     if (uiState.trackRecalibrated) {
                         item {
@@ -481,6 +485,10 @@ fun HomeScreen(
                     onOpenBoredom = {
                         showSetupDialog = false
                         onOpenBoredom()
+                    },
+                    onOpenFutureSelfVideo = {
+                        showSetupDialog = false
+                        onOpenFutureSelfVideo()
                     },
                     onExport = {
                         showSetupDialog = false
@@ -998,6 +1006,7 @@ fun SetupDialog(
     onOpenFocus: () -> Unit = {},
     onOpenMantra: () -> Unit = {},
     onOpenBoredom: () -> Unit = {},
+    onOpenFutureSelfVideo: () -> Unit = {},
     onExport: () -> Unit = {},
     onExportCsv: () -> Unit = {},
     onExportEncrypted: () -> Unit = {}
@@ -1139,6 +1148,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-boredom")
                 ) { Text("Boredom Preservatory (2 min)") }
+
+                TextButton(
+                    onClick = onOpenFutureSelfVideo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-future-self-video")
+                ) { Text("Record Future-Self Video") }
 
                 TextButton(
                     onClick = onExport,

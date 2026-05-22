@@ -31,6 +31,7 @@ sealed class Screen {
     data object Focus : Screen()
     data object Mantra : Screen()
     data object Boredom : Screen()
+    data object FutureSelfVideo : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -98,6 +99,11 @@ private fun AppRoot() {
         current == Screen.Boredom -> {
             BoredomScreen(onBack = { current = Screen.Home })
         }
+        current == Screen.FutureSelfVideo -> {
+            com.erluxman.focuslauncher.ui.futureself.FutureSelfVideoScreen(
+                onBack = { current = Screen.Home }
+            )
+        }
         else -> {
             HomeScreen(
                 prefs = prefs,
@@ -107,7 +113,8 @@ private fun AppRoot() {
                 onOpenVip = { current = Screen.Vip },
                 onOpenFocus = { current = Screen.Focus },
                 onOpenMantra = { current = Screen.Mantra },
-                onOpenBoredom = { current = Screen.Boredom }
+                onOpenBoredom = { current = Screen.Boredom },
+                onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo }
             )
         }
     }

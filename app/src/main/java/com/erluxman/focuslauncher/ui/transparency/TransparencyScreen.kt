@@ -80,6 +80,12 @@ private val TECHNIQUES = listOf(
         "Each subsequent Lobby visit for the same flagged app today adds a few seconds to the countdown. Toggle off if it ever feels punitive without being useful.",
         PrefKeys.TECH_ESCALATING
     ),
+    Technique(
+        "Dream mode",
+        "After 10pm the home screen flips into wind-down mode.",
+        "Replaces home with a breathing screen + tomorrow's One Thing between 10pm and 5am. Disable if you don't want the takeover (handy while inspecting the launcher).",
+        PrefKeys.TECH_DREAM
+    ),
 )
 
 @Composable

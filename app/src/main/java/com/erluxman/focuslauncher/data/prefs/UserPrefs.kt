@@ -109,6 +109,7 @@ object PrefKeys {
     val TECH_HIDDEN_DRAWER = booleanPreferencesKey("tech_hidden_drawer")
     val TECH_VARIABLE_RATIO = booleanPreferencesKey("tech_variable_ratio")
     val TECH_ESCALATING = booleanPreferencesKey("tech_escalating")
+    val TECH_DREAM = booleanPreferencesKey("tech_dream")
 }
 
 class UserPrefs(private val context: Context) {

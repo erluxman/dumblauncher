@@ -842,7 +842,11 @@ class HomeViewModel(
         viewModelScope.launch {
             while (true) {
                 val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                val dream = hour >= DREAM_MODE_START_HOUR || hour < DREAM_MODE_END_HOUR
+                val baseDream = hour >= DREAM_MODE_START_HOUR || hour < DREAM_MODE_END_HOUR
+                // Respect the user's transparency toggle for Dream Mode.
+                // Default ON; can be turned off (even in debug builds) via the toggle.
+                val enabled = prefs.technique(com.erluxman.focuslauncher.data.prefs.PrefKeys.TECH_DREAM).first()
+                val dream = baseDream && enabled
                 val events = runCatching {
                     com.erluxman.focuslauncher.service.CalendarReader.todayEvents(appContext)
                 }.getOrDefault(emptyList())
