@@ -286,6 +286,13 @@ fun HomeScreen(
                         }
                     }
                     item {
+                        val gradStat = com.erluxman.focuslauncher.service.GraduateState.compute(
+                            trackLevel = uiState.trackLevel,
+                            onboardingMs = uiState.onboardingCompletedAt
+                        )
+                        GraduateBanner(state = gradStat)
+                    }
+                    item {
                         SadVoicePicker(
                             current = uiState.sadVoice,
                             onPick = viewModel::setSadVoice

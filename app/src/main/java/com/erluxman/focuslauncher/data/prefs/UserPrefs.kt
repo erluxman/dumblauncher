@@ -157,6 +157,9 @@ object PrefKeys {
 
     /** READ-002 raw text highlights. */
     val HIGHLIGHTS = stringSetPreferencesKey("highlights")
+
+    /** LIFECYCLE-001 onboarding completion timestamp (ms). */
+    val ONBOARDING_COMPLETED_AT = longPreferencesKey("onboarding_completed_at")
 }
 
 class UserPrefs(private val context: Context) {
@@ -508,8 +511,16 @@ class UserPrefs(private val context: Context) {
         store.data.map { it[key] ?: true }
 
     suspend fun setOnboardingComplete(value: Boolean) {
-        store.edit { it[PrefKeys.ONBOARDING_COMPLETE] = value }
+        store.edit {
+            it[PrefKeys.ONBOARDING_COMPLETE] = value
+            if (value && it[PrefKeys.ONBOARDING_COMPLETED_AT] == null) {
+                it[PrefKeys.ONBOARDING_COMPLETED_AT] = System.currentTimeMillis()
+            }
+        }
     }
+
+    val onboardingCompletedAt: Flow<Long> =
+        store.data.map { it[PrefKeys.ONBOARDING_COMPLETED_AT] ?: 0L }
 
     suspend fun setWhyHere(text: String) {
         store.edit { it[PrefKeys.WHY_HERE] = text }

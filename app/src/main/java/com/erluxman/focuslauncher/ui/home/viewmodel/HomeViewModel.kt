@@ -83,6 +83,7 @@ data class HomeUiState(
     val moneyAssets: Int = 0,
     val moneyLiabilities: Int = 0,
     val highlights: Set<String> = emptySet(),
+    val onboardingCompletedAt: Long = 0L,
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -381,6 +382,12 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.highlights.collect { set ->
                 _uiState.update { it.copy(highlights = set) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.onboardingCompletedAt.collect { ms ->
+                _uiState.update { it.copy(onboardingCompletedAt = ms) }
             }
         }
 
