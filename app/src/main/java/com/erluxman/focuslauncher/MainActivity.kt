@@ -32,6 +32,7 @@ sealed class Screen {
     data object Mantra : Screen()
     data object Boredom : Screen()
     data object FutureSelfVideo : Screen()
+    data object Breath : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +105,11 @@ private fun AppRoot() {
                 onBack = { current = Screen.Home }
             )
         }
+        current == Screen.Breath -> {
+            com.erluxman.focuslauncher.ui.breath.BreathScreen(
+                onBack = { current = Screen.Home }
+            )
+        }
         else -> {
             HomeScreen(
                 prefs = prefs,
@@ -114,7 +120,8 @@ private fun AppRoot() {
                 onOpenFocus = { current = Screen.Focus },
                 onOpenMantra = { current = Screen.Mantra },
                 onOpenBoredom = { current = Screen.Boredom },
-                onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo }
+                onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo },
+                onOpenBreath = { current = Screen.Breath }
             )
         }
     }

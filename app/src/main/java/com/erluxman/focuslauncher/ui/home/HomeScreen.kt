@@ -71,7 +71,8 @@ fun HomeScreen(
     onOpenFocus: () -> Unit = {},
     onOpenMantra: () -> Unit = {},
     onOpenBoredom: () -> Unit = {},
-    onOpenFutureSelfVideo: () -> Unit = {}
+    onOpenFutureSelfVideo: () -> Unit = {},
+    onOpenBreath: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val database = remember { AppDatabase.getDatabase(context) }
@@ -512,6 +513,10 @@ fun HomeScreen(
                     onOpenFutureSelfVideo = {
                         showSetupDialog = false
                         onOpenFutureSelfVideo()
+                    },
+                    onOpenBreath = {
+                        showSetupDialog = false
+                        onOpenBreath()
                     },
                     onExport = {
                         showSetupDialog = false
@@ -1030,6 +1035,7 @@ fun SetupDialog(
     onOpenMantra: () -> Unit = {},
     onOpenBoredom: () -> Unit = {},
     onOpenFutureSelfVideo: () -> Unit = {},
+    onOpenBreath: () -> Unit = {},
     onExport: () -> Unit = {},
     onExportCsv: () -> Unit = {},
     onExportEncrypted: () -> Unit = {}
@@ -1178,6 +1184,13 @@ fun SetupDialog(
                         .fillMaxWidth()
                         .testTag("open-future-self-video")
                 ) { Text("Record Future-Self Video") }
+
+                TextButton(
+                    onClick = onOpenBreath,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("open-breath")
+                ) { Text("Breath Unlock (4-7-8)") }
 
                 TextButton(
                     onClick = onExport,
