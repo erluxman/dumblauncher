@@ -145,6 +145,9 @@ object PrefKeys {
 
     /** LOC-006 travel atlas. Each entry: "year|location". */
     val TRAVEL_ATLAS = stringSetPreferencesKey("travel_atlas")
+
+    /** FIN-003 subscription log. Each entry: "name|monthlyUsd". */
+    val SUBSCRIPTIONS = stringSetPreferencesKey("subscriptions")
 }
 
 class UserPrefs(private val context: Context) {
@@ -439,6 +442,27 @@ class UserPrefs(private val context: Context) {
         store.edit {
             val current = it[PrefKeys.TRAVEL_ATLAS] ?: emptySet()
             it[PrefKeys.TRAVEL_ATLAS] = current - entry
+        }
+    }
+
+    val subscriptions: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.SUBSCRIPTIONS] ?: emptySet() }
+
+    suspend fun addSubscription(name: String, monthlyUsd: Double) {
+        val safe = name.replace("|", " ").trim().ifBlank { return }
+        if (monthlyUsd <= 0) return
+        store.edit {
+            val current = it[PrefKeys.SUBSCRIPTIONS] ?: emptySet()
+            // Replace existing by name.
+            val others = current.filterNot { e -> e.substringBefore("|") == safe }.toSet()
+            it[PrefKeys.SUBSCRIPTIONS] = others + "$safe|$monthlyUsd"
+        }
+    }
+
+    suspend fun removeSubscription(entry: String) {
+        store.edit {
+            val current = it[PrefKeys.SUBSCRIPTIONS] ?: emptySet()
+            it[PrefKeys.SUBSCRIPTIONS] = current - entry
         }
     }
 

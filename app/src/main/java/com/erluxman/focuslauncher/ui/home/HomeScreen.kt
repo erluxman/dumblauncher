@@ -327,6 +327,13 @@ fun HomeScreen(
                         )
                     }
                     item { TimeMoneyCard(hourlyRate = uiState.hourlyRateUsd) }
+                    item {
+                        SubscriptionsCard(
+                            items = uiState.subscriptions,
+                            onAdd = { name, usd -> scope.launch { prefs.addSubscription(name, usd) } },
+                            onRemove = { entry -> scope.launch { prefs.removeSubscription(entry) } }
+                        )
+                    }
                     if (uiState.mortalityWidgetsOptIn && uiState.userAge in 1..120) {
                         item {
                             MortalityCard(userAge = uiState.userAge)
