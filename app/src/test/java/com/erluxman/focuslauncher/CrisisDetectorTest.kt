@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.lobby.CrisisDetector
 
-import com.erluxman.focuslauncher.service.CrisisDetector
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

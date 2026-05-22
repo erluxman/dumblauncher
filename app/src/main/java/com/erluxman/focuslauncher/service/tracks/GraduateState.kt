@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.tracks
 
 /**
  * LIFECYCLE-001 Graduate Mode (pre-graduate visibility).

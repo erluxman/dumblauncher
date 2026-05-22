@@ -1,10 +1,10 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.launcher.ExportBuilder
 
 import com.erluxman.focuslauncher.data.local.entity.JournalEntryEntity
 import com.erluxman.focuslauncher.data.local.entity.ProjectEntity
 import com.erluxman.focuslauncher.data.local.entity.TodoEntity
-import com.erluxman.focuslauncher.service.ExportBuilder
-import com.erluxman.focuslauncher.service.ExportSnapshot
+import com.erluxman.focuslauncher.service.launcher.ExportSnapshot
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

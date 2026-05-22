@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.lobby.BreathCycle
 
-import com.erluxman.focuslauncher.service.BreathCycle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * CALLS-005 Silent Mode Enforcement — policy decision only.

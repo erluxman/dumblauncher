@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.GraduateState
+import com.erluxman.focuslauncher.service.tracks.GraduateState
 
 @Composable
 fun GraduateBanner(
@@ -49,7 +49,7 @@ fun GraduateBanner(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = if (state.isGraduate) "Restrictions will quietly fade. You don't need the friction anymore."
-                    else "Stay at Level ${com.erluxman.focuslauncher.service.GraduateState.LEVEL_THRESHOLD} until ${com.erluxman.focuslauncher.service.GraduateState.DAYS_THRESHOLD} days from onboarding.",
+                    else "Stay at Level ${com.erluxman.focuslauncher.service.tracks.GraduateState.LEVEL_THRESHOLD} until ${com.erluxman.focuslauncher.service.tracks.GraduateState.DAYS_THRESHOLD} days from onboarding.",
                     style = MaterialTheme.typography.bodySmall,
                     color = outline,
                 )

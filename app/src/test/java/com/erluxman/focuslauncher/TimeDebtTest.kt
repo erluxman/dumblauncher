@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.lobby.TimeDebt
 
-import com.erluxman.focuslauncher.service.TimeDebt
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * SLEEP-003 Sleep Window Guardrails.

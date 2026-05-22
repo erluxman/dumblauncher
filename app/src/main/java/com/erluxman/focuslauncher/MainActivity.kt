@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.launcher.FaceDownDetector
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,13 +38,13 @@ sealed class Screen {
 
 class MainActivity : ComponentActivity() {
 
-    private var faceDownDetector: com.erluxman.focuslauncher.service.FaceDownDetector? = null
+    private var faceDownDetector: com.erluxman.focuslauncher.service.launcher.FaceDownDetector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        com.erluxman.focuslauncher.service.CheckInScheduler.scheduleAll(applicationContext)
-        faceDownDetector = com.erluxman.focuslauncher.service.FaceDownDetector(
+        com.erluxman.focuslauncher.service.launcher.CheckInScheduler.scheduleAll(applicationContext)
+        faceDownDetector = com.erluxman.focuslauncher.service.launcher.FaceDownDetector(
             applicationContext
         ) {
             val line = com.erluxman.focuslauncher.service.sad.Applause

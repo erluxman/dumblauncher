@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.launcher
 
 import com.erluxman.focuslauncher.data.local.entity.JournalEntryEntity
 import com.erluxman.focuslauncher.data.local.entity.ProjectEntity

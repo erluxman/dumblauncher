@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher.ui.breath
+import com.erluxman.focuslauncher.service.lobby.BreathCycle
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -33,7 +34,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.BreathCycle
 import kotlinx.coroutines.delay
 import kotlin.math.min
 

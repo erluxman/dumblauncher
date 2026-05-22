@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.launcher.CalendarReader
 
-import com.erluxman.focuslauncher.service.CalendarReader
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

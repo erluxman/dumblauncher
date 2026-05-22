@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * Pure logic for the Intent Follow-through Lockout (V1 RESTRICT-006).

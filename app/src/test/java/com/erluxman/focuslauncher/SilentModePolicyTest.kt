@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.lobby.SilentModePolicy
 
-import com.erluxman.focuslauncher.service.SilentModePolicy
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

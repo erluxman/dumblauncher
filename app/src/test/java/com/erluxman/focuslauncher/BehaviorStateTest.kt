@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.launcher.UsageStatsHelper
 
-import com.erluxman.focuslauncher.service.UsageStatsHelper
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

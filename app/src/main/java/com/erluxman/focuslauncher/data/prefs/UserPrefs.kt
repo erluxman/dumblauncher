@@ -297,13 +297,13 @@ class UserPrefs(private val context: Context) {
 
     val sleepCutoffHour: Flow<Int> =
         store.data.map {
-            (it[PrefKeys.SLEEP_CUTOFF_HOUR] ?: com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_CUTOFF_HOUR)
+            (it[PrefKeys.SLEEP_CUTOFF_HOUR] ?: com.erluxman.focuslauncher.service.lobby.SleepWindow.DEFAULT_CUTOFF_HOUR)
                 .coerceIn(0, 23)
         }
 
     val sleepWakeHour: Flow<Int> =
         store.data.map {
-            (it[PrefKeys.SLEEP_WAKE_HOUR] ?: com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_WAKE_HOUR)
+            (it[PrefKeys.SLEEP_WAKE_HOUR] ?: com.erluxman.focuslauncher.service.lobby.SleepWindow.DEFAULT_WAKE_HOUR)
                 .coerceIn(0, 23)
         }
 

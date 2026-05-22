@@ -1,4 +1,8 @@
 package com.erluxman.focuslauncher.ui.home.viewmodel
+import com.erluxman.focuslauncher.service.launcher.HealthSource
+import com.erluxman.focuslauncher.service.lobby.RouletteShuffler
+import com.erluxman.focuslauncher.service.lobby.TimeDebt
+import com.erluxman.focuslauncher.service.launcher.UsageStatsHelper
 
 import android.content.Context
 import android.content.Intent
@@ -17,7 +21,6 @@ import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
 import com.erluxman.focuslauncher.model.AppInfo
 import com.erluxman.focuslauncher.service.tracks.StreakLogic
-import com.erluxman.focuslauncher.service.UsageStatsHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -58,8 +61,8 @@ data class HomeUiState(
     val effectiveTargetMin: Int = 180,
     val moodPings: List<String> = emptyList(),
     val isDreamMode: Boolean = false,
-    val sleepCutoffHour: Int = com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_CUTOFF_HOUR,
-    val sleepWakeHour: Int = com.erluxman.focuslauncher.service.SleepWindow.DEFAULT_WAKE_HOUR,
+    val sleepCutoffHour: Int = com.erluxman.focuslauncher.service.lobby.SleepWindow.DEFAULT_CUTOFF_HOUR,
+    val sleepWakeHour: Int = com.erluxman.focuslauncher.service.lobby.SleepWindow.DEFAULT_WAKE_HOUR,
     val graceDays: Set<String> = emptySet(),
     val streakFreezes: Int = 0,
     val afterFallDueDate: String = "",
@@ -74,7 +77,7 @@ data class HomeUiState(
     val parkedIdeas: List<com.erluxman.focuslauncher.service.insights.ParkedIdea.Item> = emptyList(),
     val readingSessions: List<com.erluxman.focuslauncher.service.habits.ReadingLog.Session> = emptyList(),
     val workoutSessions: List<com.erluxman.focuslauncher.service.fitness.WorkoutLog.Session> = emptyList(),
-    val commitEntries: List<com.erluxman.focuslauncher.service.CommitLog.Entry> = emptyList(),
+    val commitEntries: List<com.erluxman.focuslauncher.service.habits.CommitLog.Entry> = emptyList(),
     val personalRecords: List<String> = emptyList(),
     val travelVisits: List<com.erluxman.focuslauncher.service.places.TravelAtlas.Visit> = emptyList(),
     val subscriptions: List<com.erluxman.focuslauncher.service.money.SubscriptionMath.Item> = emptyList(),
@@ -105,7 +108,7 @@ data class HomeUiState(
     val hourlyMinutes: IntArray = IntArray(24),
     val domainTracks: Map<String, Triple<Int, Int, Int>> = emptyMap(),  // domain → (level, points, miss)
     val emergencyPasses: Int = 5,
-    val calendarEvents: List<com.erluxman.focuslauncher.service.CalendarReader.Event> = emptyList(),
+    val calendarEvents: List<com.erluxman.focuslauncher.service.launcher.CalendarReader.Event> = emptyList(),
     val activeEventTitle: String = "",
     val isFocusBlock: Boolean = false,
     val stepsToday: Int = 0,
@@ -246,7 +249,7 @@ class HomeViewModel(
                         whyHere = why,
                         dailyTargetMin = target,
                         behaviorIndicatorEnabled = indicator,
-                        effectiveTargetMin = com.erluxman.focuslauncher.service.TimeDebt
+                        effectiveTargetMin = com.erluxman.focuslauncher.service.lobby.TimeDebt
                             .effectiveTarget(target, debt)
                     )
                 }
@@ -259,7 +262,7 @@ class HomeViewModel(
                     _uiState.update {
                         it.copy(
                             timeDebtMin = debt,
-                            effectiveTargetMin = com.erluxman.focuslauncher.service.TimeDebt
+                            effectiveTargetMin = com.erluxman.focuslauncher.service.lobby.TimeDebt
                                 .effectiveTarget(base, debt)
                         )
                     }
@@ -332,7 +335,7 @@ class HomeViewModel(
         viewModelScope.launch {
             prefs.commitLog.collect { set ->
                 _uiState.update {
-                    it.copy(commitEntries = com.erluxman.focuslauncher.service.CommitLog.parse(set))
+                    it.copy(commitEntries = com.erluxman.focuslauncher.service.habits.CommitLog.parse(set))
                 }
             }
         }
@@ -886,12 +889,12 @@ class HomeViewModel(
                     add(UsageStatsHelper.deriveBehaviorState(m, target).state)
                 }
             }
-            val crisis = com.erluxman.focuslauncher.service.CrisisDetector.isCrisis(recent)
+            val crisis = com.erluxman.focuslauncher.service.lobby.CrisisDetector.isCrisis(recent)
             val hourly = runCatching { UsageStatsHelper.todayHourlyMinutes(appContext) }
                 .getOrDefault(IntArray(24))
-            val steps = runCatching { com.erluxman.focuslauncher.service.HealthSource.todaySteps(appContext) }
+            val steps = runCatching { com.erluxman.focuslauncher.service.launcher.HealthSource.todaySteps(appContext) }
                 .getOrDefault(0)
-            val sleepMin = runCatching { com.erluxman.focuslauncher.service.HealthSource.lastNightSleepMinutes(appContext) }
+            val sleepMin = runCatching { com.erluxman.focuslauncher.service.launcher.HealthSource.lastNightSleepMinutes(appContext) }
                 .getOrDefault(0)
             _uiState.update {
                 it.copy(
@@ -988,12 +991,12 @@ class HomeViewModel(
             if (lastDebtDate == today) return@launch
             val baseTarget = prefs.dailyTargetMin.first().coerceAtLeast(1)
             val currentDebt = prefs.timeDebtMin.first()
-            val yesterdaysEffective = com.erluxman.focuslauncher.service.TimeDebt
+            val yesterdaysEffective = com.erluxman.focuslauncher.service.lobby.TimeDebt
                 .effectiveTarget(baseTarget, currentDebt)
             val yesterdayMin = runCatching {
                 UsageStatsHelper.screenMinutesForDay(appContext, daysAgo = 1)
             }.getOrDefault(yesterdaysEffective)
-            val newDebt = com.erluxman.focuslauncher.service.TimeDebt
+            val newDebt = com.erluxman.focuslauncher.service.lobby.TimeDebt
                 .nextDebt(currentDebt, yesterdayMin, yesterdaysEffective)
             prefs.setTimeDebt(newDebt, today)
         }
@@ -1005,17 +1008,17 @@ class HomeViewModel(
                 val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
                 val cutoff = prefs.sleepCutoffHour.first()
                 val wake = prefs.sleepWakeHour.first()
-                val baseDream = com.erluxman.focuslauncher.service.SleepWindow
+                val baseDream = com.erluxman.focuslauncher.service.lobby.SleepWindow
                     .isInWindow(hour, cutoffHour = cutoff, wakeHour = wake)
                 // Respect the user's transparency toggle for Dream Mode.
                 // Default ON; can be turned off (even in debug builds) via the toggle.
                 val enabled = prefs.technique(com.erluxman.focuslauncher.data.prefs.PrefKeys.TECH_DREAM).first()
                 val dream = baseDream && enabled
                 val events = runCatching {
-                    com.erluxman.focuslauncher.service.CalendarReader.todayEvents(appContext)
+                    com.erluxman.focuslauncher.service.launcher.CalendarReader.todayEvents(appContext)
                 }.getOrDefault(emptyList())
-                val active = com.erluxman.focuslauncher.service.CalendarReader.activeEvent(events)
-                val isFocus = com.erluxman.focuslauncher.service.CalendarReader.isFocusBlock(active)
+                val active = com.erluxman.focuslauncher.service.launcher.CalendarReader.activeEvent(events)
+                val isFocus = com.erluxman.focuslauncher.service.launcher.CalendarReader.isFocusBlock(active)
                 _uiState.update {
                     it.copy(
                         isDreamMode = dream,
@@ -1083,7 +1086,7 @@ class HomeViewModel(
 
             val others = allApps.filter { it.packageName != phoneApp?.packageName && it.packageName != smsApp?.packageName }
             val rouletteSeed = (System.currentTimeMillis() / (24L * 60 * 60 * 1000))
-            val rotated = com.erluxman.focuslauncher.service.RouletteShuffler.shuffle(others, rouletteSeed)
+            val rotated = com.erluxman.focuslauncher.service.lobby.RouletteShuffler.shuffle(others, rouletteSeed)
             dock.addAll(rotated.take(3))
 
             _uiState.update { it.copy(apps = allApps, dockApps = dock.take(5)) }

@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher.ui.home
+import com.erluxman.focuslauncher.service.lobby.SleepWindow
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.SleepWindow
 import java.util.Calendar
 
 /**

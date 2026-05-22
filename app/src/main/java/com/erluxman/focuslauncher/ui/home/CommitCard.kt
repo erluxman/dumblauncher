@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.erluxman.focuslauncher.service.CommitLog
+import com.erluxman.focuslauncher.service.habits.CommitLog
 
 @Composable
 fun CommitCard(

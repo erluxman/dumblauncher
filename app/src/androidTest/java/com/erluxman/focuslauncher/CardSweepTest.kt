@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.erluxman.focuslauncher.service.mortality.CompoundCurve
 import com.erluxman.focuslauncher.service.tracks.EarnedPixels
-import com.erluxman.focuslauncher.service.GraduateState
+import com.erluxman.focuslauncher.service.tracks.GraduateState
 import com.erluxman.focuslauncher.service.habits.MeditationLog
 import com.erluxman.focuslauncher.service.insights.PatternDetect
 import com.erluxman.focuslauncher.service.habits.ReadingLog

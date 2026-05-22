@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 import android.content.Context
 import android.graphics.PixelFormat

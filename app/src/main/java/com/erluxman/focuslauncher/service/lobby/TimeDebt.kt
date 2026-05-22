@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * Pure logic for the Time Debt restriction (V1 RESTRICT-009).

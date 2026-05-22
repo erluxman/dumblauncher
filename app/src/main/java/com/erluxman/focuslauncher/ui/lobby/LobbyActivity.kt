@@ -125,7 +125,7 @@ internal fun LobbyContent(
     val mantraOk = !mantraMode || mantraMatches >= mantraReps
     val intentOk = if (mantraMode) mantraOk else intent.trim().length >= 3
     val replacementSuggestion = remember {
-        com.erluxman.focuslauncher.service.LobbyTuner.replacement(
+        com.erluxman.focuslauncher.service.lobby.LobbyTuner.replacement(
             seed = System.currentTimeMillis() / (24L * 60 * 60 * 1000)
         )
     }
@@ -250,7 +250,7 @@ internal fun LobbyContent(
             if (mantraMode) {
                 Spacer(Modifier.height(8.dp))
                 val ctx = androidx.compose.ui.platform.LocalContext.current
-                val voice = remember { com.erluxman.focuslauncher.service.VoiceMantra(ctx) }
+                val voice = remember { com.erluxman.focuslauncher.service.launcher.VoiceMantra(ctx) }
                 TextButton(
                     onClick = {
                         voice.recognize { spoken ->

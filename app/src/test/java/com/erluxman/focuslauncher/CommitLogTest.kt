@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
 
-import com.erluxman.focuslauncher.service.CommitLog
+import com.erluxman.focuslauncher.service.habits.CommitLog
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -1,4 +1,7 @@
 package com.erluxman.focuslauncher.ui.home
+import com.erluxman.focuslauncher.service.launcher.EncryptedBackup
+import com.erluxman.focuslauncher.service.launcher.CalendarReader
+import com.erluxman.focuslauncher.service.launcher.ExportBuilder
 
 import android.app.admin.DevicePolicyManager
 import android.app.role.RoleManager
@@ -51,8 +54,7 @@ import com.erluxman.focuslauncher.data.prefs.UserPrefs
 import com.erluxman.focuslauncher.data.repository.JournalRepository
 import com.erluxman.focuslauncher.data.repository.ProjectRepository
 import com.erluxman.focuslauncher.data.repository.TodoRepository
-import com.erluxman.focuslauncher.service.ExportBuilder
-import com.erluxman.focuslauncher.service.ExportSnapshot
+import com.erluxman.focuslauncher.service.launcher.ExportSnapshot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import com.erluxman.focuslauncher.model.AppInfo
@@ -286,7 +288,7 @@ fun HomeScreen(
                         }
                     }
                     item {
-                        val gradStat = com.erluxman.focuslauncher.service.GraduateState.compute(
+                        val gradStat = com.erluxman.focuslauncher.service.tracks.GraduateState.compute(
                             trackLevel = uiState.trackLevel,
                             onboardingMs = uiState.onboardingCompletedAt
                         )
@@ -762,7 +764,7 @@ fun HomeScreen(
                             }
                             val snapshot = buildExportSnapshot(prefs, todoRepository, projectRepository, journalRepository)
                             val json = ExportBuilder.buildJson(snapshot, System.currentTimeMillis())
-                            val ct = com.erluxman.focuslauncher.service.EncryptedBackup
+                            val ct = com.erluxman.focuslauncher.service.launcher.EncryptedBackup
                                 .encrypt(json, passphrase.toCharArray())
                             val send = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
@@ -2111,7 +2113,7 @@ private fun HealthCard(steps: Int, sleepMinutes: Int) {
 
 @Composable
 private fun CalendarStrip(
-    events: List<com.erluxman.focuslauncher.service.CalendarReader.Event>,
+    events: List<com.erluxman.focuslauncher.service.launcher.CalendarReader.Event>,
     activeTitle: String,
     isFocusBlock: Boolean
 ) {

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * HARDWARE-002 Breath to Unlock — timing-only path.

@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.launcher
 
 import android.content.Context
 import android.content.Intent

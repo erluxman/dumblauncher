@@ -1,6 +1,6 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.service.launcher.CheckInScheduler
 
-import com.erluxman.focuslauncher.service.CheckInScheduler
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.Calendar

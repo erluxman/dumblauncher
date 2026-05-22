@@ -1,4 +1,4 @@
-package com.erluxman.focuslauncher.service
+package com.erluxman.focuslauncher.service.lobby
 
 /**
  * Pure logic for PSYCH-008: a periodic "are you sure?" full-screen intervention
