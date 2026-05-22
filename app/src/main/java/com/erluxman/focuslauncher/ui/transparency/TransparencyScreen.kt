@@ -134,7 +134,66 @@ fun TransparencyScreen(prefs: UserPrefs, onBack: () -> Unit) {
                         onToggle = { v -> scope.launch { prefs.setTechnique(tech.key, v) } }
                     )
                 }
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "OPT-IN SURFACES",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.outline,
+                        letterSpacing = 2.sp
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "Surfaces that lean on existential framing. Off by default. Turn on only if it helps you, not if it would harm you.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+                item {
+                    OptInCard(
+                        name = "Mortality widgets",
+                        tagline = "Beach Saturdays + days remaining (assumes 80yr life).",
+                        explanation = "Two home-screen tiles built from your age and a fixed 80-year actuarial assumption. The math is local. If a death-clock would hurt you instead of helping you, leave this off.",
+                        testTag = "tech-mortality",
+                        enabledFlow = prefs.mortalityWidgetsOptIn,
+                        onToggle = { v -> scope.launch { prefs.setMortalityWidgetsOptIn(v) } }
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun OptInCard(
+    name: String,
+    tagline: String,
+    explanation: String,
+    testTag: String,
+    enabledFlow: Flow<Boolean>,
+    onToggle: (Boolean) -> Unit
+) {
+    val enabled by enabledFlow.collectAsState(initial = false)
+    Surface(
+        modifier = Modifier.fillMaxWidth().testTag(testTag),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(tagline, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                }
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = onToggle,
+                    modifier = Modifier.testTag("switch-$testTag")
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(explanation, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

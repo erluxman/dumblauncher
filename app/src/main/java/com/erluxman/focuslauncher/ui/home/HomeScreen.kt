@@ -313,6 +313,11 @@ fun HomeScreen(
                             onSetAge = { a -> scope.launch { prefs.setUserAge(a) } }
                         )
                     }
+                    if (uiState.mortalityWidgetsOptIn && uiState.userAge in 1..120) {
+                        item {
+                            MortalityCard(userAge = uiState.userAge)
+                        }
+                    }
                     if (uiState.afterFallDueDate.isNotBlank()) {
                         item {
                             AfterFallCard(

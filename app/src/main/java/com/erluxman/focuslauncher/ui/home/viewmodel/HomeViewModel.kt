@@ -63,6 +63,7 @@ data class HomeUiState(
     val afterFallStepsDone: Set<String> = emptySet(),
     val hourlyRateUsd: Int = 0,
     val userAge: Int = 0,
+    val mortalityWidgetsOptIn: Boolean = false,
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -256,6 +257,12 @@ class HomeViewModel(
                 .collect { (rate, age) ->
                     _uiState.update { it.copy(hourlyRateUsd = rate, userAge = age) }
                 }
+        }
+
+        viewModelScope.launch {
+            prefs.mortalityWidgetsOptIn.collect { v ->
+                _uiState.update { it.copy(mortalityWidgetsOptIn = v) }
+            }
         }
 
         viewModelScope.launch {

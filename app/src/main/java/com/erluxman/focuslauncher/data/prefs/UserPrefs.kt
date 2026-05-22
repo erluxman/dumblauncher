@@ -110,6 +110,9 @@ object PrefKeys {
     val TECH_VARIABLE_RATIO = booleanPreferencesKey("tech_variable_ratio")
     val TECH_ESCALATING = booleanPreferencesKey("tech_escalating")
     val TECH_DREAM = booleanPreferencesKey("tech_dream")
+
+    /** LIFE-009 + LIFE-012 mortality widgets. Opt-in. */
+    val MORTALITY_WIDGETS_OPT_IN = booleanPreferencesKey("mortality_widgets_opt_in")
 }
 
 class UserPrefs(private val context: Context) {
@@ -213,6 +216,14 @@ class UserPrefs(private val context: Context) {
     val domainTracks: Flow<Set<String>> = store.data.map { it[PrefKeys.DOMAIN_TRACKS] ?: emptySet() }
     val emergencyPasses: Flow<Int> = store.data.map { it[PrefKeys.EMERGENCY_PASSES] ?: 0 }
     val emergencyWeek: Flow<String> = store.data.map { it[PrefKeys.EMERGENCY_WEEK].orEmpty() }
+
+    /** Default OFF: mortality widgets are opt-in only. */
+    val mortalityWidgetsOptIn: Flow<Boolean> =
+        store.data.map { it[PrefKeys.MORTALITY_WIDGETS_OPT_IN] ?: false }
+
+    suspend fun setMortalityWidgetsOptIn(value: Boolean) {
+        store.edit { it[PrefKeys.MORTALITY_WIDGETS_OPT_IN] = value }
+    }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
