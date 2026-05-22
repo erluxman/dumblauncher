@@ -1,4 +1,5 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.data.prefs.clearCaffeineLog
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag

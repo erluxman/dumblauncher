@@ -1,4 +1,7 @@
 package com.erluxman.focuslauncher
+import com.erluxman.focuslauncher.data.prefs.sleepCutoffHour
+import com.erluxman.focuslauncher.data.prefs.setSleepCutoffHour
+import com.erluxman.focuslauncher.data.prefs.setSleepWakeHour
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
