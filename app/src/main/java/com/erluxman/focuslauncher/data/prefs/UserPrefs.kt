@@ -124,6 +124,9 @@ object PrefKeys {
 
     /** SUB-001 hangover calculus drink log. Each entry: "epochMs|units (e.g. 1.0)". */
     val DRINK_LOG = stringSetPreferencesKey("drink_log")
+
+    /** MIND-001 meditation log. Each entry: "iso|minutes|technique". */
+    val MEDITATION_LOG = stringSetPreferencesKey("meditation_log")
 }
 
 class UserPrefs(private val context: Context) {
@@ -292,6 +295,22 @@ class UserPrefs(private val context: Context) {
 
     suspend fun clearDrinkLog() {
         store.edit { it.remove(PrefKeys.DRINK_LOG) }
+    }
+
+    val meditationLog: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.MEDITATION_LOG] ?: emptySet() }
+
+    suspend fun logMeditation(isoDate: String, minutes: Int, technique: String) {
+        if (minutes <= 0) return
+        val safeTech = technique.replace("|", " ").ifBlank { "Breath" }
+        store.edit {
+            val current = it[PrefKeys.MEDITATION_LOG] ?: emptySet()
+            it[PrefKeys.MEDITATION_LOG] = current + "$isoDate|$minutes|$safeTech"
+        }
+    }
+
+    suspend fun clearMeditationLog() {
+        store.edit { it.remove(PrefKeys.MEDITATION_LOG) }
     }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =

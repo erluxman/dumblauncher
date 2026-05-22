@@ -69,6 +69,7 @@ data class HomeUiState(
     val anchoringEnabled: Boolean = true,
     val caffeineDoses: List<com.erluxman.focuslauncher.service.CaffeineMath.Dose> = emptyList(),
     val drinks: List<com.erluxman.focuslauncher.service.HangoverMath.Drink> = emptyList(),
+    val meditationSessions: List<com.erluxman.focuslauncher.service.MeditationLog.Session> = emptyList(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -281,6 +282,13 @@ class HomeViewModel(
                 .collect { (c, w) ->
                     _uiState.update { it.copy(sleepCutoffHour = c, sleepWakeHour = w) }
                 }
+        }
+
+        viewModelScope.launch {
+            prefs.meditationLog.collect { set ->
+                val sessions = com.erluxman.focuslauncher.service.MeditationLog.parse(set)
+                _uiState.update { it.copy(meditationSessions = sessions) }
+            }
         }
 
         viewModelScope.launch {

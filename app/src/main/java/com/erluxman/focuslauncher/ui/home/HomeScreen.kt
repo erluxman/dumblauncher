@@ -342,6 +342,25 @@ fun HomeScreen(
                             onClear = { scope.launch { prefs.clearDrinkLog() } }
                         )
                     }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        val last7 = remember(today) {
+                            val cal = java.util.Calendar.getInstance()
+                            val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                            (0..6).map { offset ->
+                                val c = cal.clone() as java.util.Calendar
+                                c.add(java.util.Calendar.DAY_OF_MONTH, -offset)
+                                fmt.format(c.time)
+                            }
+                        }
+                        MeditationCard(
+                            todayIso = today,
+                            last7DaysIso = last7,
+                            sessions = uiState.meditationSessions,
+                            onLog = { mins, tech -> scope.launch { prefs.logMeditation(today, mins, tech) } },
+                            onClear = { scope.launch { prefs.clearMeditationLog() } }
+                        )
+                    }
                     item { CompoundCurveCard() }
                     item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {
