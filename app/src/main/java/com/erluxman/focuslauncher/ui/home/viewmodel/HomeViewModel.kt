@@ -82,6 +82,7 @@ data class HomeUiState(
     val moneyExpense: Int = 0,
     val moneyAssets: Int = 0,
     val moneyLiabilities: Int = 0,
+    val highlights: Set<String> = emptySet(),
     val distractionMinutesToday: Int = 0,
     val todosCompletedToday: Int = 0,
     val appTombstones: List<String> = emptyList(),
@@ -374,6 +375,12 @@ class HomeViewModel(
                     moneyIncome = arr[0], moneyExpense = arr[1],
                     moneyAssets = arr[2], moneyLiabilities = arr[3]
                 ) }
+            }
+        }
+
+        viewModelScope.launch {
+            prefs.highlights.collect { set ->
+                _uiState.update { it.copy(highlights = set) }
             }
         }
 

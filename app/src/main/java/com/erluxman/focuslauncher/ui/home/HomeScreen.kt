@@ -509,6 +509,15 @@ fun HomeScreen(
                             }
                         )
                     }
+                    item {
+                        val today = remember { java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) }
+                        HighlightCard(
+                            todayIso = today,
+                            highlights = uiState.highlights,
+                            onAdd = { t -> scope.launch { prefs.addHighlight(t) } },
+                            onRemove = { t -> scope.launch { prefs.removeHighlight(t) } }
+                        )
+                    }
                     item { TimeDilationCard(distractionMinutes = uiState.distractionMinutesToday) }
                     item {
                         AnchorCard(

@@ -154,6 +154,9 @@ object PrefKeys {
     val MONEY_EXPENSE = intPreferencesKey("money_expense_usd")
     val MONEY_ASSETS = intPreferencesKey("money_assets_usd")
     val MONEY_LIABILITIES = intPreferencesKey("money_liabilities_usd")
+
+    /** READ-002 raw text highlights. */
+    val HIGHLIGHTS = stringSetPreferencesKey("highlights")
 }
 
 class UserPrefs(private val context: Context) {
@@ -481,6 +484,25 @@ class UserPrefs(private val context: Context) {
     suspend fun setMoneyExpense(v: Int) { store.edit { it[PrefKeys.MONEY_EXPENSE] = v.coerceAtLeast(0) } }
     suspend fun setMoneyAssets(v: Int) { store.edit { it[PrefKeys.MONEY_ASSETS] = v.coerceAtLeast(0) } }
     suspend fun setMoneyLiabilities(v: Int) { store.edit { it[PrefKeys.MONEY_LIABILITIES] = v.coerceAtLeast(0) } }
+
+    val highlights: Flow<Set<String>> =
+        store.data.map { it[PrefKeys.HIGHLIGHTS] ?: emptySet() }
+
+    suspend fun addHighlight(text: String) {
+        val safe = text.trim()
+        if (safe.isEmpty()) return
+        store.edit {
+            val current = it[PrefKeys.HIGHLIGHTS] ?: emptySet()
+            it[PrefKeys.HIGHLIGHTS] = current + safe
+        }
+    }
+
+    suspend fun removeHighlight(text: String) {
+        store.edit {
+            val current = it[PrefKeys.HIGHLIGHTS] ?: emptySet()
+            it[PrefKeys.HIGHLIGHTS] = current - text
+        }
+    }
 
     fun technique(key: Preferences.Key<Boolean>): Flow<Boolean> =
         store.data.map { it[key] ?: true }
