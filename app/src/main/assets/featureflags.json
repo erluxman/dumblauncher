@@ -51,6 +51,6 @@
     { "key": "AI_LIFE_COACH",       "stage": 4, "default": false, "required": false, "label": "ai life coach",        "description": "on-device LLM weekly review" },
     { "key": "WEAR_OS_COMPANION",   "stage": 4, "default": false, "required": false, "label": "wear os companion",    "description": "hr + heart-rate based gates" },
     { "key": "WEB_COMPANION",       "stage": 4, "default": false, "required": false, "label": "web companion",        "description": "read-only desk-side stats" },
-    { "key": "IDENTITY_VOTING",     "stage": 4, "default": false, "required": false, "label": "identity voting",      "description": "builder vs consumer running tally" }
+    { "key": "IDENTITY_VOTING",     "stage": 2, "default": true,  "required": false, "label": "identity voting",      "description": "builder vs consumer running tally — daily reset" }
   ]
 }

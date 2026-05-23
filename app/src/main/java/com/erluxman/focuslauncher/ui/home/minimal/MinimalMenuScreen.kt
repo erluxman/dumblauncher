@@ -46,6 +46,7 @@ fun MinimalMenuScreen(
     onOpenUninstall: () -> Unit,
     onOpenFeatureFlags: () -> Unit,
     onOpenExport: () -> Unit,
+    onOpenIdentity: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -100,6 +101,8 @@ fun MinimalMenuScreen(
                 MenuRow("replay onboarding", "redo the setup", "menu-onboarding", onReplayOnboarding)
             if (on(FlagKey.DATA_EXPORT))
                 MenuRow("export data", "json or csv dump of everything", "menu-export", onOpenExport)
+            if (on(FlagKey.IDENTITY_VOTING))
+                MenuRow("identity", "builder vs consumer — vote with every action", "menu-identity", onOpenIdentity)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

@@ -86,6 +86,7 @@ sealed class Screen {
     data object Breath : Screen()
     data object FeatureFlags : Screen()
     data object Export : Screen()
+    data object Identity : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -198,6 +199,7 @@ private fun AppRoot() {
                 onOpenUninstall = { current = Screen.Uninstall },
                 onOpenFeatureFlags = { current = Screen.FeatureFlags },
                 onOpenExport = { current = Screen.Export },
+                onOpenIdentity = { current = Screen.Identity },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -208,6 +210,12 @@ private fun AppRoot() {
         }
         current == Screen.Export -> {
             com.erluxman.focuslauncher.ui.export.ExportScreen(
+                prefs = prefs,
+                onBack = { current = Screen.Menu },
+            )
+        }
+        current == Screen.Identity -> {
+            com.erluxman.focuslauncher.ui.identity.IdentityVotingScreen(
                 prefs = prefs,
                 onBack = { current = Screen.Menu },
             )

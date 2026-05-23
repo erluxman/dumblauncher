@@ -40,4 +40,5 @@ object FlagKey {
     const val BEHAVIOR_INDICATOR = "BEHAVIOR_INDICATOR"
     const val FEATURE_FLAGS = "FEATURE_FLAGS"
     const val DATA_EXPORT = "DATA_EXPORT"
+    const val IDENTITY_VOTING = "IDENTITY_VOTING"
 }

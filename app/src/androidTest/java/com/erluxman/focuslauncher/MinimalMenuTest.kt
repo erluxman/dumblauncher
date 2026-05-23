@@ -44,6 +44,7 @@ class MinimalMenuTest {
         "menu-future-self",
         "menu-onboarding",
         "menu-export",
+        "menu-identity",
         "menu-feature-flags",
         "menu-uninstall",
     )
