@@ -52,4 +52,8 @@ object FlagKey {
     const val PR_WALL = "PR_WALL"
     const val TRAVEL_ATLAS = "TRAVEL_ATLAS"
     const val COMPOUND_CURVE = "COMPOUND_CURVE"
+    const val MONEY_MIRROR = "MONEY_MIRROR"
+    const val ANTI_BIO = "ANTI_BIO"
+    const val SLEEP_WINDOW = "SLEEP_WINDOW"
+    const val DAILY_LOGS = "DAILY_LOGS"
 }

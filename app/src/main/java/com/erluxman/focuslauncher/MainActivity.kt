@@ -98,6 +98,10 @@ sealed class Screen {
     data object PrWall : Screen()
     data object Travel : Screen()
     data object Compound : Screen()
+    data object Money : Screen()
+    data object AntiBio : Screen()
+    data object SleepWindow : Screen()
+    data object DailyLogs : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -222,6 +226,10 @@ private fun AppRoot() {
                 onOpenPrWall = { current = Screen.PrWall },
                 onOpenTravel = { current = Screen.Travel },
                 onOpenCompound = { current = Screen.Compound },
+                onOpenMoney = { current = Screen.Money },
+                onOpenAntiBio = { current = Screen.AntiBio },
+                onOpenSleepWindow = { current = Screen.SleepWindow },
+                onOpenDailyLogs = { current = Screen.DailyLogs },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -286,6 +294,18 @@ private fun AppRoot() {
         }
         current == Screen.Compound -> {
             com.erluxman.focuslauncher.ui.compound.CompoundCurveScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Money -> {
+            com.erluxman.focuslauncher.ui.money.MoneyMirrorScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.AntiBio -> {
+            com.erluxman.focuslauncher.ui.antibio.AntiBioScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.SleepWindow -> {
+            com.erluxman.focuslauncher.ui.sleepwindow.SleepWindowScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.DailyLogs -> {
+            com.erluxman.focuslauncher.ui.logs.DailyLogsScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

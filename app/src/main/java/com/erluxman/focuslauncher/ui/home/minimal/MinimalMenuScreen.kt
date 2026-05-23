@@ -58,6 +58,10 @@ fun MinimalMenuScreen(
     onOpenPrWall: () -> Unit,
     onOpenTravel: () -> Unit,
     onOpenCompound: () -> Unit,
+    onOpenMoney: () -> Unit,
+    onOpenAntiBio: () -> Unit,
+    onOpenSleepWindow: () -> Unit,
+    onOpenDailyLogs: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -136,6 +140,14 @@ fun MinimalMenuScreen(
                 MenuRow("travel atlas", "where you've been", "menu-travel", onOpenTravel)
             if (on(FlagKey.COMPOUND_CURVE))
                 MenuRow("compounding", "1%/day is exponential", "menu-compound", onOpenCompound)
+            if (on(FlagKey.MONEY_MIRROR))
+                MenuRow("money", "income / expense / net worth", "menu-money", onOpenMoney)
+            if (on(FlagKey.ANTI_BIO))
+                MenuRow("anti-bio", "the one thing you are not", "menu-anti-bio", onOpenAntiBio)
+            if (on(FlagKey.SLEEP_WINDOW))
+                MenuRow("sleep window", "cutoff + wake hours", "menu-sleep-window", onOpenSleepWindow)
+            if (on(FlagKey.DAILY_LOGS))
+                MenuRow("daily logs", "meditation, reading, workout, commits", "menu-daily-logs", onOpenDailyLogs)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

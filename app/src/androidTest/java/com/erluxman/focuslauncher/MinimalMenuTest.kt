@@ -56,6 +56,10 @@ class MinimalMenuTest {
         "menu-pr-wall",
         "menu-travel",
         "menu-compound",
+        "menu-money",
+        "menu-anti-bio",
+        "menu-sleep-window",
+        "menu-daily-logs",
         "menu-feature-flags",
         "menu-uninstall",
     )
