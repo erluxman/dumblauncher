@@ -64,4 +64,5 @@ object FlagKey {
     const val LEGACY_COUNTER = "LEGACY_COUNTER"
     const val TIME_DILATION = "TIME_DILATION"
     const val SAD_SELF = "SAD_SELF"
+    const val TIME_MONEY = "TIME_MONEY"
 }

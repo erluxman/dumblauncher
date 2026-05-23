@@ -68,6 +68,7 @@ class MinimalMenuTest {
         "menu-legacy",
         "menu-dilation",
         "menu-sad-self",
+        "menu-time-money",
         "menu-feature-flags",
         "menu-uninstall",
     )

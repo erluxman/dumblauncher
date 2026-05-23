@@ -52,6 +52,7 @@
     { "key": "LEGACY_COUNTER",      "stage": 2, "default": true,  "required": false, "label": "legacy counter",       "description": "cumulative builder minutes (todos + focus sessions)" },
     { "key": "TIME_DILATION",       "stage": 2, "default": true,  "required": false, "label": "time dilation",        "description": "real minutes → 3× felt-like" },
     { "key": "SAD_SELF",            "stage": 2, "default": true,  "required": false, "label": "sad self",             "description": "preview + pick the voice that nudges you" },
+    { "key": "TIME_MONEY",          "stage": 2, "default": true,  "required": false, "label": "time = money",         "description": "opportunity cost + lifetime hours projection" },
 
     { "key": "BUILT_WRAPPED",       "stage": 3, "default": true,  "required": false, "label": "built wrapped",        "description": "year-in-review — score, headline, per-domain totals" },
     { "key": "MORTALITY_WIDGETS",   "stage": 3, "default": true,  "required": false, "label": "mortality widgets",    "description": "beach saturdays / days remaining; runtime opt-in still required" },

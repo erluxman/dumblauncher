@@ -70,6 +70,7 @@ fun MinimalMenuScreen(
     onOpenLegacy: () -> Unit,
     onOpenDilation: () -> Unit,
     onOpenSadSelf: () -> Unit,
+    onOpenTimeMoney: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -172,6 +173,8 @@ fun MinimalMenuScreen(
                 MenuRow("time dilation", "what 30 minutes really felt like", "menu-dilation", onOpenDilation)
             if (on(FlagKey.SAD_SELF))
                 MenuRow("sad self", "pick the voice that nudges you", "menu-sad-self", onOpenSadSelf)
+            if (on(FlagKey.TIME_MONEY))
+                MenuRow("time = money", "opportunity cost calc", "menu-time-money", onOpenTimeMoney)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
