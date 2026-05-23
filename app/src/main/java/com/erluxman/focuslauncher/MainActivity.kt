@@ -147,6 +147,10 @@ sealed class Screen {
     data object Stake : Screen()
     data object FocusDuel : Screen()
     data object Hashtags : Screen()
+    data object ThirdPlace : Screen()
+    data object LastContacted : Screen()
+    data object Cooking : Screen()
+    data object QuietBrag : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -328,6 +332,10 @@ private fun AppRoot() {
                 onOpenStake = { current = Screen.Stake },
                 onOpenFocusDuel = { current = Screen.FocusDuel },
                 onOpenHashtags = { current = Screen.Hashtags },
+                onOpenThirdPlace = { current = Screen.ThirdPlace },
+                onOpenLastContacted = { current = Screen.LastContacted },
+                onOpenCooking = { current = Screen.Cooking },
+                onOpenQuietBrag = { current = Screen.QuietBrag },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -543,6 +551,18 @@ private fun AppRoot() {
         }
         current == Screen.Hashtags -> {
             com.erluxman.focuslauncher.ui.hashtags.HashtagsScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.ThirdPlace -> {
+            com.erluxman.focuslauncher.ui.thirdplace.ThirdPlaceScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.LastContacted -> {
+            com.erluxman.focuslauncher.ui.lastcontact.LastContactedScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Cooking -> {
+            com.erluxman.focuslauncher.ui.cooking.CookingRatioScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.QuietBrag -> {
+            com.erluxman.focuslauncher.ui.quietbrag.QuietBragScreen(prefs = prefs, backend = backend, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

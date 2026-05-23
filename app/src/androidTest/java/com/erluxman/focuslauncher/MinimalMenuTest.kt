@@ -105,6 +105,10 @@ class MinimalMenuTest {
         "menu-stake",
         "menu-focus-duel",
         "menu-hashtags",
+        "menu-third-place",
+        "menu-last-contacted",
+        "menu-cooking",
+        "menu-quiet-brag",
         "menu-feature-flags",
         "menu-uninstall",
     )

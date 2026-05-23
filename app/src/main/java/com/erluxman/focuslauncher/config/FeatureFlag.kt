@@ -107,4 +107,8 @@ object FlagKey {
     const val STAKE = "STAKE"
     const val FOCUS_DUEL = "FOCUS_DUEL"
     const val HASHTAGS = "HASHTAGS"
+    const val THIRD_PLACE = "THIRD_PLACE"
+    const val LAST_CONTACTED = "LAST_CONTACTED"
+    const val COOKING = "COOKING"
+    const val QUIET_BRAG = "QUIET_BRAG"
 }

@@ -100,6 +100,10 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── money stake              (menu-stake)               ──>  Screen.Stake           (FINANCE-001)
   ├── focus duel               (menu-focus-duel)          ──>  Screen.FocusDuel       (SOCIAL-034)
   ├── hashtag tracks           (menu-hashtags)            ──>  Screen.Hashtags        (SOCIAL-019)
+  ├── third place              (menu-third-place)         ──>  Screen.ThirdPlace      (LOC-003)
+  ├── last contacted           (menu-last-contacted)      ──>  Screen.LastContacted   (PRM-002)
+  ├── cooking ratio            (menu-cooking)             ──>  Screen.Cooking         (NUT-004)
+  ├── quiet brag               (menu-quiet-brag)          ──>  Screen.QuietBrag       (SOCIAL-036)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```

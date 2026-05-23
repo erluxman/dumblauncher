@@ -104,6 +104,10 @@
     { "key": "STAKE",               "stage": 3, "default": true,  "required": false, "label": "money stake",          "description": "FINANCE-001 — escrow commitment; real escrow needs PAY-002" },
     { "key": "FOCUS_DUEL",          "stage": 4, "default": true,  "required": false, "label": "focus duel",           "description": "SOCIAL-034 — 2hr challenge vs a friend" },
     { "key": "HASHTAGS",            "stage": 4, "default": true,  "required": false, "label": "hashtag tracks",       "description": "SOCIAL-019 — public joinable challenges" },
+    { "key": "THIRD_PLACE",         "stage": 3, "default": true,  "required": false, "label": "third place",          "description": "LOC-003 — non-home, non-work spots, ≥30 min/week" },
+    { "key": "LAST_CONTACTED",      "stage": 4, "default": true,  "required": false, "label": "last contacted",       "description": "PRM-002 — humans + days since" },
+    { "key": "COOKING",             "stage": 4, "default": true,  "required": false, "label": "cooking ratio",        "description": "NUT-004 — cooked vs eaten out" },
+    { "key": "QUIET_BRAG",          "stage": 3, "default": true,  "required": false, "label": "quiet brag",           "description": "SOCIAL-036 — post the one thing you finished" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },
