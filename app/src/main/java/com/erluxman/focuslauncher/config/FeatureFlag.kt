@@ -85,4 +85,5 @@ object FlagKey {
     const val FEED = "FEED"
     const val PRE_COMMIT = "PRE_COMMIT"
     const val RECEIPT_WALL = "RECEIPT_WALL"
+    const val COURAGE = "COURAGE"
 }

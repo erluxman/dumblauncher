@@ -125,6 +125,7 @@ sealed class Screen {
     data object Feed : Screen()
     data object PreCommit : Screen()
     data object ReceiptWall : Screen()
+    data object Courage : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -284,6 +285,7 @@ private fun AppRoot() {
                 onOpenFeed = { current = Screen.Feed },
                 onOpenPreCommit = { current = Screen.PreCommit },
                 onOpenReceiptWall = { current = Screen.ReceiptWall },
+                onOpenCourage = { current = Screen.Courage },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -433,6 +435,9 @@ private fun AppRoot() {
         }
         current == Screen.ReceiptWall -> {
             com.erluxman.focuslauncher.ui.receiptwall.ReceiptWallScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.Courage -> {
+            com.erluxman.focuslauncher.ui.courage.CourageScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

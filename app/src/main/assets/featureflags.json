@@ -82,6 +82,7 @@
     { "key": "FEED",                "stage": 3, "default": true,  "required": false, "label": "chronological feed",   "description": "SOCIAL-016 — no-algorithm reverse-chronological post stream" },
     { "key": "PRE_COMMIT",          "stage": 3, "default": true,  "required": false, "label": "pre-commitments",      "description": "SOCIAL-033 — tomorrow's intent, posted to your feed; auto-grades server-side" },
     { "key": "RECEIPT_WALL",        "stage": 3, "default": true,  "required": false, "label": "receipt wall",         "description": "SOCIAL-012 — wins from putting flagged apps down inside 3 min" },
+    { "key": "COURAGE",             "stage": 4, "default": true,  "required": false, "label": "courage counters",     "description": "IDENT-003 rejections + IDENT-004 risks + IDENT-005 things made — three logs that compound" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

@@ -83,6 +83,7 @@ class MinimalMenuTest {
         "menu-feed",
         "menu-pre-commit",
         "menu-receipt-wall",
+        "menu-courage",
         "menu-feature-flags",
         "menu-uninstall",
     )

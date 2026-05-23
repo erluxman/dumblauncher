@@ -78,6 +78,7 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── feed                     (menu-feed)                ──>  Screen.Feed            (SOCIAL-016)
   ├── pre-commit               (menu-pre-commit)          ──>  Screen.PreCommit       (SOCIAL-033)
   ├── receipt wall             (menu-receipt-wall)        ──>  Screen.ReceiptWall     (SOCIAL-012)
+  ├── courage                  (menu-courage)             ──>  Screen.Courage         (IDENT-003 + IDENT-004 + IDENT-005)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```
@@ -141,6 +142,7 @@ For each shipped Compose screen, the spec features it covers (`features-by-stage
 | `Screen.Feed` | SOCIAL-016 | Chronological feed; backed by `BackendRepository.feed` |
 | `Screen.PreCommit` | SOCIAL-033 | Post tomorrow's intent as a PRE_COMMIT post that expires end-of-tomorrow |
 | `Screen.ReceiptWall` | SOCIAL-012 | Reads from `ReceiptWall.receiptFor(app, sec)` |
+| `Screen.Courage` | IDENT-003, IDENT-004, IDENT-005 | Three logs in one screen: rejections asked, risks taken, things made. Backed by new `UserPrefsIdentity` pref APIs. |
 | `Screen.FeatureFlags` | — | Build-time gating surface (not in spec) |
 | `(no UI yet)` PaymentRouter | PAY-001, PAY-002, PAY-003 | Triggered when a paywall surface calls `PaymentRouter.checkout(productId)` — opens Play Billing or web checkout per `/config/payments.nativeOnDevice` |
 | `(no UI yet)` Web companion | PLATFORM-002 | Static site on Firebase Hosting — separate repo target, not a route in the Android app |

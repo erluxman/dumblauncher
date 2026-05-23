@@ -85,6 +85,7 @@ fun MinimalMenuScreen(
     onOpenFeed: () -> Unit,
     onOpenPreCommit: () -> Unit,
     onOpenReceiptWall: () -> Unit,
+    onOpenCourage: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -217,6 +218,8 @@ fun MinimalMenuScreen(
                 MenuRow("pre-commit", "post tomorrow's intent", "menu-pre-commit", onOpenPreCommit)
             if (on(FlagKey.RECEIPT_WALL))
                 MenuRow("receipt wall", "restraint receipts", "menu-receipt-wall", onOpenReceiptWall)
+            if (on(FlagKey.COURAGE))
+                MenuRow("courage", "rejections + risks + things made", "menu-courage", onOpenCourage)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
