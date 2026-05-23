@@ -12,12 +12,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.erluxman.focuslauncher.config.FeatureFlagsRepository
+import com.erluxman.focuslauncher.config.FlagKey
 
 /**
  * Minimal menu — the single fan-out to every feature in the app.
@@ -27,7 +31,9 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun MinimalMenuScreen(
+    flagsRepo: FeatureFlagsRepository,
     onBack: () -> Unit,
+    onOpenStats: () -> Unit,
     onOpenDashboard: () -> Unit,
     onOpenTransparency: () -> Unit,
     onOpenVip: () -> Unit,
@@ -38,7 +44,11 @@ fun MinimalMenuScreen(
     onOpenFutureSelfVideo: () -> Unit,
     onReplayOnboarding: () -> Unit,
     onOpenUninstall: () -> Unit,
+    onOpenFeatureFlags: () -> Unit,
+    onOpenExport: () -> Unit,
 ) {
+    val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
+    fun on(key: String): Boolean = flags[key] ?: true
     Surface(
         modifier = Modifier.fillMaxSize().testTag("minimal-menu"),
         color = MinimalTheme.bg,
@@ -68,27 +78,44 @@ fun MinimalMenuScreen(
             )
             Spacer(Modifier.height(24.dp))
 
-            MenuRow("dashboard", "all your data, the legacy cards", "menu-dashboard", onOpenDashboard)
-            MenuRow("transparency", "opt out of any technique", "menu-transparency", onOpenTransparency)
-            MenuRow("vip contacts", "who can still reach you", "menu-vip", onOpenVip)
-            MenuRow("focus timer", "25 · 5 pomodoro", "menu-focus", onOpenFocus)
-            MenuRow("mantra", "phrase that unlocks apps", "menu-mantra", onOpenMantra)
-            MenuRow("boredom", "two minutes with nothing", "menu-boredom", onOpenBoredom)
-            MenuRow("breath unlock", "4 · 7 · 8", "menu-breath", onOpenBreath)
-            MenuRow("future self", "record a video to future you", "menu-future-self", onOpenFutureSelfVideo)
-            MenuRow("replay onboarding", "redo the setup", "menu-onboarding", onReplayOnboarding)
+            if (on(FlagKey.STATS_SHEET))
+                MenuRow("stats", "today, this week, this year — in sentences", "menu-stats", onOpenStats)
+            if (on(FlagKey.LEGACY_DASHBOARD))
+                MenuRow("dashboard", "all your data, the legacy cards", "menu-dashboard", onOpenDashboard)
+            if (on(FlagKey.TRANSPARENCY))
+                MenuRow("transparency", "opt out of any technique", "menu-transparency", onOpenTransparency)
+            if (on(FlagKey.VIP_CONTACTS))
+                MenuRow("vip contacts", "who can still reach you", "menu-vip", onOpenVip)
+            if (on(FlagKey.FOCUS_TIMER))
+                MenuRow("focus timer", "25 · 5 pomodoro", "menu-focus", onOpenFocus)
+            if (on(FlagKey.MANTRA))
+                MenuRow("mantra", "phrase that unlocks apps", "menu-mantra", onOpenMantra)
+            if (on(FlagKey.BOREDOM))
+                MenuRow("boredom", "two minutes with nothing", "menu-boredom", onOpenBoredom)
+            if (on(FlagKey.BREATH_UNLOCK))
+                MenuRow("breath unlock", "4 · 7 · 8", "menu-breath", onOpenBreath)
+            if (on(FlagKey.FUTURE_SELF_VIDEO))
+                MenuRow("future self", "record a video to future you", "menu-future-self", onOpenFutureSelfVideo)
+            if (on(FlagKey.ONBOARDING))
+                MenuRow("replay onboarding", "redo the setup", "menu-onboarding", onReplayOnboarding)
+            if (on(FlagKey.DATA_EXPORT))
+                MenuRow("export data", "json or csv dump of everything", "menu-export", onOpenExport)
+            if (on(FlagKey.FEATURE_FLAGS))
+                MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
-            Spacer(Modifier.height(48.dp))
-            Text(
-                text = "uninstall",
-                style = bodyStyle,
-                color = MinimalTheme.outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("menu-uninstall")
-                    .clickable { onOpenUninstall() }
-                    .padding(vertical = 12.dp),
-            )
+            if (on(FlagKey.UNINSTALL_FLOW)) {
+                Spacer(Modifier.height(48.dp))
+                Text(
+                    text = "uninstall",
+                    style = bodyStyle,
+                    color = MinimalTheme.outline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("menu-uninstall")
+                        .clickable { onOpenUninstall() }
+                        .padding(vertical = 12.dp),
+                )
+            }
             Spacer(Modifier.height(64.dp))
         }
     }

@@ -73,6 +73,7 @@ import com.erluxman.focuslauncher.ui.boredom.BoredomScreen
 sealed class Screen {
     data object Home : Screen()
     data object Menu : Screen()       // the minimal menu — single fan-out to every feature
+    data object Stats : Screen()      // the sentence-only dashboard (read-only)
     data object Dashboard : Screen()  // the full ~50-card legacy home (reachable from Menu)
     data object Onboarding : Screen()
     data object Transparency : Screen()
@@ -83,6 +84,8 @@ sealed class Screen {
     data object Boredom : Screen()
     data object FutureSelfVideo : Screen()
     data object Breath : Screen()
+    data object FeatureFlags : Screen()
+    data object Export : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -123,6 +126,9 @@ class MainActivity : ComponentActivity() {
 private fun AppRoot() {
     val context = LocalContext.current
     val prefs = remember { UserPrefs(context.applicationContext) }
+    val flagsRepo = remember {
+        com.erluxman.focuslauncher.config.FeatureFlagsRepository(context.applicationContext)
+    }
     val onboardingComplete by prefs.onboardingComplete.collectAsState(initial = null)
     val legacyHome by prefs.legacyHome.collectAsState(initial = false)
 
@@ -177,7 +183,9 @@ private fun AppRoot() {
         }
         current == Screen.Menu -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalMenuScreen(
+                flagsRepo = flagsRepo,
                 onBack = { current = Screen.Home },
+                onOpenStats = { current = Screen.Stats },
                 onOpenDashboard = { current = Screen.Dashboard },
                 onOpenTransparency = { current = Screen.Transparency },
                 onOpenVip = { current = Screen.Vip },
@@ -188,6 +196,29 @@ private fun AppRoot() {
                 onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo },
                 onReplayOnboarding = { current = Screen.Onboarding },
                 onOpenUninstall = { current = Screen.Uninstall },
+                onOpenFeatureFlags = { current = Screen.FeatureFlags },
+                onOpenExport = { current = Screen.Export },
+            )
+        }
+        current == Screen.FeatureFlags -> {
+            com.erluxman.focuslauncher.ui.flags.FeatureFlagsScreen(
+                repo = flagsRepo,
+                onBack = { current = Screen.Menu },
+            )
+        }
+        current == Screen.Export -> {
+            com.erluxman.focuslauncher.ui.export.ExportScreen(
+                prefs = prefs,
+                onBack = { current = Screen.Menu },
+            )
+        }
+        current == Screen.Stats -> {
+            com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(
+                prefs = prefs,
+                onReturn = { current = Screen.Home },
+                onOpenTransparency = { current = Screen.Transparency },
+                onOpenUninstall = { current = Screen.Uninstall },
+                onOpenDashboard = { current = Screen.Dashboard },
             )
         }
         else -> {

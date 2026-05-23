@@ -33,6 +33,7 @@ class MinimalMenuTest {
     private val ctx get() = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val featureRows = listOf(
+        "menu-stats",
         "menu-dashboard",
         "menu-transparency",
         "menu-vip",
@@ -42,6 +43,8 @@ class MinimalMenuTest {
         "menu-breath",
         "menu-future-self",
         "menu-onboarding",
+        "menu-export",
+        "menu-feature-flags",
         "menu-uninstall",
     )
 
