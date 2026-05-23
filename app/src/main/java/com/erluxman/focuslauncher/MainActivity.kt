@@ -114,6 +114,8 @@ sealed class Screen {
     data object Estimation : Screen()
     data object Stress : Screen()
     data object Anchor : Screen()
+    data object EnergyZones : Screen()
+    data object TrackStatus : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -254,6 +256,8 @@ private fun AppRoot() {
                 onOpenEstimation = { current = Screen.Estimation },
                 onOpenStress = { current = Screen.Stress },
                 onOpenAnchor = { current = Screen.Anchor },
+                onOpenEnergyZones = { current = Screen.EnergyZones },
+                onOpenTrackStatus = { current = Screen.TrackStatus },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -366,6 +370,12 @@ private fun AppRoot() {
         }
         current == Screen.Anchor -> {
             com.erluxman.focuslauncher.ui.anchor.AnchorScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.EnergyZones -> {
+            com.erluxman.focuslauncher.ui.energy.EnergyZonesScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.TrackStatus -> {
+            com.erluxman.focuslauncher.ui.track.TrackStatusScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

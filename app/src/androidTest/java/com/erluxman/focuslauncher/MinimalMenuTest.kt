@@ -72,6 +72,8 @@ class MinimalMenuTest {
         "menu-estimation",
         "menu-stress",
         "menu-anchor",
+        "menu-energy-zones",
+        "menu-track-status",
         "menu-feature-flags",
         "menu-uninstall",
     )

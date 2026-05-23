@@ -68,4 +68,6 @@ object FlagKey {
     const val ESTIMATION = "ESTIMATION"
     const val STRESS = "STRESS"
     const val ANCHOR = "ANCHOR"
+    const val ENERGY_ZONES_SURFACE = "ENERGY_ZONES_SURFACE"
+    const val TRACK_STATUS = "TRACK_STATUS"
 }

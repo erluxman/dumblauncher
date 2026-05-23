@@ -74,6 +74,8 @@ fun MinimalMenuScreen(
     onOpenEstimation: () -> Unit,
     onOpenStress: () -> Unit,
     onOpenAnchor: () -> Unit,
+    onOpenEnergyZones: () -> Unit,
+    onOpenTrackStatus: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -184,6 +186,10 @@ fun MinimalMenuScreen(
                 MenuRow("stress weather", "sleep + checking behavior", "menu-stress", onOpenStress)
             if (on(FlagKey.ANCHOR))
                 MenuRow("anchor", "you vs the most disciplined", "menu-anchor", onOpenAnchor)
+            if (on(FlagKey.ENERGY_ZONES_SURFACE))
+                MenuRow("energy zones", "tag each 4-hour window", "menu-energy-zones", onOpenEnergyZones)
+            if (on(FlagKey.TRACK_STATUS))
+                MenuRow("track status", "level, points, misses", "menu-track-status", onOpenTrackStatus)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
