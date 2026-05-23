@@ -4,8 +4,8 @@
     "version": "1.0.0-plan",
     "generated": "2026-05-17",
     "source": "Synthesized from ../docs/09-features-master.json + ../docs/00-13 narrative specs",
-    "total_features_in_stages": 246,
-    "stage_counts": { "stage1_mvp": 20, "stage2_v1": 62, "stage3_v2": 92, "stage4_v3": 72 },
+    "total_features_in_stages": 250,
+    "stage_counts": { "stage1_mvp": 20, "stage2_v1": 65, "stage3_v2": 92, "stage4_v3": 73 },
     "impossible_features_excluded": 18,
     "impossible_features_location": "challenges.md §'Technically impossible features'",
     "stage_definitions": {
@@ -132,7 +132,13 @@
 
       { "id": "INTEG-001", "name": "HealthConnect Integration", "category": "integration", "description": "Read all body data (steps, sleep, HR, HRV, workouts, weight, cycle, mindfulness) from HealthConnect.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": [] },
       { "id": "FIT-001", "name": "Daily Activity Loop", "category": "fitness", "description": "Steps, active minutes, calories, floors. Apple-rings-style daily goals widget.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] },
-      { "id": "SLEEP-001", "name": "Sleep Stats Dashboard", "category": "sleep", "description": "Duration, debt, consistency, stages from HealthConnect.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] }
+      { "id": "SLEEP-001", "name": "Sleep Stats Dashboard", "category": "sleep", "description": "Duration, debt, consistency, stages from HealthConnect.", "priority": 3, "difficulty": 2, "impact": 4, "feasibility": 5, "dependencies": ["INTEG-001"] },
+
+      { "id": "PAY-001", "name": "Google Play Billing (Native In-App)", "category": "payments", "description": "Direct in-app purchases via the Google Play Billing Library; Google Pay handles the user-side payment. Required by Play policy for digital features sold inside the Android app. Receipts verified server-side by a Cloud Function.", "priority": 5, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["BACKUP-001"] },
+      { "id": "PAY-002", "name": "Web Checkout (Stripe + Google Pay)", "category": "payments", "description": "Hosted on the Chrome-homepage web app. Stripe as merchant backend with Google Pay button as the payment method. Used for physical goods (MERCH-001) and B2B subscriptions where Play Billing isn't required. Identity link via Google Sign-In to match the in-app uid.", "priority": 5, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["PLATFORM-002"] },
+      { "id": "PAY-003", "name": "Payment Router (Remote-Flag-Driven)", "category": "payments", "description": "Firestore document /config/payments holds a boolean nativeOnDevice. The in-app PaymentRouter reads it on cold start (cached 1h) and routes Buy taps to either Play Billing (PAY-001) or web checkout (PAY-002). Falls back to local PAYMENTS_NATIVE_ON_DEVICE flag when offline.", "priority": 5, "difficulty": 2, "impact": 5, "feasibility": 5, "dependencies": ["PAY-001", "PAY-002"] },
+
+      { "id": "PLATFORM-002", "name": "Chrome-Homepage Web App", "category": "infrastructure", "description": "Static site on Firebase Hosting served at built.app or similar. Acts as the user's Chrome homepage: live read-only stats preview (signed-in), shipping checkout (PAY-002), and a marketing landing page for the unauthenticated case. Decided in Stage 2 instead of Stage 4 because PAY-002 depends on it.", "priority": 4, "difficulty": 3, "impact": 5, "feasibility": 5, "dependencies": ["BACKUP-001"] }
     ]
   },
 
@@ -272,7 +278,7 @@
       { "id": "B2B-001", "name": "Therapist / Coach Dashboard", "category": "b2b", "description": "Web dashboard for licensed coaches/therapists. Consent-based anonymized patterns. Subscription product.", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["PLATFORM-001"] },
       { "id": "B2B-002", "name": "Team Focus Dashboard", "category": "b2b", "description": "Company-level managers see aggregate focus hours (no individual surveillance).", "priority": 2, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["PLATFORM-001"] },
 
-      { "id": "PLATFORM-001", "name": "Web / Desktop Companion", "category": "infrastructure", "description": "Web app for read-only stats, journal, todos, project tracking.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["BACKUP-001"] },
+      { "id": "PLATFORM-001", "name": "Web / Desktop Companion (Full Read+Write)", "category": "infrastructure", "description": "Builds on the Stage-2 PLATFORM-002 shell into a full-featured desktop companion: journal-edit, todo-edit, project-edit, dashboard customization. The Stage-2 site is read-only marketing + checkout; this is the productive workspace.", "priority": 3, "difficulty": 4, "impact": 4, "feasibility": 5, "dependencies": ["PLATFORM-002", "BACKUP-001"] },
       { "id": "MERCH-001", "name": "Print Shop (Heatmap / Journal / NFC Puck)", "category": "infrastructure", "description": "Order physical artifacts of your year. Real anchor in the world.", "priority": 2, "difficulty": 3, "impact": 4, "feasibility": 5, "dependencies": ["BACKUP-002", "HARDWARE-001"] },
 
       { "id": "CREATOR-001", "name": "Track Marketplace", "category": "creator_economy", "description": "Verified creators publish curated tracks. Users clone, follow stats. Revenue split.", "priority": 3, "difficulty": 4, "impact": 5, "feasibility": 5, "dependencies": ["TRACK-001", "SOCIAL-011"] },

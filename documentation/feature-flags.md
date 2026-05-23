@@ -98,3 +98,23 @@ Some flags can't be toggled because turning them off would brick the app
    flag entry, the `FlagKey` constant, and every `if (flags[...])` check.
 
 Flags are scaffolding, not load-bearing. Don't let them accumulate.
+
+## Special case: remote-overridable flags
+
+Most flags live entirely in `assets/featureflags.json` + DataStore. A few
+(payments, the Firebase backend toggle) are **mirrored remotely** in
+Firestore so we can flip channels without an app update.
+
+The contract: the JSON default is the **offline fallback**. If Firebase
+returns a value, that value wins for the session. If Firebase is unreachable
+(no network or `FIREBASE_BACKEND` is off), the in-app effective value falls
+back to JSON default → DataStore override.
+
+| Flag | Remote source | Why remote |
+|---|---|---|
+| `PAYMENTS_NATIVE_ON_DEVICE` | `/config/payments.nativeOnDevice` | Switch between Play Billing and web checkout without an app update; see `payment-architecture.md`. |
+| `FIREBASE_BACKEND` | n/a (chicken-and-egg) | Pure local — toggling it on triggers the Firebase init path. |
+| `PAYMENTS_NATIVE`, `PAYMENTS_WEB` | n/a | Per-channel kill switches; local-only so we can shut one off even if Firebase is unreachable. |
+| `WEB_APP_CHROME_HOME` | n/a | Pure marketing/deploy flag. |
+
+See `documentation/payment-architecture.md` for the full routing flow.

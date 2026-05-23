@@ -52,13 +52,16 @@ Discipline is private. A discipline **movement** is social. Both surfaces must c
 | Mobile platform | **Android-only at first** | iOS sandbox makes 80% of the concept impossible. |
 | Language / UI | **Kotlin + Jetpack Compose** | Native, deep API access for launcher/admin/accessibility. |
 | Local data | **Room (SQLite) + DataStore** | On-device source of truth. |
-| Backend | **Supabase (Postgres + Auth + Realtime)** | Open source, complex query power. Firebase as fallback if free-tier preferred. |
-| Push | FCM | Group features, shame notifications, dual-streak nudges. |
-| Payment / escrow | **Stripe + custom escrow logic** | For FINANCE-001 (money stake), CREATOR-001 (marketplace). |
+| Backend | **Firebase (Firestore + Auth + Cloud Functions + Remote Config + Storage)** | Free tier covers MVP, single vendor for auth/data/push/functions/hosting, native Google integration for billing + identity. |
+| Push | **FCM** (part of Firebase) | Group features, shame notifications, dual-streak nudges. |
+| Payment — digital (in-app) | **Google Play Billing (native) — `PAY-001`** | Required by Play policy for digital features sold inside the Android app. Channel chosen at runtime by the remote-config flag (see `payment-architecture.md`). |
+| Payment — physical + B2B | **Web checkout: Stripe + Google Pay button — `PAY-002`** | Hosted on the Chrome-homepage web app (`PLATFORM-002`). For physical goods (Print Shop) and B2B subscriptions where Play Billing isn't required. |
+| Payment routing | **Firebase Remote Config / Firestore `/config/payments`** | Single backend boolean `nativeOnDevice` flips on-device vs web checkout without an app update. Local feature flag `PAYMENTS_NATIVE_ON_DEVICE` is the offline default. |
+| Web app | **Firebase Hosting** (`PLATFORM-002`) | Chrome homepage — read-only dashboard preview + web checkout surface. |
 | AI (on-device) | **Gemma Nano / Phi-3 mini** | Sad Self generation, Auto-Insight Engine, voice-to-structured-data. |
 | AI (cloud, optional) | Anthropic API | Premium tier features only; default to on-device for privacy. |
 | Distribution | **Play Store (core) + sideload APK (extreme mode)** | Play Store for reach, sideload for nuclear features that Play Store rejects. |
-| Companion | **WearOS** (V3), **Web dashboard** (V3 PLATFORM-001) | HR sensors, desk-side read-only stats. |
+| Companion | **WearOS** (V3), **Chrome-homepage web app** (V3 `PLATFORM-002`) | HR sensors, desk-side read-only stats, and the checkout surface. |
 
 ADR-grade decisions still pending: see `../docs/04-decisions-needed.md` and `challenges.md` §"Open decisions".
 
@@ -100,13 +103,28 @@ ADR-grade decisions still pending: see `../docs/04-decisions-needed.md` and `cha
 │  • Strava, Spotify, Letterboxd, GitHub        │
 │  • OAuth manager + token refresh              │
 ├─────────────────────────────────────────────┤
-│  Backend (Supabase)                           │
-│  • Auth, groups, voting                       │
-│  • Real-time presence + streak sync           │
-│  • Push notifications                         │
-│  • Wrapped generation                         │
-│  • Public profile read API                    │
-│  • Escrow (Stripe webhook bridge)             │
+│  Backend (Firebase)                           │
+│  • Auth (Google Sign-In, anonymous)           │
+│  • Firestore: groups, votes, entitlements,    │
+│    `/config/payments` remote router doc       │
+│  • Realtime presence + streak sync            │
+│  • FCM push (shame, dual-streak, due-letter)  │
+│  • Cloud Functions:                           │
+│      - verifyPlayPurchase (Billing webhook)   │
+│      - verifyStripeWebhook (web checkout)     │
+│      - grantEntitlement (writes uid→product)  │
+│      - generateWrapped                        │
+│  • Firebase Hosting: Chrome-homepage web app  │
+│  • Remote Config: payment channel + kill swit │
+├─────────────────────────────────────────────┤
+│  Payments                                     │
+│  • PaymentRouter (in-app)                     │
+│      reads /config/payments.nativeOnDevice    │
+│        → true:  BillingClient (Google Play)   │
+│        → false: CustomTabs to web checkout    │
+│  • Web checkout: Stripe + Google Pay button   │
+│  • Entitlements live in Firestore +           │
+│    mirrored to local DataStore                │
 └─────────────────────────────────────────────┘
 ```
 
@@ -123,7 +141,14 @@ Custom home screen, app dock, hidden drawer, usage tracking, basic widgets, **Th
 **Exit criteria:** Author dogfoods for 2 weeks straight without bypassing.
 
 ### Stage 2 — V1 (3–4 months)
-**Theme: "The Track system unlocks the rest."**
+**Theme: "The Track system unlocks the rest." + the payment plumbing.**
+
+Payment / backend ships here even though the consumer-facing paid features
+mostly live in Stage 3, because the routing infrastructure (`PAY-001`,
+`PAY-002`, `PAY-003`, `PLATFORM-002`) is what unlocks them. The Firebase
+project, Cloud Functions, Hosting target, and `/config/payments` document
+all come up in Stage 2 with no products yet for sale.
+
 Track engine (10 levels, promotion/demotion, baseline detection, grace days, streak freezes, after-fall ritual), Mantra Gate + Whisper mode, emergency-pass system, full Sad Self engine + 4 voices + celebration self, Identity Voting, Session Receipts, Legacy Counter, Builder/Consumer mode, Mirror Widget, Future Self Video, Last Day Test, Phantom Vibration counter, Compound Time Bank, productivity heatmap, streak system, applause, journal, focus timer, face-down detection, morning routine, shutdown ritual, One Thing, time-blocking enforcer, Nourishing Consumption, Mood Pings, Crisis Detection / Soften Mode, Encrypted Backup, Data Export, HealthConnect, Sleep Stats, Daily Activity Loop, Dream Mode, context-aware locks, full restriction stack (variable ratio, boredom preservatory, intent declaration, escalating lockout, gatekeeper tasks, time debt, reverse notifications, replacement engine, app roulette, dream mode, one-app-at-a-time), graduated freedom.
 
 **Exit criteria:** 100 beta testers, 30-day D30 retention >40%.
@@ -215,6 +240,8 @@ Default tagline candidates: "Built. Day by day." / "The OS for a life worth buil
 | `WRITE_SETTINGS` | Brightness / DND control | ✅ |
 | HealthConnect scopes | Body/mind data | ✅ permissioned per-scope |
 | `BIND_VPN_SERVICE` | Per-app firewall (RESTRICT-020) | ⚠️ Special |
+| `com.android.vending.BILLING` | Google Play Billing (`PAY-001`) | ✅ Standard for paid apps |
+| Internet access (for Firebase) | Auth, Firestore, FCM, Remote Config | ✅ Standard |
 
 Mitigation: split into **Play Store edition** (compliant) + **sideload extreme APK** (full power). Open-source the core to build trust.
 

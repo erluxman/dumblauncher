@@ -71,4 +71,11 @@ object FlagKey {
     const val ENERGY_ZONES_SURFACE = "ENERGY_ZONES_SURFACE"
     const val TRACK_STATUS = "TRACK_STATUS"
     const val RECIPROCITY = "RECIPROCITY"
+
+    // ─── Payments + backend (Stage 2) ──────────────────────────────────────
+    const val PAYMENTS_NATIVE_ON_DEVICE = "PAYMENTS_NATIVE_ON_DEVICE"
+    const val PAYMENTS_NATIVE = "PAYMENTS_NATIVE"
+    const val PAYMENTS_WEB = "PAYMENTS_WEB"
+    const val FIREBASE_BACKEND = "FIREBASE_BACKEND"
+    const val WEB_APP_CHROME_HOME = "WEB_APP_CHROME_HOME"
 }
