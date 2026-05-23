@@ -46,7 +46,7 @@
     { "key": "COUPLES_MODE",        "stage": 3, "default": false, "required": false, "label": "couples mode",         "description": "dual-streak accountability (no backend yet)" },
     { "key": "MONEY_STAKE",         "stage": 3, "default": false, "required": false, "label": "money stake",          "description": "escrowed money on failure (gambling-law review pending)" },
 
-    { "key": "GRADUATE_MODE",       "stage": 4, "default": false, "required": false, "label": "graduate mode",        "description": "loosens restrictions after sustained level 10" },
+    { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },
     { "key": "AI_LIFE_COACH",       "stage": 4, "default": false, "required": false, "label": "ai life coach",        "description": "on-device LLM weekly review" },
     { "key": "WEAR_OS_COMPANION",   "stage": 4, "default": false, "required": false, "label": "wear os companion",    "description": "hr + heart-rate based gates" },

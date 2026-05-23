@@ -47,6 +47,7 @@ fun MinimalMenuScreen(
     onOpenFeatureFlags: () -> Unit,
     onOpenExport: () -> Unit,
     onOpenIdentity: () -> Unit,
+    onOpenGraduate: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -103,6 +104,8 @@ fun MinimalMenuScreen(
                 MenuRow("export data", "json or csv dump of everything", "menu-export", onOpenExport)
             if (on(FlagKey.IDENTITY_VOTING))
                 MenuRow("identity", "builder vs consumer — vote with every action", "menu-identity", onOpenIdentity)
+            if (on(FlagKey.GRADUATE_MODE))
+                MenuRow("graduate", "your progress out of the friction system", "menu-graduate", onOpenGraduate)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

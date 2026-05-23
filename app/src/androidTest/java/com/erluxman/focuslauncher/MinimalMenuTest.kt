@@ -45,6 +45,7 @@ class MinimalMenuTest {
         "menu-onboarding",
         "menu-export",
         "menu-identity",
+        "menu-graduate",
         "menu-feature-flags",
         "menu-uninstall",
     )

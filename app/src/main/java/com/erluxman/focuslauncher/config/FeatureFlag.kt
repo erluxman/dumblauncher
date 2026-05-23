@@ -41,4 +41,5 @@ object FlagKey {
     const val FEATURE_FLAGS = "FEATURE_FLAGS"
     const val DATA_EXPORT = "DATA_EXPORT"
     const val IDENTITY_VOTING = "IDENTITY_VOTING"
+    const val GRADUATE_MODE = "GRADUATE_MODE"
 }
