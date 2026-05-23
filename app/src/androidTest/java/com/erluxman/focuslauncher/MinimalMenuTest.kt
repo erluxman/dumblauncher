@@ -65,6 +65,7 @@ class MinimalMenuTest {
         "menu-future-letters",
         "menu-weekly-review",
         "menu-promises",
+        "menu-legacy",
         "menu-feature-flags",
         "menu-uninstall",
     )

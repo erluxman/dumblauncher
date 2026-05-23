@@ -107,6 +107,7 @@ sealed class Screen {
     data object FutureLetters : Screen()
     data object WeeklyReview : Screen()
     data object Promises : Screen()
+    data object Legacy : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -240,6 +241,7 @@ private fun AppRoot() {
                 onOpenFutureLetters = { current = Screen.FutureLetters },
                 onOpenWeeklyReview = { current = Screen.WeeklyReview },
                 onOpenPromises = { current = Screen.Promises },
+                onOpenLegacy = { current = Screen.Legacy },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -331,6 +333,9 @@ private fun AppRoot() {
         }
         current == Screen.Promises -> {
             com.erluxman.focuslauncher.ui.promises.PromiseRatioScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.Legacy -> {
+            com.erluxman.focuslauncher.ui.legacy.LegacyCounterScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

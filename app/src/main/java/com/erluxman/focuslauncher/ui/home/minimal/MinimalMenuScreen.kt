@@ -67,6 +67,7 @@ fun MinimalMenuScreen(
     onOpenFutureLetters: () -> Unit,
     onOpenWeeklyReview: () -> Unit,
     onOpenPromises: () -> Unit,
+    onOpenLegacy: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -163,6 +164,8 @@ fun MinimalMenuScreen(
                 MenuRow("week review", "last 7 days at a glance", "menu-weekly-review", onOpenWeeklyReview)
             if (on(FlagKey.PROMISE_RATIO))
                 MenuRow("promises", "kept vs broken todos", "menu-promises", onOpenPromises)
+            if (on(FlagKey.LEGACY_COUNTER))
+                MenuRow("legacy", "cumulative builder minutes", "menu-legacy", onOpenLegacy)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

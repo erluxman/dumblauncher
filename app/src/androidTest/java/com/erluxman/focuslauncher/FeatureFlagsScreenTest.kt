@@ -51,8 +51,8 @@ class FeatureFlagsScreenTest {
         rule.onNodeWithTag("flag-switch-${FlagKey.LAUNCHER_HOME}").performScrollTo().assertIsOn()
         // An optional Stage-1 flag defaults to on
         rule.onNodeWithTag("flag-switch-${FlagKey.STATS_SHEET}").performScrollTo().assertIsOn()
-        // A Stage-3 not-built flag defaults to off
-        rule.onNodeWithTag("flag-switch-BUILT_WRAPPED").performScrollTo().assertIsOff()
+        // A Stage-3 flag we deliberately keep default-off until backend lands
+        rule.onNodeWithTag("flag-switch-SOCIAL_GROUPS").performScrollTo().assertIsOff()
     }
 
     @Test

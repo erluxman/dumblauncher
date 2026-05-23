@@ -61,4 +61,5 @@ object FlagKey {
     const val FUTURE_LETTERS = "FUTURE_LETTERS"
     const val WEEKLY_REVIEW = "WEEKLY_REVIEW"
     const val PROMISE_RATIO = "PROMISE_RATIO"
+    const val LEGACY_COUNTER = "LEGACY_COUNTER"
 }
