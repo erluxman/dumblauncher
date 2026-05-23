@@ -71,6 +71,7 @@ fun MinimalMenuScreen(
     onOpenDilation: () -> Unit,
     onOpenSadSelf: () -> Unit,
     onOpenTimeMoney: () -> Unit,
+    onOpenEstimation: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -175,6 +176,8 @@ fun MinimalMenuScreen(
                 MenuRow("sad self", "pick the voice that nudges you", "menu-sad-self", onOpenSadSelf)
             if (on(FlagKey.TIME_MONEY))
                 MenuRow("time = money", "opportunity cost calc", "menu-time-money", onOpenTimeMoney)
+            if (on(FlagKey.ESTIMATION))
+                MenuRow("estimation", "how well you predict task time", "menu-estimation", onOpenEstimation)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
