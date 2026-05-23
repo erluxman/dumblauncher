@@ -1,5 +1,6 @@
 package com.erluxman.focuslauncher.data.prefs
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -18,6 +19,11 @@ import kotlinx.coroutines.flow.map
 private val OUTDOOR_LOG = stringSetPreferencesKey("outdoor_log")  // "yyyy-MM-dd|minutes"
 private val SUBSTANCE_LOG = stringSetPreferencesKey("substance_log")  // "timestampMs|substance|amount"
 private val DREAM_JOURNAL = stringSetPreferencesKey("dream_journal")  // "timestampMs|text"
+private val PHANTOM_CHECKS = stringSetPreferencesKey("phantom_checks")  // "yyyy-MM-dd|count"
+private val ABSURD_KAZOO = booleanPreferencesKey("absurd_kazoo")
+private val ABSURD_NARRATOR = booleanPreferencesKey("absurd_narrator")
+private val ABSURD_VOICE_GATE = booleanPreferencesKey("absurd_voice_gate")
+private val TAX_INCOMES = stringSetPreferencesKey("tax_incomes")  // "timestampMs|source|amount"
 
 val UserPrefs.outdoorLog: Flow<Set<String>>
     get() = store.data.map { it[OUTDOOR_LOG] ?: emptySet() }
@@ -60,4 +66,48 @@ suspend fun UserPrefs.addDreamEntry(text: String, nowMs: Long = System.currentTi
 
 suspend fun UserPrefs.removeDreamEntry(entry: String) {
     store.edit { it[DREAM_JOURNAL] = (it[DREAM_JOURNAL] ?: emptySet()) - entry }
+}
+
+// PSYCH-011 phantom-vibration counter — per-day int.
+val UserPrefs.phantomChecks: Flow<Set<String>>
+    get() = store.data.map { it[PHANTOM_CHECKS] ?: emptySet() }
+
+suspend fun UserPrefs.bumpPhantomCheck(isoDate: String, delta: Int = 1) {
+    store.edit {
+        val cur = it[PHANTOM_CHECKS] ?: emptySet()
+        val sameDay = cur.firstOrNull { e -> e.substringBefore("|") == isoDate }
+        val n = (sameDay?.substringAfter("|")?.toIntOrNull() ?: 0) + delta
+        val pruned = if (sameDay != null) cur - sameDay else cur
+        it[PHANTOM_CHECKS] = if (n > 0) pruned + "$isoDate|$n" else pruned
+    }
+}
+
+// ABSURD-001/002/004 — three on-device toggles. False by default so the
+// user has to choose to suffer.
+val UserPrefs.absurdKazoo: Flow<Boolean>
+    get() = store.data.map { it[ABSURD_KAZOO] ?: false }
+val UserPrefs.absurdNarrator: Flow<Boolean>
+    get() = store.data.map { it[ABSURD_NARRATOR] ?: false }
+val UserPrefs.absurdVoiceGate: Flow<Boolean>
+    get() = store.data.map { it[ABSURD_VOICE_GATE] ?: false }
+
+suspend fun UserPrefs.setAbsurdKazoo(v: Boolean) { store.edit { it[ABSURD_KAZOO] = v } }
+suspend fun UserPrefs.setAbsurdNarrator(v: Boolean) { store.edit { it[ABSURD_NARRATOR] = v } }
+suspend fun UserPrefs.setAbsurdVoiceGate(v: Boolean) { store.edit { it[ABSURD_VOICE_GATE] = v } }
+
+// FIN-010 tax-aware income tracker. "timestampMs|source|amount".
+val UserPrefs.taxIncomes: Flow<Set<String>>
+    get() = store.data.map { it[TAX_INCOMES] ?: emptySet() }
+
+suspend fun UserPrefs.logTaxIncome(source: String, amountUsd: Double, nowMs: Long = System.currentTimeMillis()) {
+    val safe = source.replace("|", " ").trim().ifBlank { return }
+    if (amountUsd <= 0) return
+    store.edit {
+        val cur = it[TAX_INCOMES] ?: emptySet()
+        it[TAX_INCOMES] = cur + "$nowMs|$safe|$amountUsd"
+    }
+}
+
+suspend fun UserPrefs.removeTaxIncome(entry: String) {
+    store.edit { it[TAX_INCOMES] = (it[TAX_INCOMES] ?: emptySet()) - entry }
 }

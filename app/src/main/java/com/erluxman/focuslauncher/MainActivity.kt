@@ -151,6 +151,12 @@ sealed class Screen {
     data object LastContacted : Screen()
     data object Cooking : Screen()
     data object QuietBrag : Screen()
+    data object EarnedPixels : Screen()
+    data object Phantom : Screen()
+    data object Absurd : Screen()
+    data object Relapse : Screen()
+    data object TaxIncome : Screen()
+    data object ReadingThinking : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -336,6 +342,12 @@ private fun AppRoot() {
                 onOpenLastContacted = { current = Screen.LastContacted },
                 onOpenCooking = { current = Screen.Cooking },
                 onOpenQuietBrag = { current = Screen.QuietBrag },
+                onOpenEarnedPixels = { current = Screen.EarnedPixels },
+                onOpenPhantom = { current = Screen.Phantom },
+                onOpenAbsurd = { current = Screen.Absurd },
+                onOpenRelapse = { current = Screen.Relapse },
+                onOpenTaxIncome = { current = Screen.TaxIncome },
+                onOpenReadingThinking = { current = Screen.ReadingThinking },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -563,6 +575,24 @@ private fun AppRoot() {
         }
         current == Screen.QuietBrag -> {
             com.erluxman.focuslauncher.ui.quietbrag.QuietBragScreen(prefs = prefs, backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.EarnedPixels -> {
+            com.erluxman.focuslauncher.ui.earnedpixels.EarnedPixelsScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Phantom -> {
+            com.erluxman.focuslauncher.ui.phantom.PhantomVibrationScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Absurd -> {
+            com.erluxman.focuslauncher.ui.absurd.AbsurdistScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Relapse -> {
+            com.erluxman.focuslauncher.ui.relapse.RelapsePredictionScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.TaxIncome -> {
+            com.erluxman.focuslauncher.ui.taxincome.TaxIncomeScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.ReadingThinking -> {
+            com.erluxman.focuslauncher.ui.readingthinking.ReadingThinkingScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

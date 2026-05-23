@@ -104,6 +104,12 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── last contacted           (menu-last-contacted)      ──>  Screen.LastContacted   (PRM-002)
   ├── cooking ratio            (menu-cooking)             ──>  Screen.Cooking         (NUT-004)
   ├── quiet brag               (menu-quiet-brag)          ──>  Screen.QuietBrag       (SOCIAL-036)
+  ├── earned pixels            (menu-earned-pixels)       ──>  Screen.EarnedPixels    (GAMIFY-007)
+  ├── phantom checks           (menu-phantom)             ──>  Screen.Phantom         (PSYCH-011)
+  ├── absurdist toggles        (menu-absurd)              ──>  Screen.Absurd          (ABSURD-001/002/004)
+  ├── relapse forecast         (menu-relapse)             ──>  Screen.Relapse         (UNINSTALL-006)
+  ├── tax income               (menu-tax-income)          ──>  Screen.TaxIncome       (FIN-010)
+  ├── reading as thinking      (menu-reading-thinking)    ──>  Screen.ReadingThinking (MIND-007)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```

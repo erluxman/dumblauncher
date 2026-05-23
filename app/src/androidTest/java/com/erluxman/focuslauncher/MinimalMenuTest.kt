@@ -109,6 +109,12 @@ class MinimalMenuTest {
         "menu-last-contacted",
         "menu-cooking",
         "menu-quiet-brag",
+        "menu-earned-pixels",
+        "menu-phantom",
+        "menu-absurd",
+        "menu-relapse",
+        "menu-tax-income",
+        "menu-reading-thinking",
         "menu-feature-flags",
         "menu-uninstall",
     )

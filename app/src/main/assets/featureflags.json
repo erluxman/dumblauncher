@@ -108,6 +108,12 @@
     { "key": "LAST_CONTACTED",      "stage": 4, "default": true,  "required": false, "label": "last contacted",       "description": "PRM-002 — humans + days since" },
     { "key": "COOKING",             "stage": 4, "default": true,  "required": false, "label": "cooking ratio",        "description": "NUT-004 — cooked vs eaten out" },
     { "key": "QUIET_BRAG",          "stage": 3, "default": true,  "required": false, "label": "quiet brag",           "description": "SOCIAL-036 — post the one thing you finished" },
+    { "key": "EARNED_PIXELS",       "stage": 2, "default": true,  "required": false, "label": "earned pixels",        "description": "GAMIFY-007 — saturation earned from focus points (preview)" },
+    { "key": "PHANTOM",             "stage": 2, "default": true,  "required": false, "label": "phantom checks",       "description": "PSYCH-011 — self-recorded reflex-unlock counter" },
+    { "key": "ABSURD",              "stage": 3, "default": true,  "required": false, "label": "absurdist toggles",    "description": "ABSURD-001/002/004 — kazoo, narrator, voice-authenticity gate" },
+    { "key": "RELAPSE",             "stage": 3, "default": true,  "required": false, "label": "relapse forecast",     "description": "UNINSTALL-006 — cohort reinstall odds (stub model)" },
+    { "key": "TAX_INCOME",          "stage": 4, "default": true,  "required": false, "label": "tax income",           "description": "FIN-010 — 1099 / gig / sale log + quarterly rollup" },
+    { "key": "READING_THINKING",    "stage": 4, "default": true,  "required": false, "label": "reading as thinking",  "description": "MIND-007 — random highlight + a journal prompt" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

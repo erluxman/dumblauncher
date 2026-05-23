@@ -111,4 +111,10 @@ object FlagKey {
     const val LAST_CONTACTED = "LAST_CONTACTED"
     const val COOKING = "COOKING"
     const val QUIET_BRAG = "QUIET_BRAG"
+    const val EARNED_PIXELS = "EARNED_PIXELS"
+    const val PHANTOM = "PHANTOM"
+    const val ABSURD = "ABSURD"
+    const val RELAPSE = "RELAPSE"
+    const val TAX_INCOME = "TAX_INCOME"
+    const val READING_THINKING = "READING_THINKING"
 }

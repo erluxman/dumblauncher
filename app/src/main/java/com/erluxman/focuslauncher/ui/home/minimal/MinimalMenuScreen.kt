@@ -111,6 +111,12 @@ fun MinimalMenuScreen(
     onOpenLastContacted: () -> Unit,
     onOpenCooking: () -> Unit,
     onOpenQuietBrag: () -> Unit,
+    onOpenEarnedPixels: () -> Unit,
+    onOpenPhantom: () -> Unit,
+    onOpenAbsurd: () -> Unit,
+    onOpenRelapse: () -> Unit,
+    onOpenTaxIncome: () -> Unit,
+    onOpenReadingThinking: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -295,6 +301,18 @@ fun MinimalMenuScreen(
                 MenuRow("cooking ratio", "cooked vs eaten out", "menu-cooking", onOpenCooking)
             if (on(FlagKey.QUIET_BRAG))
                 MenuRow("quiet brag", "post the one thing you finished", "menu-quiet-brag", onOpenQuietBrag)
+            if (on(FlagKey.EARNED_PIXELS))
+                MenuRow("earned pixels", "color is earned from focus points", "menu-earned-pixels", onOpenEarnedPixels)
+            if (on(FlagKey.PHANTOM))
+                MenuRow("phantom checks", "self-recorded reflex unlocks", "menu-phantom", onOpenPhantom)
+            if (on(FlagKey.ABSURD))
+                MenuRow("absurdist toggles", "kazoo, narrator, voice gate", "menu-absurd", onOpenAbsurd)
+            if (on(FlagKey.RELAPSE))
+                MenuRow("relapse forecast", "what happens if you quit", "menu-relapse", onOpenRelapse)
+            if (on(FlagKey.TAX_INCOME))
+                MenuRow("tax income", "1099 / gig / sale log", "menu-tax-income", onOpenTaxIncome)
+            if (on(FlagKey.READING_THINKING))
+                MenuRow("reading as thinking", "a highlight + a prompt", "menu-reading-thinking", onOpenReadingThinking)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
