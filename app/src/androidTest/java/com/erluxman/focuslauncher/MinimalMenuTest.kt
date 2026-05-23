@@ -66,6 +66,8 @@ class MinimalMenuTest {
         "menu-weekly-review",
         "menu-promises",
         "menu-legacy",
+        "menu-dilation",
+        "menu-sad-self",
         "menu-feature-flags",
         "menu-uninstall",
     )

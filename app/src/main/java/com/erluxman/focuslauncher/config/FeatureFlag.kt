@@ -62,4 +62,6 @@ object FlagKey {
     const val WEEKLY_REVIEW = "WEEKLY_REVIEW"
     const val PROMISE_RATIO = "PROMISE_RATIO"
     const val LEGACY_COUNTER = "LEGACY_COUNTER"
+    const val TIME_DILATION = "TIME_DILATION"
+    const val SAD_SELF = "SAD_SELF"
 }

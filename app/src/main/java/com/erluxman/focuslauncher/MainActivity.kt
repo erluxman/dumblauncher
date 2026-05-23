@@ -108,6 +108,8 @@ sealed class Screen {
     data object WeeklyReview : Screen()
     data object Promises : Screen()
     data object Legacy : Screen()
+    data object Dilation : Screen()
+    data object SadSelf : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -242,6 +244,8 @@ private fun AppRoot() {
                 onOpenWeeklyReview = { current = Screen.WeeklyReview },
                 onOpenPromises = { current = Screen.Promises },
                 onOpenLegacy = { current = Screen.Legacy },
+                onOpenDilation = { current = Screen.Dilation },
+                onOpenSadSelf = { current = Screen.SadSelf },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -336,6 +340,12 @@ private fun AppRoot() {
         }
         current == Screen.Legacy -> {
             com.erluxman.focuslauncher.ui.legacy.LegacyCounterScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Dilation -> {
+            com.erluxman.focuslauncher.ui.dilation.TimeDilationScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.SadSelf -> {
+            com.erluxman.focuslauncher.ui.sadself.SadSelfScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

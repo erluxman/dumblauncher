@@ -68,6 +68,8 @@ fun MinimalMenuScreen(
     onOpenWeeklyReview: () -> Unit,
     onOpenPromises: () -> Unit,
     onOpenLegacy: () -> Unit,
+    onOpenDilation: () -> Unit,
+    onOpenSadSelf: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -166,6 +168,10 @@ fun MinimalMenuScreen(
                 MenuRow("promises", "kept vs broken todos", "menu-promises", onOpenPromises)
             if (on(FlagKey.LEGACY_COUNTER))
                 MenuRow("legacy", "cumulative builder minutes", "menu-legacy", onOpenLegacy)
+            if (on(FlagKey.TIME_DILATION))
+                MenuRow("time dilation", "what 30 minutes really felt like", "menu-dilation", onOpenDilation)
+            if (on(FlagKey.SAD_SELF))
+                MenuRow("sad self", "pick the voice that nudges you", "menu-sad-self", onOpenSadSelf)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
