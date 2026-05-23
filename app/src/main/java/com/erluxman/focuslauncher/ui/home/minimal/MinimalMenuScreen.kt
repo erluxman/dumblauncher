@@ -49,6 +49,7 @@ fun MinimalMenuScreen(
     onOpenIdentity: () -> Unit,
     onOpenGraduate: () -> Unit,
     onOpenWrapped: () -> Unit,
+    onOpenSubscriptions: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -109,6 +110,8 @@ fun MinimalMenuScreen(
                 MenuRow("graduate", "your progress out of the friction system", "menu-graduate", onOpenGraduate)
             if (on(FlagKey.BUILT_WRAPPED))
                 MenuRow("wrapped", "year-in-review — what you built", "menu-wrapped", onOpenWrapped)
+            if (on(FlagKey.SUBSCRIPTIONS))
+                MenuRow("subscriptions", "monthly burn — manual entries", "menu-subscriptions", onOpenSubscriptions)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

@@ -47,6 +47,7 @@ class MinimalMenuTest {
         "menu-identity",
         "menu-graduate",
         "menu-wrapped",
+        "menu-subscriptions",
         "menu-feature-flags",
         "menu-uninstall",
     )

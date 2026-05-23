@@ -89,6 +89,7 @@ sealed class Screen {
     data object Identity : Screen()
     data object Graduate : Screen()
     data object Wrapped : Screen()
+    data object Subscriptions : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -204,6 +205,7 @@ private fun AppRoot() {
                 onOpenIdentity = { current = Screen.Identity },
                 onOpenGraduate = { current = Screen.Graduate },
                 onOpenWrapped = { current = Screen.Wrapped },
+                onOpenSubscriptions = { current = Screen.Subscriptions },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -232,6 +234,12 @@ private fun AppRoot() {
         }
         current == Screen.Wrapped -> {
             com.erluxman.focuslauncher.ui.wrapped.WrappedScreen(
+                prefs = prefs,
+                onBack = { current = Screen.Menu },
+            )
+        }
+        current == Screen.Subscriptions -> {
+            com.erluxman.focuslauncher.ui.subscriptions.SubscriptionsScreen(
                 prefs = prefs,
                 onBack = { current = Screen.Menu },
             )

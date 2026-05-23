@@ -43,4 +43,5 @@ object FlagKey {
     const val IDENTITY_VOTING = "IDENTITY_VOTING"
     const val GRADUATE_MODE = "GRADUATE_MODE"
     const val BUILT_WRAPPED = "BUILT_WRAPPED"
+    const val SUBSCRIPTIONS = "SUBSCRIPTIONS"
 }
