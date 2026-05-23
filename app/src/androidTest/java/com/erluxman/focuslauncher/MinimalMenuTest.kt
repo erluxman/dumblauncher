@@ -80,6 +80,9 @@ class MinimalMenuTest {
         "menu-dual-streak",
         "menu-disappointment",
         "menu-profile",
+        "menu-feed",
+        "menu-pre-commit",
+        "menu-receipt-wall",
         "menu-feature-flags",
         "menu-uninstall",
     )

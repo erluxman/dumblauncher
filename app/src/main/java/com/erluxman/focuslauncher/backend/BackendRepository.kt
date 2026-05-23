@@ -41,6 +41,28 @@ interface BackendRepository {
     /** Send a "disappointment" ping (SOCIAL-005). One per week per pair, enforced server-side. */
     suspend fun sendDisappointment(toUid: String, worstStat: String): Result<Unit>
 
+    /** Chronological feed (SOCIAL-016): your posts + groups + followed users. */
+    val feed: Flow<List<Post>>
+
+    /** Post a story / pre-commitment / quiet brag (SOCIAL-021, SOCIAL-033, SOCIAL-036). */
+    suspend fun addPost(text: String, kind: PostKind, expiresAtMs: Long? = null): Result<Post>
+
+    suspend fun removePost(postId: String): Result<Unit>
+
+    /** Vote in a group uninstall request (SOCIAL-002). */
+    suspend fun voteUninstall(groupId: String, allow: Boolean): Result<Unit>
+
+    enum class PostKind { STORY, PRE_COMMIT, QUIET_BRAG, MILESTONE }
+
+    data class Post(
+        val id: String,
+        val authorUid: String,
+        val kind: PostKind,
+        val text: String,
+        val createdAtMs: Long,
+        val expiresAtMs: Long?,
+    )
+
     data class PaymentConfig(
         val nativeOnDevice: Boolean,
         val webFallbackUrl: String,
@@ -116,6 +138,37 @@ class StubBackendRepository(@Suppress("UNUSED_PARAMETER") context: Context) : Ba
 
     override suspend fun sendDisappointment(toUid: String, worstStat: String): Result<Unit> {
         // Stub: pretend it sent.
+        return Result.success(Unit)
+    }
+
+    private val _feed = MutableStateFlow<List<BackendRepository.Post>>(emptyList())
+    override val feed: Flow<List<BackendRepository.Post>> = _feed.asStateFlow()
+
+    override suspend fun addPost(
+        text: String,
+        kind: BackendRepository.PostKind,
+        expiresAtMs: Long?,
+    ): Result<BackendRepository.Post> {
+        val now = System.currentTimeMillis()
+        val p = BackendRepository.Post(
+            id = "stub-${now}",
+            authorUid = _uid.value.orEmpty(),
+            kind = kind,
+            text = text.trim(),
+            createdAtMs = now,
+            expiresAtMs = expiresAtMs,
+        )
+        _feed.value = listOf(p) + _feed.value
+        return Result.success(p)
+    }
+
+    override suspend fun removePost(postId: String): Result<Unit> {
+        _feed.value = _feed.value.filterNot { it.id == postId }
+        return Result.success(Unit)
+    }
+
+    override suspend fun voteUninstall(groupId: String, allow: Boolean): Result<Unit> {
+        // Stub: no-op; real impl posts to /groups/{groupId}/uninstallVotes/{uid}
         return Result.success(Unit)
     }
 }

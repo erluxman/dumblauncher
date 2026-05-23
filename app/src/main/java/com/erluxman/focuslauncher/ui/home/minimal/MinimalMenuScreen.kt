@@ -82,6 +82,9 @@ fun MinimalMenuScreen(
     onOpenDualStreak: () -> Unit,
     onOpenDisappointment: () -> Unit,
     onOpenProfile: () -> Unit,
+    onOpenFeed: () -> Unit,
+    onOpenPreCommit: () -> Unit,
+    onOpenReceiptWall: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -208,6 +211,12 @@ fun MinimalMenuScreen(
                 MenuRow("disappointment", "one weekly ping to someone you respect", "menu-disappointment", onOpenDisappointment)
             if (on(FlagKey.BUILDER_PROFILE))
                 MenuRow("builder profile", "what your public url shows", "menu-profile", onOpenProfile)
+            if (on(FlagKey.FEED))
+                MenuRow("feed", "chronological. no algorithm.", "menu-feed", onOpenFeed)
+            if (on(FlagKey.PRE_COMMIT))
+                MenuRow("pre-commit", "post tomorrow's intent", "menu-pre-commit", onOpenPreCommit)
+            if (on(FlagKey.RECEIPT_WALL))
+                MenuRow("receipt wall", "restraint receipts", "menu-receipt-wall", onOpenReceiptWall)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

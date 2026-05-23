@@ -82,4 +82,7 @@ object FlagKey {
     const val SOCIAL_DUAL_STREAKS = "SOCIAL_DUAL_STREAKS"
     const val DISAPPOINTMENT = "DISAPPOINTMENT"
     const val BUILDER_PROFILE = "BUILDER_PROFILE"
+    const val FEED = "FEED"
+    const val PRE_COMMIT = "PRE_COMMIT"
+    const val RECEIPT_WALL = "RECEIPT_WALL"
 }

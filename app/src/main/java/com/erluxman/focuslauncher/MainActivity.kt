@@ -122,6 +122,9 @@ sealed class Screen {
     data object DualStreak : Screen()
     data object Disappointment : Screen()
     data object Profile : Screen()
+    data object Feed : Screen()
+    data object PreCommit : Screen()
+    data object ReceiptWall : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -278,6 +281,9 @@ private fun AppRoot() {
                 onOpenDualStreak = { current = Screen.DualStreak },
                 onOpenDisappointment = { current = Screen.Disappointment },
                 onOpenProfile = { current = Screen.Profile },
+                onOpenFeed = { current = Screen.Feed },
+                onOpenPreCommit = { current = Screen.PreCommit },
+                onOpenReceiptWall = { current = Screen.ReceiptWall },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -418,6 +424,15 @@ private fun AppRoot() {
         }
         current == Screen.Profile -> {
             com.erluxman.focuslauncher.ui.profile.BuilderProfileScreen(prefs = prefs, backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Feed -> {
+            com.erluxman.focuslauncher.ui.feed.FeedScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.PreCommit -> {
+            com.erluxman.focuslauncher.ui.precommit.PreCommitScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.ReceiptWall -> {
+            com.erluxman.focuslauncher.ui.receiptwall.ReceiptWallScreen(onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

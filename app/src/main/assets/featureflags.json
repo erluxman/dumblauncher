@@ -79,6 +79,9 @@
     { "key": "SOCIAL_DUAL_STREAKS", "stage": 3, "default": true,  "required": false, "label": "dual streaks",         "description": "SOCIAL-025 — paired daily-streak with a friend; stub today, Firebase later" },
     { "key": "DISAPPOINTMENT",      "stage": 3, "default": true,  "required": false, "label": "disappointment api",   "description": "SOCIAL-005 — one weekly push to someone you respect; rate-limited server-side" },
     { "key": "BUILDER_PROFILE",     "stage": 3, "default": true,  "required": false, "label": "builder profile",      "description": "SOCIAL-009 — public-style profile preview (read-only). Public URL via PLATFORM-002 later." },
+    { "key": "FEED",                "stage": 3, "default": true,  "required": false, "label": "chronological feed",   "description": "SOCIAL-016 — no-algorithm reverse-chronological post stream" },
+    { "key": "PRE_COMMIT",          "stage": 3, "default": true,  "required": false, "label": "pre-commitments",      "description": "SOCIAL-033 — tomorrow's intent, posted to your feed; auto-grades server-side" },
+    { "key": "RECEIPT_WALL",        "stage": 3, "default": true,  "required": false, "label": "receipt wall",         "description": "SOCIAL-012 — wins from putting flagged apps down inside 3 min" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },
