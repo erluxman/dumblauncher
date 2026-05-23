@@ -77,6 +77,9 @@ class MinimalMenuTest {
         "menu-reciprocity",
         "menu-groups",
         "menu-backend",
+        "menu-dual-streak",
+        "menu-disappointment",
+        "menu-profile",
         "menu-feature-flags",
         "menu-uninstall",
     )

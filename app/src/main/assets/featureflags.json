@@ -76,6 +76,9 @@
     { "key": "PAYMENTS_WEB",        "stage": 2, "default": false, "required": false, "label": "web checkout",         "description": "PAY-002 — enables the CustomTabs handoff to the web app. Off until the web app is deployed." },
     { "key": "FIREBASE_BACKEND",    "stage": 2, "default": true,  "required": false, "label": "firebase backend",     "description": "Master switch for Firebase calls (auth, firestore, FCM, remote config). With this on, the menu exposes a backend-status debug screen — the actual Firebase impl is wired in once google-services.json is present." },
     { "key": "WEB_APP_CHROME_HOME", "stage": 2, "default": false, "required": false, "label": "chrome-homepage web app", "description": "PLATFORM-002 — landing page + read-only stats + web checkout surface. Off until deployed to Firebase Hosting." },
+    { "key": "SOCIAL_DUAL_STREAKS", "stage": 3, "default": true,  "required": false, "label": "dual streaks",         "description": "SOCIAL-025 — paired daily-streak with a friend; stub today, Firebase later" },
+    { "key": "DISAPPOINTMENT",      "stage": 3, "default": true,  "required": false, "label": "disappointment api",   "description": "SOCIAL-005 — one weekly push to someone you respect; rate-limited server-side" },
+    { "key": "BUILDER_PROFILE",     "stage": 3, "default": true,  "required": false, "label": "builder profile",      "description": "SOCIAL-009 — public-style profile preview (read-only). Public URL via PLATFORM-002 later." },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

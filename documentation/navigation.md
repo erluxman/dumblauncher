@@ -72,6 +72,9 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── reciprocity              (menu-reciprocity)         ──>  Screen.Reciprocity
   ├── groups                   (menu-groups)              ──>  Screen.Groups          (SOCIAL-001 — stub backend)
   ├── backend status           (menu-backend)             ──>  Screen.Backend         (firebase + payment debug)
+  ├── dual streak              (menu-dual-streak)         ──>  Screen.DualStreak      (SOCIAL-025)
+  ├── disappointment           (menu-disappointment)      ──>  Screen.Disappointment  (SOCIAL-005)
+  ├── builder profile          (menu-profile)             ──>  Screen.Profile         (SOCIAL-009 + SOCIAL-011)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```
@@ -129,6 +132,9 @@ For each shipped Compose screen, the spec features it covers (`features-by-stage
 | `Screen.Reciprocity` | PRM-003 | Contacts log + outbound% |
 | `Screen.Groups` | SOCIAL-001 | Create / join / leave; stub BackendRepository until Firebase wired |
 | `Screen.Backend` | PAY-003 (router preview), FIREBASE_BACKEND meta | Read-only debug: firebase init state, uid, payment channel, cached config, "test checkout" trigger |
+| `Screen.DualStreak` | SOCIAL-025 | Pair-uid input + shared 🔥 counter + per-side done-today indicators |
+| `Screen.Disappointment` | SOCIAL-005 | Form: to + worstStat; server-side weekly rate-limit (when Firebase is wired) |
+| `Screen.Profile` | SOCIAL-009, SOCIAL-011 | Read-only profile preview + verification eligibility check (days + projects + vouches) |
 | `Screen.FeatureFlags` | — | Build-time gating surface (not in spec) |
 | `(no UI yet)` PaymentRouter | PAY-001, PAY-002, PAY-003 | Triggered when a paywall surface calls `PaymentRouter.checkout(productId)` — opens Play Billing or web checkout per `/config/payments.nativeOnDevice` |
 | `(no UI yet)` Web companion | PLATFORM-002 | Static site on Firebase Hosting — separate repo target, not a route in the Android app |

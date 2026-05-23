@@ -79,6 +79,9 @@ fun MinimalMenuScreen(
     onOpenReciprocity: () -> Unit,
     onOpenGroups: () -> Unit,
     onOpenBackend: () -> Unit,
+    onOpenDualStreak: () -> Unit,
+    onOpenDisappointment: () -> Unit,
+    onOpenProfile: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -199,6 +202,12 @@ fun MinimalMenuScreen(
                 MenuRow("groups", "accountability groups (stub today)", "menu-groups", onOpenGroups)
             if (on(FlagKey.FIREBASE_BACKEND))
                 MenuRow("backend status", "firebase + payment router debug", "menu-backend", onOpenBackend)
+            if (on(FlagKey.SOCIAL_DUAL_STREAKS))
+                MenuRow("dual streak", "🔥 with a partner", "menu-dual-streak", onOpenDualStreak)
+            if (on(FlagKey.DISAPPOINTMENT))
+                MenuRow("disappointment", "one weekly ping to someone you respect", "menu-disappointment", onOpenDisappointment)
+            if (on(FlagKey.BUILDER_PROFILE))
+                MenuRow("builder profile", "what your public url shows", "menu-profile", onOpenProfile)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

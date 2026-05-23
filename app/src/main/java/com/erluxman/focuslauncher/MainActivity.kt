@@ -119,6 +119,9 @@ sealed class Screen {
     data object Reciprocity : Screen()
     data object Groups : Screen()
     data object Backend : Screen()
+    data object DualStreak : Screen()
+    data object Disappointment : Screen()
+    data object Profile : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -272,6 +275,9 @@ private fun AppRoot() {
                 onOpenReciprocity = { current = Screen.Reciprocity },
                 onOpenGroups = { current = Screen.Groups },
                 onOpenBackend = { current = Screen.Backend },
+                onOpenDualStreak = { current = Screen.DualStreak },
+                onOpenDisappointment = { current = Screen.Disappointment },
+                onOpenProfile = { current = Screen.Profile },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -403,6 +409,15 @@ private fun AppRoot() {
                 paymentRouter = paymentRouter,
                 onBack = { current = Screen.Menu },
             )
+        }
+        current == Screen.DualStreak -> {
+            com.erluxman.focuslauncher.ui.dualstreak.DualStreakScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Disappointment -> {
+            com.erluxman.focuslauncher.ui.disappointment.DisappointmentScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Profile -> {
+            com.erluxman.focuslauncher.ui.profile.BuilderProfileScreen(prefs = prefs, backend = backend, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(
