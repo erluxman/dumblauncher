@@ -1,8 +1,12 @@
 package com.erluxman.focuslauncher.data.prefs
 
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+
+/** PRM-003 contacts log. Entries: "yyyy-MM-dd|name|out|in". */
+private val CONTACTS_LOG = stringSetPreferencesKey("contacts_log")
 
 /**
  * SOCIAL-013 anti-bio + READ-002 highlights + FIT-003 personal records.
@@ -55,5 +59,29 @@ suspend fun UserPrefs.removePersonalRecord(entry: String) {
     store.edit {
         val current = it[PrefKeys.PR_WALL] ?: emptySet()
         it[PrefKeys.PR_WALL] = current - entry
+    }
+}
+
+val UserPrefs.contactsLog: Flow<Set<String>>
+    get() = store.data.map { it[CONTACTS_LOG] ?: emptySet() }
+
+/** [direction] is "out" (you initiated) or "in" (they did). */
+suspend fun UserPrefs.logContactTouch(isoDate: String, name: String, direction: String) {
+    val safeName = name.replace("|", " ").trim().ifBlank { return }
+    val d = when (direction.lowercase()) {
+        "out", "outbound", "you" -> "out"
+        "in", "inbound", "them" -> "in"
+        else -> return
+    }
+    store.edit {
+        val current = it[CONTACTS_LOG] ?: emptySet()
+        it[CONTACTS_LOG] = current + "$isoDate|$safeName|$d"
+    }
+}
+
+suspend fun UserPrefs.removeContactTouch(entry: String) {
+    store.edit {
+        val current = it[CONTACTS_LOG] ?: emptySet()
+        it[CONTACTS_LOG] = current - entry
     }
 }

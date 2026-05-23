@@ -58,6 +58,7 @@
     { "key": "ANCHOR",              "stage": 2, "default": true,  "required": false, "label": "anchoring",            "description": "you vs the 12-min/day anchor" },
     { "key": "ENERGY_ZONES_SURFACE","stage": 2, "default": true,  "required": false, "label": "energy zones surface", "description": "6 windows × high/med/low picker + current-window suggestion" },
     { "key": "TRACK_STATUS",        "stage": 2, "default": true,  "required": false, "label": "track status",         "description": "current level + points + misses (read-only)" },
+    { "key": "RECIPROCITY",         "stage": 2, "default": true,  "required": false, "label": "reciprocity",          "description": "who reaches out to whom; flags lopsided relationships" },
 
     { "key": "BUILT_WRAPPED",       "stage": 3, "default": true,  "required": false, "label": "built wrapped",        "description": "year-in-review — score, headline, per-domain totals" },
     { "key": "MORTALITY_WIDGETS",   "stage": 3, "default": true,  "required": false, "label": "mortality widgets",    "description": "beach saturdays / days remaining; runtime opt-in still required" },

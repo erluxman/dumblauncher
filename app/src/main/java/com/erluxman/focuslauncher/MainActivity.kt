@@ -116,6 +116,7 @@ sealed class Screen {
     data object Anchor : Screen()
     data object EnergyZones : Screen()
     data object TrackStatus : Screen()
+    data object Reciprocity : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -258,6 +259,7 @@ private fun AppRoot() {
                 onOpenAnchor = { current = Screen.Anchor },
                 onOpenEnergyZones = { current = Screen.EnergyZones },
                 onOpenTrackStatus = { current = Screen.TrackStatus },
+                onOpenReciprocity = { current = Screen.Reciprocity },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -376,6 +378,9 @@ private fun AppRoot() {
         }
         current == Screen.TrackStatus -> {
             com.erluxman.focuslauncher.ui.track.TrackStatusScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Reciprocity -> {
+            com.erluxman.focuslauncher.ui.reciprocity.ReciprocityScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

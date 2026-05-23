@@ -76,6 +76,7 @@ fun MinimalMenuScreen(
     onOpenAnchor: () -> Unit,
     onOpenEnergyZones: () -> Unit,
     onOpenTrackStatus: () -> Unit,
+    onOpenReciprocity: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -190,6 +191,8 @@ fun MinimalMenuScreen(
                 MenuRow("energy zones", "tag each 4-hour window", "menu-energy-zones", onOpenEnergyZones)
             if (on(FlagKey.TRACK_STATUS))
                 MenuRow("track status", "level, points, misses", "menu-track-status", onOpenTrackStatus)
+            if (on(FlagKey.RECIPROCITY))
+                MenuRow("reciprocity", "who reaches out to whom", "menu-reciprocity", onOpenReciprocity)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
