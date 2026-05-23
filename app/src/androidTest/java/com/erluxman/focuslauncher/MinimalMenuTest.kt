@@ -63,6 +63,8 @@ class MinimalMenuTest {
         "menu-highlights",
         "menu-tombstones",
         "menu-future-letters",
+        "menu-weekly-review",
+        "menu-promises",
         "menu-feature-flags",
         "menu-uninstall",
     )

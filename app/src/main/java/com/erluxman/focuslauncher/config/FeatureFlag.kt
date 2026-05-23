@@ -59,4 +59,6 @@ object FlagKey {
     const val HIGHLIGHTS = "HIGHLIGHTS"
     const val TOMBSTONES = "TOMBSTONES"
     const val FUTURE_LETTERS = "FUTURE_LETTERS"
+    const val WEEKLY_REVIEW = "WEEKLY_REVIEW"
+    const val PROMISE_RATIO = "PROMISE_RATIO"
 }
