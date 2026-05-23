@@ -103,6 +103,10 @@ fun MinimalMenuScreen(
     onOpenBudgetFuture: () -> Unit,
     onOpenSubstance: () -> Unit,
     onOpenDreamJournal: () -> Unit,
+    onOpenUninstallVote: () -> Unit,
+    onOpenStake: () -> Unit,
+    onOpenFocusDuel: () -> Unit,
+    onOpenHashtags: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -271,6 +275,14 @@ fun MinimalMenuScreen(
                 MenuRow("substance log", "private, local-only", "menu-substance", onOpenSubstance)
             if (on(FlagKey.DREAM_JOURNAL))
                 MenuRow("dream journal", "morning recall", "menu-dream-journal", onOpenDreamJournal)
+            if (on(FlagKey.UNINSTALL_VOTE))
+                MenuRow("uninstall vote", "ask your group's permission to quit", "menu-uninstall-vote", onOpenUninstallVote)
+            if (on(FlagKey.STAKE))
+                MenuRow("money stake", "commit cash to a cause you hate", "menu-stake", onOpenStake)
+            if (on(FlagKey.FOCUS_DUEL))
+                MenuRow("focus duel", "2hr challenge vs a friend", "menu-focus-duel", onOpenFocusDuel)
+            if (on(FlagKey.HASHTAGS))
+                MenuRow("hashtag tracks", "join public challenges", "menu-hashtags", onOpenHashtags)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

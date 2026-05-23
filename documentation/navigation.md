@@ -96,6 +96,10 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── future-self budget       (menu-budget-future)       ──>  Screen.BudgetFuture    (FIN-007)
   ├── substance log            (menu-substance)           ──>  Screen.Substance       (SUB-002)
   ├── dream journal            (menu-dream-journal)       ──>  Screen.DreamJournal    (MIND-006)
+  ├── uninstall vote           (menu-uninstall-vote)      ──>  Screen.UninstallVote   (SOCIAL-002)
+  ├── money stake              (menu-stake)               ──>  Screen.Stake           (FINANCE-001)
+  ├── focus duel               (menu-focus-duel)          ──>  Screen.FocusDuel       (SOCIAL-034)
+  ├── hashtag tracks           (menu-hashtags)            ──>  Screen.Hashtags        (SOCIAL-019)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```

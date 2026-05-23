@@ -101,6 +101,10 @@ class MinimalMenuTest {
         "menu-budget-future",
         "menu-substance",
         "menu-dream-journal",
+        "menu-uninstall-vote",
+        "menu-stake",
+        "menu-focus-duel",
+        "menu-hashtags",
         "menu-feature-flags",
         "menu-uninstall",
     )

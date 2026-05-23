@@ -143,6 +143,10 @@ sealed class Screen {
     data object BudgetFuture : Screen()
     data object Substance : Screen()
     data object DreamJournal : Screen()
+    data object UninstallVote : Screen()
+    data object Stake : Screen()
+    data object FocusDuel : Screen()
+    data object Hashtags : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -320,6 +324,10 @@ private fun AppRoot() {
                 onOpenBudgetFuture = { current = Screen.BudgetFuture },
                 onOpenSubstance = { current = Screen.Substance },
                 onOpenDreamJournal = { current = Screen.DreamJournal },
+                onOpenUninstallVote = { current = Screen.UninstallVote },
+                onOpenStake = { current = Screen.Stake },
+                onOpenFocusDuel = { current = Screen.FocusDuel },
+                onOpenHashtags = { current = Screen.Hashtags },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -523,6 +531,18 @@ private fun AppRoot() {
         }
         current == Screen.DreamJournal -> {
             com.erluxman.focuslauncher.ui.dream.DreamJournalScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.UninstallVote -> {
+            com.erluxman.focuslauncher.ui.uninstallvote.UninstallVoteScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Stake -> {
+            com.erluxman.focuslauncher.ui.stake.MoneyStakeScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.FocusDuel -> {
+            com.erluxman.focuslauncher.ui.duels.FocusDuelScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Hashtags -> {
+            com.erluxman.focuslauncher.ui.hashtags.HashtagsScreen(backend = backend, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

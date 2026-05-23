@@ -100,6 +100,10 @@
     { "key": "BUDGET_FUTURE",       "stage": 4, "default": true,  "required": false, "label": "future-self budget",   "description": "FIN-007 — assets + contribution + apy + years → projected" },
     { "key": "SUBSTANCE",           "stage": 4, "default": true,  "required": false, "label": "substance log",        "description": "SUB-002 — private; e2ee encryption follow-up" },
     { "key": "DREAM_JOURNAL",       "stage": 4, "default": true,  "required": false, "label": "dream journal",        "description": "MIND-006 — text only today; AI symbols later" },
+    { "key": "UNINSTALL_VOTE",      "stage": 3, "default": true,  "required": false, "label": "uninstall vote",       "description": "SOCIAL-002 — group must approve before you can quit" },
+    { "key": "STAKE",               "stage": 3, "default": true,  "required": false, "label": "money stake",          "description": "FINANCE-001 — escrow commitment; real escrow needs PAY-002" },
+    { "key": "FOCUS_DUEL",          "stage": 4, "default": true,  "required": false, "label": "focus duel",           "description": "SOCIAL-034 — 2hr challenge vs a friend" },
+    { "key": "HASHTAGS",            "stage": 4, "default": true,  "required": false, "label": "hashtag tracks",       "description": "SOCIAL-019 — public joinable challenges" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

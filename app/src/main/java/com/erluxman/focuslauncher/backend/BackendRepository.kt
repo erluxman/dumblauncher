@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 
 /**
  * Thin facade over the optional Firebase backend. Every consumer goes
@@ -84,6 +85,29 @@ interface BackendRepository {
     val familyPair: Flow<FamilyPair?>
     suspend fun pairFamily(uid: String, name: String, role: FamilyRole): Result<Unit>
     suspend fun unpairFamily(): Result<Unit>
+
+    /** Active uninstall vote per group (SOCIAL-002). */
+    fun uninstallVote(groupId: String): Flow<UninstallVote?>
+    suspend fun requestUninstallVote(groupId: String, reason: String): Result<Unit>
+
+    /** Money stake (FINANCE-001). Single active stake in the stub. */
+    val moneyStake: Flow<MoneyStake?>
+    suspend fun createMoneyStake(amountUsd: Int, daysCommitted: Int, charity: String): Result<Unit>
+    suspend fun cancelMoneyStake(): Result<Unit>
+
+    /** Focus duel (SOCIAL-034). */
+    val activeDuel: Flow<FocusDuel?>
+    suspend fun challengeFocusDuel(otherUid: String, otherName: String, durationMin: Int): Result<Unit>
+    suspend fun cancelFocusDuel(): Result<Unit>
+
+    /** Hashtag tracks (SOCIAL-019). */
+    val joinedHashtags: Flow<Set<String>>
+    suspend fun joinHashtag(tag: String): Result<Unit>
+    suspend fun leaveHashtag(tag: String): Result<Unit>
+
+    data class UninstallVote(val groupId: String, val reason: String, val createdAtMs: Long, val ayes: Int, val nays: Int)
+    data class MoneyStake(val amountUsd: Int, val daysCommitted: Int, val charity: String, val startedAtMs: Long)
+    data class FocusDuel(val otherUid: String, val otherName: String, val durationMin: Int, val startedAtMs: Long)
 
     enum class FamilyRole { PARENT, CHILD }
     data class Friend(val uid: String, val name: String, val addedMs: Long)
@@ -308,6 +332,57 @@ class StubBackendRepository(@Suppress("UNUSED_PARAMETER") context: Context) : Ba
 
     override suspend fun unpairFamily(): Result<Unit> {
         _family.value = null
+        return Result.success(Unit)
+    }
+
+    private val _votes = MutableStateFlow<Map<String, BackendRepository.UninstallVote>>(emptyMap())
+    override fun uninstallVote(groupId: String): Flow<BackendRepository.UninstallVote?> =
+        _votes.map { it[groupId] }
+
+    override suspend fun requestUninstallVote(groupId: String, reason: String): Result<Unit> {
+        _votes.value = _votes.value + (groupId to BackendRepository.UninstallVote(
+            groupId, reason, System.currentTimeMillis(), ayes = 0, nays = 0,
+        ))
+        return Result.success(Unit)
+    }
+
+    private val _stake = MutableStateFlow<BackendRepository.MoneyStake?>(null)
+    override val moneyStake: Flow<BackendRepository.MoneyStake?> = _stake.asStateFlow()
+
+    override suspend fun createMoneyStake(amountUsd: Int, daysCommitted: Int, charity: String): Result<Unit> {
+        if (amountUsd <= 0 || daysCommitted <= 0) return Result.failure(IllegalArgumentException("invalid stake"))
+        _stake.value = BackendRepository.MoneyStake(amountUsd, daysCommitted, charity.trim(), System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun cancelMoneyStake(): Result<Unit> {
+        _stake.value = null
+        return Result.success(Unit)
+    }
+
+    private val _duel = MutableStateFlow<BackendRepository.FocusDuel?>(null)
+    override val activeDuel: Flow<BackendRepository.FocusDuel?> = _duel.asStateFlow()
+
+    override suspend fun challengeFocusDuel(otherUid: String, otherName: String, durationMin: Int): Result<Unit> {
+        _duel.value = BackendRepository.FocusDuel(otherUid, otherName, durationMin, System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun cancelFocusDuel(): Result<Unit> {
+        _duel.value = null
+        return Result.success(Unit)
+    }
+
+    private val _hashtags = MutableStateFlow<Set<String>>(emptySet())
+    override val joinedHashtags: Flow<Set<String>> = _hashtags.asStateFlow()
+
+    override suspend fun joinHashtag(tag: String): Result<Unit> {
+        _hashtags.value = _hashtags.value + tag.trim().removePrefix("#")
+        return Result.success(Unit)
+    }
+
+    override suspend fun leaveHashtag(tag: String): Result<Unit> {
+        _hashtags.value = _hashtags.value - tag.trim().removePrefix("#")
         return Result.success(Unit)
     }
 }

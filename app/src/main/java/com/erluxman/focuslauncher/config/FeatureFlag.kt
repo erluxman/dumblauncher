@@ -103,4 +103,8 @@ object FlagKey {
     const val BUDGET_FUTURE = "BUDGET_FUTURE"
     const val SUBSTANCE = "SUBSTANCE"
     const val DREAM_JOURNAL = "DREAM_JOURNAL"
+    const val UNINSTALL_VOTE = "UNINSTALL_VOTE"
+    const val STAKE = "STAKE"
+    const val FOCUS_DUEL = "FOCUS_DUEL"
+    const val HASHTAGS = "HASHTAGS"
 }
