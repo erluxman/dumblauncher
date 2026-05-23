@@ -114,6 +114,10 @@
     { "key": "RELAPSE",             "stage": 3, "default": true,  "required": false, "label": "relapse forecast",     "description": "UNINSTALL-006 — cohort reinstall odds (stub model)" },
     { "key": "TAX_INCOME",          "stage": 4, "default": true,  "required": false, "label": "tax income",           "description": "FIN-010 — 1099 / gig / sale log + quarterly rollup" },
     { "key": "READING_THINKING",    "stage": 4, "default": true,  "required": false, "label": "reading as thinking",  "description": "MIND-007 — random highlight + a journal prompt" },
+    { "key": "LIFE_STATE",          "stage": 3, "default": true,  "required": false, "label": "life-state mode",      "description": "RESTRICT-022 — single active mode (commute/sick/vacation/weekend)" },
+    { "key": "ROULETTE",            "stage": 2, "default": true,  "required": false, "label": "app roulette",         "description": "RESTRICT-013 — pool of 3, one allowed per day" },
+    { "key": "COWORKING",           "stage": 3, "default": true,  "required": false, "label": "co-working presence",  "description": "SOCIAL-006 — who in your group is in focus right now" },
+    { "key": "FUNERAL",             "stage": 4, "default": true,  "required": false, "label": "phone funerals",       "description": "SOCIAL-040 — 30-day-off-an-app ceremony" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

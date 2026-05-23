@@ -105,6 +105,11 @@ interface BackendRepository {
     suspend fun joinHashtag(tag: String): Result<Unit>
     suspend fun leaveHashtag(tag: String): Result<Unit>
 
+    /** Co-working presence (SOCIAL-006). */
+    val coworkingPresence: Flow<List<PresenceEntry>>
+
+    data class PresenceEntry(val uid: String, val name: String, val inFocusSinceMs: Long)
+
     data class UninstallVote(val groupId: String, val reason: String, val createdAtMs: Long, val ayes: Int, val nays: Int)
     data class MoneyStake(val amountUsd: Int, val daysCommitted: Int, val charity: String, val startedAtMs: Long)
     data class FocusDuel(val otherUid: String, val otherName: String, val durationMin: Int, val startedAtMs: Long)
@@ -385,4 +390,12 @@ class StubBackendRepository(@Suppress("UNUSED_PARAMETER") context: Context) : Ba
         _hashtags.value = _hashtags.value - tag.trim().removePrefix("#")
         return Result.success(Unit)
     }
+
+    private val _presence = MutableStateFlow(
+        listOf(
+            BackendRepository.PresenceEntry("stub-1", "alex", System.currentTimeMillis() - 1_200_000L),
+            BackendRepository.PresenceEntry("stub-2", "jamie", System.currentTimeMillis() - 600_000L),
+        )
+    )
+    override val coworkingPresence: Flow<List<BackendRepository.PresenceEntry>> = _presence.asStateFlow()
 }

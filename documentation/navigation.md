@@ -110,6 +110,10 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── relapse forecast         (menu-relapse)             ──>  Screen.Relapse         (UNINSTALL-006)
   ├── tax income               (menu-tax-income)          ──>  Screen.TaxIncome       (FIN-010)
   ├── reading as thinking      (menu-reading-thinking)    ──>  Screen.ReadingThinking (MIND-007)
+  ├── life state               (menu-life-state)          ──>  Screen.LifeState       (RESTRICT-022)
+  ├── app roulette             (menu-roulette)            ──>  Screen.Roulette        (RESTRICT-013)
+  ├── co-working               (menu-coworking)           ──>  Screen.Coworking       (SOCIAL-006)
+  ├── phone funerals           (menu-funeral)             ──>  Screen.Funeral         (SOCIAL-040)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```

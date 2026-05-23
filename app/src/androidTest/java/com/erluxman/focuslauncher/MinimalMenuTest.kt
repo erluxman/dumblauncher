@@ -115,6 +115,10 @@ class MinimalMenuTest {
         "menu-relapse",
         "menu-tax-income",
         "menu-reading-thinking",
+        "menu-life-state",
+        "menu-roulette",
+        "menu-coworking",
+        "menu-funeral",
         "menu-feature-flags",
         "menu-uninstall",
     )

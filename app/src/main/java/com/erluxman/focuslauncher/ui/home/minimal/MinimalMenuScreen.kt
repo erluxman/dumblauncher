@@ -117,6 +117,10 @@ fun MinimalMenuScreen(
     onOpenRelapse: () -> Unit,
     onOpenTaxIncome: () -> Unit,
     onOpenReadingThinking: () -> Unit,
+    onOpenLifeState: () -> Unit,
+    onOpenRoulette: () -> Unit,
+    onOpenCoworking: () -> Unit,
+    onOpenFuneral: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -313,6 +317,14 @@ fun MinimalMenuScreen(
                 MenuRow("tax income", "1099 / gig / sale log", "menu-tax-income", onOpenTaxIncome)
             if (on(FlagKey.READING_THINKING))
                 MenuRow("reading as thinking", "a highlight + a prompt", "menu-reading-thinking", onOpenReadingThinking)
+            if (on(FlagKey.LIFE_STATE))
+                MenuRow("life state", "commute / sick / vacation / weekend", "menu-life-state", onOpenLifeState)
+            if (on(FlagKey.ROULETTE))
+                MenuRow("app roulette", "3 apps, system picks 1/day", "menu-roulette", onOpenRoulette)
+            if (on(FlagKey.COWORKING))
+                MenuRow("co-working", "who's in focus right now", "menu-coworking", onOpenCoworking)
+            if (on(FlagKey.FUNERAL))
+                MenuRow("phone funerals", "30-day off → ceremony", "menu-funeral", onOpenFuneral)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

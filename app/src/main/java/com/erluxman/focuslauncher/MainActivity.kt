@@ -157,6 +157,10 @@ sealed class Screen {
     data object Relapse : Screen()
     data object TaxIncome : Screen()
     data object ReadingThinking : Screen()
+    data object LifeState : Screen()
+    data object Roulette : Screen()
+    data object Coworking : Screen()
+    data object Funeral : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -348,6 +352,10 @@ private fun AppRoot() {
                 onOpenRelapse = { current = Screen.Relapse },
                 onOpenTaxIncome = { current = Screen.TaxIncome },
                 onOpenReadingThinking = { current = Screen.ReadingThinking },
+                onOpenLifeState = { current = Screen.LifeState },
+                onOpenRoulette = { current = Screen.Roulette },
+                onOpenCoworking = { current = Screen.Coworking },
+                onOpenFuneral = { current = Screen.Funeral },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -593,6 +601,18 @@ private fun AppRoot() {
         }
         current == Screen.ReadingThinking -> {
             com.erluxman.focuslauncher.ui.readingthinking.ReadingThinkingScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.LifeState -> {
+            com.erluxman.focuslauncher.ui.lifestate.LifeStateModeScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Roulette -> {
+            com.erluxman.focuslauncher.ui.roulette.AppRouletteScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Coworking -> {
+            com.erluxman.focuslauncher.ui.presence.CoworkingScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Funeral -> {
+            com.erluxman.focuslauncher.ui.funeral.PhoneFuneralScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

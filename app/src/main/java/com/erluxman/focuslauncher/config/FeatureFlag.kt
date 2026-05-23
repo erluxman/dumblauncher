@@ -117,4 +117,8 @@ object FlagKey {
     const val RELAPSE = "RELAPSE"
     const val TAX_INCOME = "TAX_INCOME"
     const val READING_THINKING = "READING_THINKING"
+    const val LIFE_STATE = "LIFE_STATE"
+    const val ROULETTE = "ROULETTE"
+    const val COWORKING = "COWORKING"
+    const val FUNERAL = "FUNERAL"
 }

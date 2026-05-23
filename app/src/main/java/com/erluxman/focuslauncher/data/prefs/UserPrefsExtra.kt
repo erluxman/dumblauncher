@@ -3,6 +3,7 @@ package com.erluxman.focuslauncher.data.prefs
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -110,4 +111,63 @@ suspend fun UserPrefs.logTaxIncome(source: String, amountUsd: Double, nowMs: Lon
 
 suspend fun UserPrefs.removeTaxIncome(entry: String) {
     store.edit { it[TAX_INCOMES] = (it[TAX_INCOMES] ?: emptySet()) - entry }
+}
+
+// RESTRICT-022 — single active "life-state" mode (commute/vacation/sick/…)
+private val LIFE_STATE_MODE = stringPreferencesKey("life_state_mode")
+
+val UserPrefs.lifeStateMode: Flow<String>
+    get() = store.data.map { it[LIFE_STATE_MODE].orEmpty() }
+
+suspend fun UserPrefs.setLifeStateMode(mode: String) {
+    store.edit { it[LIFE_STATE_MODE] = mode }
+}
+
+// RESTRICT-013 App roulette — pool of up to 3, one allowed per day.
+private val ROULETTE_POOL = stringSetPreferencesKey("roulette_pool")
+private val ROULETTE_PICK_DATE = stringPreferencesKey("roulette_pick_date")
+private val ROULETTE_PICK_APP = stringPreferencesKey("roulette_pick_app")
+
+val UserPrefs.roulettePool: Flow<Set<String>>
+    get() = store.data.map { it[ROULETTE_POOL] ?: emptySet() }
+val UserPrefs.roulettePickDate: Flow<String>
+    get() = store.data.map { it[ROULETTE_PICK_DATE].orEmpty() }
+val UserPrefs.roulettePickApp: Flow<String>
+    get() = store.data.map { it[ROULETTE_PICK_APP].orEmpty() }
+
+suspend fun UserPrefs.addRouletteApp(name: String) {
+    val safe = name.trim().ifBlank { return }
+    store.edit {
+        val cur = it[ROULETTE_POOL] ?: emptySet()
+        if (cur.size >= 3 || safe in cur) return@edit
+        it[ROULETTE_POOL] = cur + safe
+    }
+}
+
+suspend fun UserPrefs.removeRouletteApp(name: String) {
+    store.edit { it[ROULETTE_POOL] = (it[ROULETTE_POOL] ?: emptySet()) - name }
+}
+
+suspend fun UserPrefs.spinRoulette(isoDate: String, seed: Long = System.currentTimeMillis()) {
+    store.edit {
+        val pool = (it[ROULETTE_POOL] ?: emptySet()).toList()
+        if (pool.isEmpty()) return@edit
+        val idx = ((seed.toInt() % pool.size) + pool.size) % pool.size
+        it[ROULETTE_PICK_DATE] = isoDate
+        it[ROULETTE_PICK_APP] = pool[idx]
+    }
+}
+
+// SOCIAL-040 Public Phone Funeral — record which tombstones we've held a funeral for.
+private val FUNERAL_LABELS = stringSetPreferencesKey("funeral_labels")
+
+val UserPrefs.funeralLabels: Flow<Set<String>>
+    get() = store.data.map { it[FUNERAL_LABELS] ?: emptySet() }
+
+suspend fun UserPrefs.holdFuneralFor(label: String) {
+    val safe = label.trim().ifBlank { return }
+    store.edit {
+        val cur = it[FUNERAL_LABELS] ?: emptySet()
+        it[FUNERAL_LABELS] = cur + safe
+    }
 }
