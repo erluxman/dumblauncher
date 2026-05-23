@@ -35,7 +35,7 @@
     { "key": "WORKOUT_LOG",         "stage": 2, "default": true,  "required": false, "label": "workout log",          "description": "exercise minutes per day" },
     { "key": "COMMIT_LOG",          "stage": 2, "default": true,  "required": false, "label": "commit log",           "description": "code commits per day" },
 
-    { "key": "BUILT_WRAPPED",       "stage": 3, "default": false, "required": false, "label": "built wrapped",        "description": "year-end recap (engine only — surface pending)" },
+    { "key": "BUILT_WRAPPED",       "stage": 3, "default": true,  "required": false, "label": "built wrapped",        "description": "year-in-review — score, headline, per-domain totals" },
     { "key": "MORTALITY_WIDGETS",   "stage": 3, "default": true,  "required": false, "label": "mortality widgets",    "description": "beach saturdays / days remaining; runtime opt-in still required" },
     { "key": "DEATHBED_WIDGET",     "stage": 3, "default": true,  "required": false, "label": "deathbed widget",      "description": "projected years on screen by 80; runtime opt-in" },
     { "key": "MONEY_MIRROR",        "stage": 3, "default": false, "required": false, "label": "money mirror",         "description": "net-worth + spend; needs plaid integration" },
