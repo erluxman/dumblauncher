@@ -90,6 +90,10 @@
     { "key": "CONFESSION",          "stage": 4, "default": true,  "required": false, "label": "confession booth",     "description": "SOCIAL-023 — anonymous failure post; 24h expiry" },
     { "key": "COUPLES",             "stage": 3, "default": true,  "required": false, "label": "couples pair",         "description": "COUPLES-001 — partner pair mode" },
     { "key": "REGRET",              "stage": 4, "default": true,  "required": false, "label": "regret receipts",      "description": "FIN-008 — 24h after purchase: still glad?" },
+    { "key": "COMMUTE",             "stage": 3, "default": true,  "required": false, "label": "commute tax",          "description": "LOC-004 — hours/year + cost + books unread" },
+    { "key": "BEST_FRIENDS",        "stage": 4, "default": true,  "required": false, "label": "best friends",         "description": "SOCIAL-039 — top 8 supportive" },
+    { "key": "SABBATH",             "stage": 3, "default": true,  "required": false, "label": "phone sabbath",        "description": "COUPLES-002 — schedule a shared full-day disconnect" },
+    { "key": "FAMILY",              "stage": 3, "default": true,  "required": false, "label": "family pair",          "description": "FAMILY-001 — parent ↔ child" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

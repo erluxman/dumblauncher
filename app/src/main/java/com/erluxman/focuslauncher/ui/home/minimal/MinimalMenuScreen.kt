@@ -93,6 +93,10 @@ fun MinimalMenuScreen(
     onOpenConfession: () -> Unit,
     onOpenCouples: () -> Unit,
     onOpenRegret: () -> Unit,
+    onOpenCommute: () -> Unit,
+    onOpenBestFriends: () -> Unit,
+    onOpenSabbath: () -> Unit,
+    onOpenFamily: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -241,6 +245,14 @@ fun MinimalMenuScreen(
                 MenuRow("couples", "pair with one partner", "menu-couples", onOpenCouples)
             if (on(FlagKey.REGRET))
                 MenuRow("regret receipts", "24h after-purchase ratings", "menu-regret", onOpenRegret)
+            if (on(FlagKey.COMMUTE))
+                MenuRow("commute tax", "hours/year lost on the way", "menu-commute", onOpenCommute)
+            if (on(FlagKey.BEST_FRIENDS))
+                MenuRow("best friends", "top 8 supportive", "menu-best-friends", onOpenBestFriends)
+            if (on(FlagKey.SABBATH))
+                MenuRow("phone sabbath", "schedule a full day off, together", "menu-sabbath", onOpenSabbath)
+            if (on(FlagKey.FAMILY))
+                MenuRow("family pair", "parent ↔ child", "menu-family", onOpenFamily)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

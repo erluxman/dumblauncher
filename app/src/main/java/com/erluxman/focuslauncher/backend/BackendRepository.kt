@@ -70,6 +70,25 @@ interface BackendRepository {
     suspend fun pairWithPartner(uid: String, name: String): Result<Unit>
     suspend fun unpairPartner(): Result<Unit>
 
+    /** Phone Sabbath shared schedule (COUPLES-002). */
+    val phoneSabbathAt: Flow<Long?>
+    suspend fun scheduleSabbath(atMs: Long): Result<Unit>
+    suspend fun cancelSabbath(): Result<Unit>
+
+    /** Best Friends list (SOCIAL-039). Stub keeps whatever was added. */
+    val bestFriends: Flow<List<Friend>>
+    suspend fun addBestFriend(uid: String, name: String): Result<Unit>
+    suspend fun removeBestFriend(uid: String): Result<Unit>
+
+    /** Parent/Child pair (FAMILY-001). */
+    val familyPair: Flow<FamilyPair?>
+    suspend fun pairFamily(uid: String, name: String, role: FamilyRole): Result<Unit>
+    suspend fun unpairFamily(): Result<Unit>
+
+    enum class FamilyRole { PARENT, CHILD }
+    data class Friend(val uid: String, val name: String, val addedMs: Long)
+    data class FamilyPair(val uid: String, val name: String, val role: FamilyRole, val sinceMs: Long)
+
     data class Disappointment(
         val id: String,
         val fromName: String,
@@ -248,6 +267,47 @@ class StubBackendRepository(@Suppress("UNUSED_PARAMETER") context: Context) : Ba
 
     override suspend fun unpairPartner(): Result<Unit> {
         _partner.value = null
+        return Result.success(Unit)
+    }
+
+    private val _sabbath = MutableStateFlow<Long?>(null)
+    override val phoneSabbathAt: Flow<Long?> = _sabbath.asStateFlow()
+
+    override suspend fun scheduleSabbath(atMs: Long): Result<Unit> {
+        _sabbath.value = atMs
+        return Result.success(Unit)
+    }
+
+    override suspend fun cancelSabbath(): Result<Unit> {
+        _sabbath.value = null
+        return Result.success(Unit)
+    }
+
+    private val _bestFriends = MutableStateFlow<List<BackendRepository.Friend>>(emptyList())
+    override val bestFriends: Flow<List<BackendRepository.Friend>> = _bestFriends.asStateFlow()
+
+    override suspend fun addBestFriend(uid: String, name: String): Result<Unit> {
+        if (_bestFriends.value.size >= 8) return Result.failure(IllegalStateException("max 8 best friends"))
+        if (_bestFriends.value.any { it.uid == uid }) return Result.success(Unit)
+        _bestFriends.value = _bestFriends.value + BackendRepository.Friend(uid, name, System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun removeBestFriend(uid: String): Result<Unit> {
+        _bestFriends.value = _bestFriends.value.filterNot { it.uid == uid }
+        return Result.success(Unit)
+    }
+
+    private val _family = MutableStateFlow<BackendRepository.FamilyPair?>(null)
+    override val familyPair: Flow<BackendRepository.FamilyPair?> = _family.asStateFlow()
+
+    override suspend fun pairFamily(uid: String, name: String, role: BackendRepository.FamilyRole): Result<Unit> {
+        _family.value = BackendRepository.FamilyPair(uid, name, role, System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun unpairFamily(): Result<Unit> {
+        _family.value = null
         return Result.success(Unit)
     }
 }

@@ -93,4 +93,8 @@ object FlagKey {
     const val CONFESSION = "CONFESSION"
     const val COUPLES = "COUPLES"
     const val REGRET = "REGRET"
+    const val COMMUTE = "COMMUTE"
+    const val BEST_FRIENDS = "BEST_FRIENDS"
+    const val SABBATH = "SABBATH"
+    const val FAMILY = "FAMILY"
 }

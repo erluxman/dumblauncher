@@ -133,6 +133,10 @@ sealed class Screen {
     data object Confession : Screen()
     data object Couples : Screen()
     data object Regret : Screen()
+    data object Commute : Screen()
+    data object BestFriends : Screen()
+    data object Sabbath : Screen()
+    data object Family : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -300,6 +304,10 @@ private fun AppRoot() {
                 onOpenConfession = { current = Screen.Confession },
                 onOpenCouples = { current = Screen.Couples },
                 onOpenRegret = { current = Screen.Regret },
+                onOpenCommute = { current = Screen.Commute },
+                onOpenBestFriends = { current = Screen.BestFriends },
+                onOpenSabbath = { current = Screen.Sabbath },
+                onOpenFamily = { current = Screen.Family },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -473,6 +481,18 @@ private fun AppRoot() {
         }
         current == Screen.Regret -> {
             com.erluxman.focuslauncher.ui.regret.RegretScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Commute -> {
+            com.erluxman.focuslauncher.ui.commute.CommuteScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.BestFriends -> {
+            com.erluxman.focuslauncher.ui.bestfriends.BestFriendsScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Sabbath -> {
+            com.erluxman.focuslauncher.ui.sabbath.SabbathScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Family -> {
+            com.erluxman.focuslauncher.ui.family.FamilyScreen(backend = backend, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

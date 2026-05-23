@@ -91,6 +91,10 @@ class MinimalMenuTest {
         "menu-confession",
         "menu-couples",
         "menu-regret",
+        "menu-commute",
+        "menu-best-friends",
+        "menu-sabbath",
+        "menu-family",
         "menu-feature-flags",
         "menu-uninstall",
     )

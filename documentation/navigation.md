@@ -86,6 +86,10 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── confession               (menu-confession)          ──>  Screen.Confession      (SOCIAL-023)
   ├── couples                  (menu-couples)             ──>  Screen.Couples         (COUPLES-001)
   ├── regret receipts          (menu-regret)              ──>  Screen.Regret          (FIN-008)
+  ├── commute tax              (menu-commute)             ──>  Screen.Commute         (LOC-004)
+  ├── best friends             (menu-best-friends)        ──>  Screen.BestFriends     (SOCIAL-039)
+  ├── phone sabbath            (menu-sabbath)             ──>  Screen.Sabbath         (COUPLES-002)
+  ├── family pair              (menu-family)              ──>  Screen.Family          (FAMILY-001)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```
@@ -157,6 +161,10 @@ For each shipped Compose screen, the spec features it covers (`features-by-stage
 | `Screen.Confession` | SOCIAL-023 | Posts STORY-kind post anonymously (24h expiry) |
 | `Screen.Couples` | COUPLES-001 | `backend.pairWithPartner` / `unpairPartner` |
 | `Screen.Regret` | FIN-008 | New `UserPrefsMoney.regrets` log; 24h-old purchases surface for rating |
+| `Screen.Commute` | LOC-004 | Pure form: min/day + days/week + hourly rate → hours/year, $/year, books, gym |
+| `Screen.BestFriends` | SOCIAL-039 | Stub backend; max 8; add/remove |
+| `Screen.Sabbath` | COUPLES-002 | Preset weekday picks; one-tap schedule via `backend.scheduleSabbath` |
+| `Screen.Family` | FAMILY-001 | Role picker (PARENT/CHILD) + uid/name; `backend.pairFamily` |
 | `Screen.FeatureFlags` | — | Build-time gating surface (not in spec) |
 | `(no UI yet)` PaymentRouter | PAY-001, PAY-002, PAY-003 | Triggered when a paywall surface calls `PaymentRouter.checkout(productId)` — opens Play Billing or web checkout per `/config/payments.nativeOnDevice` |
 | `(no UI yet)` Web companion | PLATFORM-002 | Static site on Firebase Hosting — separate repo target, not a route in the Android app |
