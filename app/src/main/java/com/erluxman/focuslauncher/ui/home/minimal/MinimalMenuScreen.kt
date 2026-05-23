@@ -86,6 +86,13 @@ fun MinimalMenuScreen(
     onOpenPreCommit: () -> Unit,
     onOpenReceiptWall: () -> Unit,
     onOpenCourage: () -> Unit,
+    onOpenFasting: () -> Unit,
+    onOpenDisappointmentInbox: () -> Unit,
+    onOpenTimeDonation: () -> Unit,
+    onOpenSponsor: () -> Unit,
+    onOpenConfession: () -> Unit,
+    onOpenCouples: () -> Unit,
+    onOpenRegret: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -220,6 +227,20 @@ fun MinimalMenuScreen(
                 MenuRow("receipt wall", "restraint receipts", "menu-receipt-wall", onOpenReceiptWall)
             if (on(FlagKey.COURAGE))
                 MenuRow("courage", "rejections + risks + things made", "menu-courage", onOpenCourage)
+            if (on(FlagKey.FASTING))
+                MenuRow("fasting", "hours since last meal", "menu-fasting", onOpenFasting)
+            if (on(FlagKey.DISAPPOINTMENT_INBOX))
+                MenuRow("disappointment inbox", "incoming pings", "menu-disappointment-inbox", onOpenDisappointmentInbox)
+            if (on(FlagKey.TIME_DONATION))
+                MenuRow("time donation", "gift saved minutes to a friend", "menu-time-donation", onOpenTimeDonation)
+            if (on(FlagKey.SPONSOR))
+                MenuRow("sponsor", "aa-style — one person on uninstall", "menu-sponsor", onOpenSponsor)
+            if (on(FlagKey.CONFESSION))
+                MenuRow("confession", "anonymous failure post", "menu-confession", onOpenConfession)
+            if (on(FlagKey.COUPLES))
+                MenuRow("couples", "pair with one partner", "menu-couples", onOpenCouples)
+            if (on(FlagKey.REGRET))
+                MenuRow("regret receipts", "24h after-purchase ratings", "menu-regret", onOpenRegret)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

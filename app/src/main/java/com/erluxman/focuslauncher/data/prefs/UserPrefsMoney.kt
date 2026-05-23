@@ -1,8 +1,12 @@
 package com.erluxman.focuslauncher.data.prefs
 
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+
+/** FIN-008 regret-receipts log. Entries: "timestampMs|amount|category|name|rating". */
+private val REGRETS = stringSetPreferencesKey("regrets")
 
 /**
  * FIN-002 net worth + FIN-003 subscriptions + FIN-004 savings-rate
@@ -43,3 +47,33 @@ suspend fun UserPrefs.setMoneyIncome(v: Int) { store.edit { it[PrefKeys.MONEY_IN
 suspend fun UserPrefs.setMoneyExpense(v: Int) { store.edit { it[PrefKeys.MONEY_EXPENSE] = v.coerceAtLeast(0) } }
 suspend fun UserPrefs.setMoneyAssets(v: Int) { store.edit { it[PrefKeys.MONEY_ASSETS] = v.coerceAtLeast(0) } }
 suspend fun UserPrefs.setMoneyLiabilities(v: Int) { store.edit { it[PrefKeys.MONEY_LIABILITIES] = v.coerceAtLeast(0) } }
+
+val UserPrefs.regrets: Flow<Set<String>>
+    get() = store.data.map { it[REGRETS] ?: emptySet() }
+
+suspend fun UserPrefs.addRegret(
+    name: String,
+    amountUsd: Double,
+    category: String,
+    nowMs: Long = System.currentTimeMillis(),
+) {
+    val safeName = name.replace("|", " ").trim().ifBlank { return }
+    if (amountUsd <= 0) return
+    val safeCat = category.replace("|", " ").trim()
+    store.edit {
+        val cur = it[REGRETS] ?: emptySet()
+        it[REGRETS] = cur + "$nowMs|$amountUsd|$safeCat|$safeName|?"
+    }
+}
+
+/** [rating] must be "glad" or "regret". */
+suspend fun UserPrefs.markRegretRating(entry: String, rating: String) {
+    if (rating != "glad" && rating != "regret") return
+    store.edit {
+        val cur = it[REGRETS] ?: emptySet()
+        val parts = entry.split("|", limit = 5)
+        if (parts.size < 5) return@edit
+        val updated = "${parts[0]}|${parts[1]}|${parts[2]}|${parts[3]}|$rating"
+        it[REGRETS] = (cur - entry) + updated
+    }
+}

@@ -126,6 +126,13 @@ sealed class Screen {
     data object PreCommit : Screen()
     data object ReceiptWall : Screen()
     data object Courage : Screen()
+    data object Fasting : Screen()
+    data object DisappointmentInbox : Screen()
+    data object TimeDonation : Screen()
+    data object Sponsor : Screen()
+    data object Confession : Screen()
+    data object Couples : Screen()
+    data object Regret : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -286,6 +293,13 @@ private fun AppRoot() {
                 onOpenPreCommit = { current = Screen.PreCommit },
                 onOpenReceiptWall = { current = Screen.ReceiptWall },
                 onOpenCourage = { current = Screen.Courage },
+                onOpenFasting = { current = Screen.Fasting },
+                onOpenDisappointmentInbox = { current = Screen.DisappointmentInbox },
+                onOpenTimeDonation = { current = Screen.TimeDonation },
+                onOpenSponsor = { current = Screen.Sponsor },
+                onOpenConfession = { current = Screen.Confession },
+                onOpenCouples = { current = Screen.Couples },
+                onOpenRegret = { current = Screen.Regret },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -438,6 +452,27 @@ private fun AppRoot() {
         }
         current == Screen.Courage -> {
             com.erluxman.focuslauncher.ui.courage.CourageScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Fasting -> {
+            com.erluxman.focuslauncher.ui.fasting.FastingScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.DisappointmentInbox -> {
+            com.erluxman.focuslauncher.ui.inbox.DisappointmentInboxScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.TimeDonation -> {
+            com.erluxman.focuslauncher.ui.timedonation.TimeDonationScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Sponsor -> {
+            com.erluxman.focuslauncher.ui.sponsor.SponsorScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Confession -> {
+            com.erluxman.focuslauncher.ui.confession.ConfessionScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Couples -> {
+            com.erluxman.focuslauncher.ui.couples.CouplesScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Regret -> {
+            com.erluxman.focuslauncher.ui.regret.RegretScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

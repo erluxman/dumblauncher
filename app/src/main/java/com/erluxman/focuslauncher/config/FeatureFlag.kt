@@ -86,4 +86,11 @@ object FlagKey {
     const val PRE_COMMIT = "PRE_COMMIT"
     const val RECEIPT_WALL = "RECEIPT_WALL"
     const val COURAGE = "COURAGE"
+    const val FASTING = "FASTING"
+    const val DISAPPOINTMENT_INBOX = "DISAPPOINTMENT_INBOX"
+    const val TIME_DONATION = "TIME_DONATION"
+    const val SPONSOR = "SPONSOR"
+    const val CONFESSION = "CONFESSION"
+    const val COUPLES = "COUPLES"
+    const val REGRET = "REGRET"
 }

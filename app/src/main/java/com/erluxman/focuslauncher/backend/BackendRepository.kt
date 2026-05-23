@@ -52,6 +52,35 @@ interface BackendRepository {
     /** Vote in a group uninstall request (SOCIAL-002). */
     suspend fun voteUninstall(groupId: String, allow: Boolean): Result<Unit>
 
+    /** Disappointment pings RECEIVED (SOCIAL-020). */
+    val disappointmentInbox: Flow<List<Disappointment>>
+
+    suspend fun markDisappointmentRead(id: String): Result<Unit>
+
+    /** Time donation (SOCIAL-035) — gift saved minutes to a friend's bank. */
+    suspend fun donateTime(toUid: String, minutes: Int, note: String): Result<Unit>
+
+    /** Sponsor system (SOCIAL-008). */
+    val sponsor: Flow<Sponsor?>
+    suspend fun setSponsor(uid: String, name: String): Result<Unit>
+    suspend fun clearSponsor(): Result<Unit>
+
+    /** Couples pair (COUPLES-001). */
+    val couplesPartner: Flow<CouplesPartner?>
+    suspend fun pairWithPartner(uid: String, name: String): Result<Unit>
+    suspend fun unpairPartner(): Result<Unit>
+
+    data class Disappointment(
+        val id: String,
+        val fromName: String,
+        val worstStat: String,
+        val createdAtMs: Long,
+        val read: Boolean,
+    )
+
+    data class Sponsor(val uid: String, val name: String, val sinceMs: Long)
+    data class CouplesPartner(val uid: String, val name: String, val sinceMs: Long)
+
     enum class PostKind { STORY, PRE_COMMIT, QUIET_BRAG, MILESTONE }
 
     data class Post(
@@ -169,6 +198,56 @@ class StubBackendRepository(@Suppress("UNUSED_PARAMETER") context: Context) : Ba
 
     override suspend fun voteUninstall(groupId: String, allow: Boolean): Result<Unit> {
         // Stub: no-op; real impl posts to /groups/{groupId}/uninstallVotes/{uid}
+        return Result.success(Unit)
+    }
+
+    private val _inbox = MutableStateFlow<List<BackendRepository.Disappointment>>(
+        // Seed with one sample so the inbox isn't lifeless on first open.
+        listOf(
+            BackendRepository.Disappointment(
+                id = "seed-1",
+                fromName = "sample",
+                worstStat = "2h 34m in tiktok yesterday.",
+                createdAtMs = System.currentTimeMillis() - 86_400_000L,
+                read = false,
+            )
+        )
+    )
+    override val disappointmentInbox: Flow<List<BackendRepository.Disappointment>> = _inbox.asStateFlow()
+
+    override suspend fun markDisappointmentRead(id: String): Result<Unit> {
+        _inbox.value = _inbox.value.map { if (it.id == id) it.copy(read = true) else it }
+        return Result.success(Unit)
+    }
+
+    override suspend fun donateTime(toUid: String, minutes: Int, note: String): Result<Unit> {
+        // Stub: pretend it landed in their bank.
+        return Result.success(Unit)
+    }
+
+    private val _sponsor = MutableStateFlow<BackendRepository.Sponsor?>(null)
+    override val sponsor: Flow<BackendRepository.Sponsor?> = _sponsor.asStateFlow()
+
+    override suspend fun setSponsor(uid: String, name: String): Result<Unit> {
+        _sponsor.value = BackendRepository.Sponsor(uid, name, System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun clearSponsor(): Result<Unit> {
+        _sponsor.value = null
+        return Result.success(Unit)
+    }
+
+    private val _partner = MutableStateFlow<BackendRepository.CouplesPartner?>(null)
+    override val couplesPartner: Flow<BackendRepository.CouplesPartner?> = _partner.asStateFlow()
+
+    override suspend fun pairWithPartner(uid: String, name: String): Result<Unit> {
+        _partner.value = BackendRepository.CouplesPartner(uid, name, System.currentTimeMillis())
+        return Result.success(Unit)
+    }
+
+    override suspend fun unpairPartner(): Result<Unit> {
+        _partner.value = null
         return Result.success(Unit)
     }
 }

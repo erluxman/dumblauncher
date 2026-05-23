@@ -83,6 +83,13 @@
     { "key": "PRE_COMMIT",          "stage": 3, "default": true,  "required": false, "label": "pre-commitments",      "description": "SOCIAL-033 — tomorrow's intent, posted to your feed; auto-grades server-side" },
     { "key": "RECEIPT_WALL",        "stage": 3, "default": true,  "required": false, "label": "receipt wall",         "description": "SOCIAL-012 — wins from putting flagged apps down inside 3 min" },
     { "key": "COURAGE",             "stage": 4, "default": true,  "required": false, "label": "courage counters",     "description": "IDENT-003 rejections + IDENT-004 risks + IDENT-005 things made — three logs that compound" },
+    { "key": "FASTING",             "stage": 4, "default": true,  "required": false, "label": "fasting window",       "description": "NUT-002 — hours since last meal" },
+    { "key": "DISAPPOINTMENT_INBOX","stage": 3, "default": true,  "required": false, "label": "disappointment inbox", "description": "SOCIAL-020 — receive disappointment + sad-self pings" },
+    { "key": "TIME_DONATION",       "stage": 4, "default": true,  "required": false, "label": "time donation",        "description": "SOCIAL-035 — gift saved minutes to a friend's bank" },
+    { "key": "SPONSOR",             "stage": 3, "default": true,  "required": false, "label": "sponsor",              "description": "SOCIAL-008 — aa-style, one person on uninstall attempt" },
+    { "key": "CONFESSION",          "stage": 4, "default": true,  "required": false, "label": "confession booth",     "description": "SOCIAL-023 — anonymous failure post; 24h expiry" },
+    { "key": "COUPLES",             "stage": 3, "default": true,  "required": false, "label": "couples pair",         "description": "COUPLES-001 — partner pair mode" },
+    { "key": "REGRET",              "stage": 4, "default": true,  "required": false, "label": "regret receipts",      "description": "FIN-008 — 24h after purchase: still glad?" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

@@ -84,6 +84,13 @@ class MinimalMenuTest {
         "menu-pre-commit",
         "menu-receipt-wall",
         "menu-courage",
+        "menu-fasting",
+        "menu-disappointment-inbox",
+        "menu-time-donation",
+        "menu-sponsor",
+        "menu-confession",
+        "menu-couples",
+        "menu-regret",
         "menu-feature-flags",
         "menu-uninstall",
     )

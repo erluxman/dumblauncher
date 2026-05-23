@@ -79,6 +79,13 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── pre-commit               (menu-pre-commit)          ──>  Screen.PreCommit       (SOCIAL-033)
   ├── receipt wall             (menu-receipt-wall)        ──>  Screen.ReceiptWall     (SOCIAL-012)
   ├── courage                  (menu-courage)             ──>  Screen.Courage         (IDENT-003 + IDENT-004 + IDENT-005)
+  ├── fasting                  (menu-fasting)             ──>  Screen.Fasting         (NUT-002)
+  ├── disappointment inbox     (menu-disappointment-inbox)──>  Screen.DisappointmentInbox  (SOCIAL-020)
+  ├── time donation            (menu-time-donation)       ──>  Screen.TimeDonation    (SOCIAL-035)
+  ├── sponsor                  (menu-sponsor)             ──>  Screen.Sponsor         (SOCIAL-008)
+  ├── confession               (menu-confession)          ──>  Screen.Confession      (SOCIAL-023)
+  ├── couples                  (menu-couples)             ──>  Screen.Couples         (COUPLES-001)
+  ├── regret receipts          (menu-regret)              ──>  Screen.Regret          (FIN-008)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```
@@ -143,6 +150,13 @@ For each shipped Compose screen, the spec features it covers (`features-by-stage
 | `Screen.PreCommit` | SOCIAL-033 | Post tomorrow's intent as a PRE_COMMIT post that expires end-of-tomorrow |
 | `Screen.ReceiptWall` | SOCIAL-012 | Reads from `ReceiptWall.receiptFor(app, sec)` |
 | `Screen.Courage` | IDENT-003, IDENT-004, IDENT-005 | Three logs in one screen: rejections asked, risks taken, things made. Backed by new `UserPrefsIdentity` pref APIs. |
+| `Screen.Fasting` | NUT-002 | Manual "i just ate" timestamp + auto window. New `UserPrefsNutrition.lastMealAtMs`. |
+| `Screen.DisappointmentInbox` | SOCIAL-020 | Receives `BackendRepository.disappointmentInbox` (stub seeds a sample) |
+| `Screen.TimeDonation` | SOCIAL-035 | `backend.donateTime(toUid, mins, note)` |
+| `Screen.Sponsor` | SOCIAL-008 | `backend.setSponsor` / `clearSponsor` |
+| `Screen.Confession` | SOCIAL-023 | Posts STORY-kind post anonymously (24h expiry) |
+| `Screen.Couples` | COUPLES-001 | `backend.pairWithPartner` / `unpairPartner` |
+| `Screen.Regret` | FIN-008 | New `UserPrefsMoney.regrets` log; 24h-old purchases surface for rating |
 | `Screen.FeatureFlags` | — | Build-time gating surface (not in spec) |
 | `(no UI yet)` PaymentRouter | PAY-001, PAY-002, PAY-003 | Triggered when a paywall surface calls `PaymentRouter.checkout(productId)` — opens Play Billing or web checkout per `/config/payments.nativeOnDevice` |
 | `(no UI yet)` Web companion | PLATFORM-002 | Static site on Firebase Hosting — separate repo target, not a route in the Android app |
