@@ -90,6 +90,7 @@ sealed class Screen {
     data object Graduate : Screen()
     data object Wrapped : Screen()
     data object Subscriptions : Screen()
+    data object SleepCorrelator : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -206,6 +207,7 @@ private fun AppRoot() {
                 onOpenGraduate = { current = Screen.Graduate },
                 onOpenWrapped = { current = Screen.Wrapped },
                 onOpenSubscriptions = { current = Screen.Subscriptions },
+                onOpenSleepCorrelator = { current = Screen.SleepCorrelator },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -240,6 +242,12 @@ private fun AppRoot() {
         }
         current == Screen.Subscriptions -> {
             com.erluxman.focuslauncher.ui.subscriptions.SubscriptionsScreen(
+                prefs = prefs,
+                onBack = { current = Screen.Menu },
+            )
+        }
+        current == Screen.SleepCorrelator -> {
+            com.erluxman.focuslauncher.ui.sleep.SleepCorrelatorScreen(
                 prefs = prefs,
                 onBack = { current = Screen.Menu },
             )

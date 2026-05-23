@@ -50,6 +50,7 @@ fun MinimalMenuScreen(
     onOpenGraduate: () -> Unit,
     onOpenWrapped: () -> Unit,
     onOpenSubscriptions: () -> Unit,
+    onOpenSleepCorrelator: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -112,6 +113,8 @@ fun MinimalMenuScreen(
                 MenuRow("wrapped", "year-in-review — what you built", "menu-wrapped", onOpenWrapped)
             if (on(FlagKey.SUBSCRIPTIONS))
                 MenuRow("subscriptions", "monthly burn — manual entries", "menu-subscriptions", onOpenSubscriptions)
+            if (on(FlagKey.SLEEP_CORRELATOR))
+                MenuRow("sleep ↔ output", "did last night's sleep predict tomorrow?", "menu-sleep-correlator", onOpenSleepCorrelator)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

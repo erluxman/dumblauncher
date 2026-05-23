@@ -48,6 +48,7 @@ class MinimalMenuTest {
         "menu-graduate",
         "menu-wrapped",
         "menu-subscriptions",
+        "menu-sleep-correlator",
         "menu-feature-flags",
         "menu-uninstall",
     )

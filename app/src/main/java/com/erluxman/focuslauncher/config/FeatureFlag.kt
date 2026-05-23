@@ -44,4 +44,5 @@ object FlagKey {
     const val GRADUATE_MODE = "GRADUATE_MODE"
     const val BUILT_WRAPPED = "BUILT_WRAPPED"
     const val SUBSCRIPTIONS = "SUBSCRIPTIONS"
+    const val SLEEP_CORRELATOR = "SLEEP_CORRELATOR"
 }

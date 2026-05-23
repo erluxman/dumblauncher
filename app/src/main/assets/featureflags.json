@@ -40,7 +40,7 @@
     { "key": "DEATHBED_WIDGET",     "stage": 3, "default": true,  "required": false, "label": "deathbed widget",      "description": "projected years on screen by 80; runtime opt-in" },
     { "key": "MONEY_MIRROR",        "stage": 3, "default": false, "required": false, "label": "money mirror",         "description": "net-worth + spend; needs plaid integration" },
     { "key": "SUBSCRIPTIONS",       "stage": 3, "default": true,  "required": false, "label": "subscriptions",        "description": "monthly burn — manual entries, total + yearly projection" },
-    { "key": "SLEEP_CORRELATOR",    "stage": 3, "default": false, "required": false, "label": "sleep correlator",     "description": "tie sleep to next-day mood/focus" },
+    { "key": "SLEEP_CORRELATOR",    "stage": 3, "default": true,  "required": false, "label": "sleep correlator",     "description": "did last night's sleep predict tomorrow's commits? (pearson r)" },
     { "key": "SOCIAL_GROUPS",       "stage": 3, "default": false, "required": false, "label": "social groups",        "description": "accountability groups (no backend yet)" },
     { "key": "GROUP_UNINSTALL_VOTE","stage": 3, "default": false, "required": false, "label": "group uninstall vote", "description": "you can't quit alone (no backend yet)" },
     { "key": "COUPLES_MODE",        "stage": 3, "default": false, "required": false, "label": "couples mode",         "description": "dual-streak accountability (no backend yet)" },
