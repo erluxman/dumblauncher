@@ -137,6 +137,12 @@ sealed class Screen {
     data object BestFriends : Screen()
     data object Sabbath : Screen()
     data object Family : Screen()
+    data object Quarterly : Screen()
+    data object AnnualReport : Screen()
+    data object Outdoor : Screen()
+    data object BudgetFuture : Screen()
+    data object Substance : Screen()
+    data object DreamJournal : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -308,6 +314,12 @@ private fun AppRoot() {
                 onOpenBestFriends = { current = Screen.BestFriends },
                 onOpenSabbath = { current = Screen.Sabbath },
                 onOpenFamily = { current = Screen.Family },
+                onOpenQuarterly = { current = Screen.Quarterly },
+                onOpenAnnualReport = { current = Screen.AnnualReport },
+                onOpenOutdoor = { current = Screen.Outdoor },
+                onOpenBudgetFuture = { current = Screen.BudgetFuture },
+                onOpenSubstance = { current = Screen.Substance },
+                onOpenDreamJournal = { current = Screen.DreamJournal },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -493,6 +505,24 @@ private fun AppRoot() {
         }
         current == Screen.Family -> {
             com.erluxman.focuslauncher.ui.family.FamilyScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Quarterly -> {
+            com.erluxman.focuslauncher.ui.quarterly.QuarterlyAuditScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.AnnualReport -> {
+            com.erluxman.focuslauncher.ui.annualreport.AnnualReportScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Outdoor -> {
+            com.erluxman.focuslauncher.ui.outdoor.OutdoorScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.BudgetFuture -> {
+            com.erluxman.focuslauncher.ui.budgetfuture.BudgetFutureScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Substance -> {
+            com.erluxman.focuslauncher.ui.substance.SubstanceScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.DreamJournal -> {
+            com.erluxman.focuslauncher.ui.dream.DreamJournalScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

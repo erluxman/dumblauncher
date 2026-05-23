@@ -95,6 +95,12 @@ class MinimalMenuTest {
         "menu-best-friends",
         "menu-sabbath",
         "menu-family",
+        "menu-quarterly",
+        "menu-annual-report",
+        "menu-outdoor",
+        "menu-budget-future",
+        "menu-substance",
+        "menu-dream-journal",
         "menu-feature-flags",
         "menu-uninstall",
     )

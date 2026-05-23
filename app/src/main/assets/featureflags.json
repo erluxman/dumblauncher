@@ -94,6 +94,12 @@
     { "key": "BEST_FRIENDS",        "stage": 4, "default": true,  "required": false, "label": "best friends",         "description": "SOCIAL-039 — top 8 supportive" },
     { "key": "SABBATH",             "stage": 3, "default": true,  "required": false, "label": "phone sabbath",        "description": "COUPLES-002 — schedule a shared full-day disconnect" },
     { "key": "FAMILY",              "stage": 3, "default": true,  "required": false, "label": "family pair",          "description": "FAMILY-001 — parent ↔ child" },
+    { "key": "QUARTERLY",           "stage": 4, "default": true,  "required": false, "label": "90-day audit",         "description": "LIFE-004 — quarterly self-audit" },
+    { "key": "ANNUAL_REPORT",       "stage": 4, "default": true,  "required": false, "label": "annual report",        "description": "LIFE-005 — year in plain text, share-ready" },
+    { "key": "OUTDOOR",             "stage": 3, "default": true,  "required": false, "label": "outdoor minutes",      "description": "LOC-005 — daily manual log (auto-fusion is later)" },
+    { "key": "BUDGET_FUTURE",       "stage": 4, "default": true,  "required": false, "label": "future-self budget",   "description": "FIN-007 — assets + contribution + apy + years → projected" },
+    { "key": "SUBSTANCE",           "stage": 4, "default": true,  "required": false, "label": "substance log",        "description": "SUB-002 — private; e2ee encryption follow-up" },
+    { "key": "DREAM_JOURNAL",       "stage": 4, "default": true,  "required": false, "label": "dream journal",        "description": "MIND-006 — text only today; AI symbols later" },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },
     { "key": "THERAPIST_DASHBOARD", "stage": 4, "default": false, "required": false, "label": "therapist dashboard",  "description": "between-session read-only summary" },

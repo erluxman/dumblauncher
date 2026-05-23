@@ -90,6 +90,12 @@ MinimalMenuScreen  (Screen.Menu — navigation surface, not a spec feature)
   ├── best friends             (menu-best-friends)        ──>  Screen.BestFriends     (SOCIAL-039)
   ├── phone sabbath            (menu-sabbath)             ──>  Screen.Sabbath         (COUPLES-002)
   ├── family pair              (menu-family)              ──>  Screen.Family          (FAMILY-001)
+  ├── 90-day audit             (menu-quarterly)           ──>  Screen.Quarterly       (LIFE-004)
+  ├── annual report            (menu-annual-report)       ──>  Screen.AnnualReport    (LIFE-005)
+  ├── outdoor                  (menu-outdoor)             ──>  Screen.Outdoor         (LOC-005)
+  ├── future-self budget       (menu-budget-future)       ──>  Screen.BudgetFuture    (FIN-007)
+  ├── substance log            (menu-substance)           ──>  Screen.Substance       (SUB-002)
+  ├── dream journal            (menu-dream-journal)       ──>  Screen.DreamJournal    (MIND-006)
   ├── feature flags            (menu-feature-flags)       ──>  Screen.FeatureFlags
   └── uninstall                (menu-uninstall)           ──>  Screen.Uninstall
 ```

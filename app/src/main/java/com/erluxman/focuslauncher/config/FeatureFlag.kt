@@ -97,4 +97,10 @@ object FlagKey {
     const val BEST_FRIENDS = "BEST_FRIENDS"
     const val SABBATH = "SABBATH"
     const val FAMILY = "FAMILY"
+    const val QUARTERLY = "QUARTERLY"
+    const val ANNUAL_REPORT = "ANNUAL_REPORT"
+    const val OUTDOOR = "OUTDOOR"
+    const val BUDGET_FUTURE = "BUDGET_FUTURE"
+    const val SUBSTANCE = "SUBSTANCE"
+    const val DREAM_JOURNAL = "DREAM_JOURNAL"
 }

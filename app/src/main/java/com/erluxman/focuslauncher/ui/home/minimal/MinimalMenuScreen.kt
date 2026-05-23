@@ -97,6 +97,12 @@ fun MinimalMenuScreen(
     onOpenBestFriends: () -> Unit,
     onOpenSabbath: () -> Unit,
     onOpenFamily: () -> Unit,
+    onOpenQuarterly: () -> Unit,
+    onOpenAnnualReport: () -> Unit,
+    onOpenOutdoor: () -> Unit,
+    onOpenBudgetFuture: () -> Unit,
+    onOpenSubstance: () -> Unit,
+    onOpenDreamJournal: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -253,6 +259,18 @@ fun MinimalMenuScreen(
                 MenuRow("phone sabbath", "schedule a full day off, together", "menu-sabbath", onOpenSabbath)
             if (on(FlagKey.FAMILY))
                 MenuRow("family pair", "parent ↔ child", "menu-family", onOpenFamily)
+            if (on(FlagKey.QUARTERLY))
+                MenuRow("90-day audit", "quarterly self-audit", "menu-quarterly", onOpenQuarterly)
+            if (on(FlagKey.ANNUAL_REPORT))
+                MenuRow("annual report", "the year, shareable", "menu-annual-report", onOpenAnnualReport)
+            if (on(FlagKey.OUTDOOR))
+                MenuRow("outdoor", "minutes outside today", "menu-outdoor", onOpenOutdoor)
+            if (on(FlagKey.BUDGET_FUTURE))
+                MenuRow("future-self budget", "compound + apy + years", "menu-budget-future", onOpenBudgetFuture)
+            if (on(FlagKey.SUBSTANCE))
+                MenuRow("substance log", "private, local-only", "menu-substance", onOpenSubstance)
+            if (on(FlagKey.DREAM_JOURNAL))
+                MenuRow("dream journal", "morning recall", "menu-dream-journal", onOpenDreamJournal)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
