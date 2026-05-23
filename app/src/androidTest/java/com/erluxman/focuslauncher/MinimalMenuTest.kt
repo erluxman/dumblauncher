@@ -71,6 +71,7 @@ class MinimalMenuTest {
         "menu-time-money",
         "menu-estimation",
         "menu-stress",
+        "menu-anchor",
         "menu-feature-flags",
         "menu-uninstall",
     )

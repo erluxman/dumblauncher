@@ -67,4 +67,5 @@ object FlagKey {
     const val TIME_MONEY = "TIME_MONEY"
     const val ESTIMATION = "ESTIMATION"
     const val STRESS = "STRESS"
+    const val ANCHOR = "ANCHOR"
 }
