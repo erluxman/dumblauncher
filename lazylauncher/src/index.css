@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  --color-page:     #050505;
+  --color-ink:      #0A0A0A;
+  --color-surface:  #141414;
+  --color-surface2: #1F1F1F;
+  --color-edge:     #2A2A2A;
+  --color-fg:       #F5F5F5;
+  --color-fg-dim:   #8D8D8D;
+  --color-fg-mute:  #505050;
+  --color-accent:   #FF6B35;
+  --color-success:  #6FCF97;
+  --color-danger:   #EB5757;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--color-page);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.label-caps {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.dashed-row {
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.tracking-display { letter-spacing: -0.03em; }
+.tracking-heading { letter-spacing: -0.02em; }
+
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--color-edge); border-radius: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+button:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ────────────────────────────────────────────────────────────
+ * Document mode — used for ?doc=1 on-screen and the PDF print.
+ * One A4 portrait page per .doc-page. Phone renders are scaled
+ * to fit comfortably with caption text.
+ * ──────────────────────────────────────────────────────────── */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+.doc-root {
+  background: var(--color-page);
+  width: 794px;          /* A4 portrait width at 96dpi */
+  margin: 0 auto;
+}
+
+.doc-page {
+  width: 794px;
+  min-height: 1123px;    /* A4 portrait height at 96dpi */
+  padding: 56px 60px;
+  background: var(--color-page);
+  page-break-after: always;
+  break-after: page;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-bottom: 1px solid #111;  /* divider on-screen only */
+}
+
+.doc-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+/* Scale the phone components down for print pages. Wrapper keeps
+   document flow correct so caption text sits next to it cleanly. */
+.phone-scaled-65 {
+  width: 268px;
+  height: 595px;
+}
+.phone-scaled-65 > * {
+  transform: scale(0.65);
+  transform-origin: top left;
+}
+
+@media print {
+  body, html {
+    background: var(--color-page) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .doc-page {
+    border-bottom: none !important;
+  }
+}
+
