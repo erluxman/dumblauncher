@@ -75,6 +75,8 @@ class MinimalMenuTest {
         "menu-energy-zones",
         "menu-track-status",
         "menu-reciprocity",
+        "menu-groups",
+        "menu-backend",
         "menu-feature-flags",
         "menu-uninstall",
     )

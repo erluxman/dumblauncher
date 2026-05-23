@@ -77,6 +77,8 @@ fun MinimalMenuScreen(
     onOpenEnergyZones: () -> Unit,
     onOpenTrackStatus: () -> Unit,
     onOpenReciprocity: () -> Unit,
+    onOpenGroups: () -> Unit,
+    onOpenBackend: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -193,6 +195,10 @@ fun MinimalMenuScreen(
                 MenuRow("track status", "level, points, misses", "menu-track-status", onOpenTrackStatus)
             if (on(FlagKey.RECIPROCITY))
                 MenuRow("reciprocity", "who reaches out to whom", "menu-reciprocity", onOpenReciprocity)
+            if (on(FlagKey.SOCIAL_GROUPS))
+                MenuRow("groups", "accountability groups (stub today)", "menu-groups", onOpenGroups)
+            if (on(FlagKey.FIREBASE_BACKEND))
+                MenuRow("backend status", "firebase + payment router debug", "menu-backend", onOpenBackend)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

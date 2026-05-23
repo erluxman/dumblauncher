@@ -5,6 +5,14 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Only apply the Google Services plugin if google-services.json is present.
+// This keeps the build green for contributors who don't have a Firebase
+// project yet; FirebaseApp.initializeApp will fail gracefully at runtime
+// and the FIREBASE_BACKEND feature flag stays effectively off.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.erluxman.focuslauncher"
     compileSdk = 35
@@ -72,6 +80,20 @@ dependencies {
     implementation(libs.androidx.camera.video)
     // CameraX returns ListenableFuture; satisfy Kotlin's classpath for it.
     implementation("com.google.guava:guava:33.0.0-android")
+
+    // Firebase (BoM pins versions)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.config)
+    implementation(libs.firebase.functions)
+
+    // Google Play Billing (PAY-001)
+    implementation(libs.play.billing)
+
+    // Chrome Custom Tabs for the web checkout fallback (PAY-002)
+    implementation(libs.androidx.browser)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

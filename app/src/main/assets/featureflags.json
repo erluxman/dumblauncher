@@ -66,7 +66,7 @@
     { "key": "MONEY_MIRROR",        "stage": 3, "default": true,  "required": false, "label": "money mirror",         "description": "manual snapshot — income / expense / assets / liabilities" },
     { "key": "SUBSCRIPTIONS",       "stage": 3, "default": true,  "required": false, "label": "subscriptions",        "description": "monthly burn — manual entries, total + yearly projection" },
     { "key": "SLEEP_CORRELATOR",    "stage": 3, "default": true,  "required": false, "label": "sleep correlator",     "description": "did last night's sleep predict tomorrow's commits? (pearson r)" },
-    { "key": "SOCIAL_GROUPS",       "stage": 3, "default": false, "required": false, "label": "social groups",        "description": "accountability groups (no backend yet)" },
+    { "key": "SOCIAL_GROUPS",       "stage": 3, "default": true,  "required": false, "label": "social groups",        "description": "SOCIAL-001 accountability groups; stub backend until FIREBASE_BACKEND wires up" },
     { "key": "GROUP_UNINSTALL_VOTE","stage": 3, "default": false, "required": false, "label": "group uninstall vote", "description": "you can't quit alone (no backend yet)" },
     { "key": "COUPLES_MODE",        "stage": 3, "default": false, "required": false, "label": "couples mode",         "description": "dual-streak accountability (no backend yet)" },
     { "key": "MONEY_STAKE",         "stage": 3, "default": false, "required": false, "label": "money stake",          "description": "escrowed money on failure (gambling-law review pending)" },
@@ -74,7 +74,7 @@
     { "key": "PAYMENTS_NATIVE_ON_DEVICE", "stage": 2, "default": false, "required": false, "label": "payments — native on device", "description": "OFFLINE DEFAULT. true → in-app Google Play Billing. false → open web checkout (Stripe + Google Pay). The Firebase /config/payments doc wins when online." },
     { "key": "PAYMENTS_NATIVE",     "stage": 2, "default": false, "required": false, "label": "google play billing",  "description": "PAY-001 — enables the in-app Billing client + entitlement listener. Off until Play Console products are set up." },
     { "key": "PAYMENTS_WEB",        "stage": 2, "default": false, "required": false, "label": "web checkout",         "description": "PAY-002 — enables the CustomTabs handoff to the web app. Off until the web app is deployed." },
-    { "key": "FIREBASE_BACKEND",    "stage": 2, "default": false, "required": false, "label": "firebase backend",     "description": "Master switch for Firebase calls (auth, firestore, FCM, remote config). Off until google-services.json is present." },
+    { "key": "FIREBASE_BACKEND",    "stage": 2, "default": true,  "required": false, "label": "firebase backend",     "description": "Master switch for Firebase calls (auth, firestore, FCM, remote config). With this on, the menu exposes a backend-status debug screen — the actual Firebase impl is wired in once google-services.json is present." },
     { "key": "WEB_APP_CHROME_HOME", "stage": 2, "default": false, "required": false, "label": "chrome-homepage web app", "description": "PLATFORM-002 — landing page + read-only stats + web checkout surface. Off until deployed to Firebase Hosting." },
 
     { "key": "GRADUATE_MODE",       "stage": 2, "default": true,  "required": false, "label": "graduate mode",        "description": "progress out of the friction system (read-only surface)" },

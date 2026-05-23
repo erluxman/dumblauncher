@@ -117,6 +117,8 @@ sealed class Screen {
     data object EnergyZones : Screen()
     data object TrackStatus : Screen()
     data object Reciprocity : Screen()
+    data object Groups : Screen()
+    data object Backend : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -126,6 +128,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Best-effort Firebase init; safe to call without google-services.json.
+        com.erluxman.focuslauncher.backend.FirebaseInit.attemptInit(applicationContext)
         com.erluxman.focuslauncher.service.launcher.CheckInScheduler.scheduleAll(applicationContext)
         faceDownDetector = com.erluxman.focuslauncher.service.launcher.FaceDownDetector(
             applicationContext
@@ -159,6 +163,12 @@ private fun AppRoot() {
     val prefs = remember { UserPrefs(context.applicationContext) }
     val flagsRepo = remember {
         com.erluxman.focuslauncher.config.FeatureFlagsRepository(context.applicationContext)
+    }
+    val backend = remember {
+        com.erluxman.focuslauncher.backend.StubBackendRepository(context.applicationContext)
+    }
+    val paymentRouter = remember {
+        com.erluxman.focuslauncher.payment.PaymentRouter(context.applicationContext, backend, flagsRepo)
     }
     val onboardingComplete by prefs.onboardingComplete.collectAsState(initial = null)
     val legacyHome by prefs.legacyHome.collectAsState(initial = false)
@@ -260,6 +270,8 @@ private fun AppRoot() {
                 onOpenEnergyZones = { current = Screen.EnergyZones },
                 onOpenTrackStatus = { current = Screen.TrackStatus },
                 onOpenReciprocity = { current = Screen.Reciprocity },
+                onOpenGroups = { current = Screen.Groups },
+                onOpenBackend = { current = Screen.Backend },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -381,6 +393,16 @@ private fun AppRoot() {
         }
         current == Screen.Reciprocity -> {
             com.erluxman.focuslauncher.ui.reciprocity.ReciprocityScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Groups -> {
+            com.erluxman.focuslauncher.ui.groups.GroupsScreen(backend = backend, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Backend -> {
+            com.erluxman.focuslauncher.ui.backend.BackendStatusScreen(
+                backend = backend,
+                paymentRouter = paymentRouter,
+                onBack = { current = Screen.Menu },
+            )
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(
