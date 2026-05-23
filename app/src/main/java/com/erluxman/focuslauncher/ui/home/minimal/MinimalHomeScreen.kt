@@ -1,6 +1,10 @@
 package com.erluxman.focuslauncher.ui.home.minimal
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -66,8 +70,7 @@ import java.util.Locale
 @Composable
 fun MinimalHomeScreen(
     prefs: UserPrefs,
-    onOpenDashboard: () -> Unit,
-    onOpenTransparency: () -> Unit,
+    onOpenMenu: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
@@ -108,16 +111,24 @@ fun MinimalHomeScreen(
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectVerticalDragGestures { _, dragAmount ->
-                        if (dragAmount > 40f) onOpenDashboard()
+                        if (dragAmount > 40f) onOpenMenu()
                     }
                 }
         ) {
             Column(modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp)) {
-                // top: time + soft ↓ glyph
+                // top: time + soft ↓ glyph (tappable to open menu)
                 Spacer(Modifier.height(40.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("· $timeStr", style = captionStyle, color = MinimalTheme.outline)
-                    Text("↓", style = captionStyle, color = MinimalTheme.outline.copy(alpha = 0.4f), modifier = Modifier.testTag("dashboard-hint"))
+                    Text(
+                        text = "↓ menu",
+                        style = captionStyle,
+                        color = MinimalTheme.outline.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .testTag("dashboard-hint")
+                            .clickable { onOpenMenu() }
+                            .padding(8.dp),
+                    )
                 }
 
                 Spacer(Modifier.weight(0.4f))
@@ -126,6 +137,7 @@ fun MinimalHomeScreen(
                     in 5..8 -> MorningSection(
                         morningStepsToday = if (morningDate == todayIso) morningSteps else emptySet(),
                         oneThingText = oneThingText,
+                        onOpenMenu = onOpenMenu,
                         onToggleStep = { step ->
                             scope.launch { prefs.toggleMorningStep(step, todayIso) }
                         }
@@ -134,6 +146,7 @@ fun MinimalHomeScreen(
                         streakDays = streakDays,
                         oneThingText = oneThingText,
                         whyHere = whyHere,
+                        onOpenMenu = onOpenMenu,
                     )
                     in 17..21 -> ShutdownSection(
                         shutdownStepsToday = if (shutdownDate == todayIso) shutdownSteps else emptySet(),
@@ -149,13 +162,27 @@ fun MinimalHomeScreen(
                         streakDays = streakDays,
                         oneThingText = oneThingText,
                         whyHere = whyHere,
+                        onOpenMenu = onOpenMenu,
                     )
                 }
 
                 Spacer(Modifier.weight(1f))
 
                 MinimalDock(
-                    onTransparency = onOpenTransparency,
+                    onOpenMenu = onOpenMenu,
+                    onDial = {
+                        val intent = Intent(Intent.ACTION_DIAL).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        try { context.startActivity(intent) } catch (_: ActivityNotFoundException) {}
+                    },
+                    onMessages = {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse("sms:")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        try { context.startActivity(intent) } catch (_: ActivityNotFoundException) {}
+                    },
                 )
                 Spacer(Modifier.height(24.dp))
             }
@@ -167,6 +194,7 @@ fun MinimalHomeScreen(
 private fun MorningSection(
     morningStepsToday: Set<String>,
     oneThingText: String,
+    onOpenMenu: () -> Unit,
     onToggleStep: (String) -> Unit,
 ) {
     Column(modifier = Modifier.testTag("section-morning")) {
@@ -176,10 +204,12 @@ private fun MorningSection(
         Text("today's one thing —", style = bodyStyle, color = MinimalTheme.outline)
         Spacer(Modifier.height(8.dp))
         Text(
-            text = oneThingText.ifBlank { "(not set yet — open the dashboard.)" },
+            text = oneThingText.ifBlank { "(tap to set →)" },
             style = bodyStyle,
             color = if (oneThingText.isBlank()) MinimalTheme.outline else MinimalTheme.accent,
-            modifier = Modifier.testTag("morning-one-thing"),
+            modifier = Modifier
+                .testTag("morning-one-thing")
+                .clickable { if (oneThingText.isBlank()) onOpenMenu() },
         )
 
         Spacer(Modifier.height(40.dp))
@@ -220,6 +250,7 @@ private fun WorkSection(
     streakDays: Int,
     oneThingText: String,
     whyHere: String,
+    onOpenMenu: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag("section-work")) {
         Text(
@@ -232,10 +263,12 @@ private fun WorkSection(
         Text("one thing —", style = bodyStyle, color = MinimalTheme.outline)
         Spacer(Modifier.height(8.dp))
         Text(
-            text = oneThingText.ifBlank { "(not set today — open the dashboard.)" },
+            text = oneThingText.ifBlank { "(tap to set →)" },
             style = bodyStyle,
             color = if (oneThingText.isBlank()) MinimalTheme.outline else MinimalTheme.accent,
-            modifier = Modifier.testTag("work-one-thing"),
+            modifier = Modifier
+                .testTag("work-one-thing")
+                .clickable { if (oneThingText.isBlank()) onOpenMenu() },
         )
         if (whyHere.isNotBlank()) {
             Spacer(Modifier.height(40.dp))
@@ -353,7 +386,11 @@ private fun DreamSurface(oneThingText: String) {
 }
 
 @Composable
-private fun MinimalDock(onTransparency: () -> Unit) {
+private fun MinimalDock(
+    onOpenMenu: () -> Unit,
+    onDial: () -> Unit,
+    onMessages: () -> Unit,
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         androidx.compose.foundation.layout.Box(
             modifier = Modifier
@@ -367,25 +404,23 @@ private fun MinimalDock(onTransparency: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DockGlyph("phone")
-            DockGlyph("msgs")
-            DockGlyph(
-                label = "settings",
-                modifier = Modifier
-                    .testTag("dock-settings")
-                    .pointerInput(Unit) { detectTap { onTransparency() } }
-            )
+            DockGlyph(label = "phone", onClick = onDial)
+            DockGlyph(label = "msgs", onClick = onMessages)
+            DockGlyph(label = "settings", onClick = onOpenMenu)
         }
     }
 }
 
 @Composable
-private fun DockGlyph(label: String, modifier: Modifier = Modifier) {
+private fun DockGlyph(label: String, onClick: () -> Unit) {
     Text(
         text = label,
         style = bodyStyle.copy(fontSize = 14.sp),
         color = MinimalTheme.outline,
-        modifier = modifier.padding(8.dp).testTag("dock-$label"),
+        modifier = Modifier
+            .testTag("dock-$label")
+            .clickable { onClick() }
+            .padding(8.dp),
     )
 }
 

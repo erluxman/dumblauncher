@@ -72,7 +72,8 @@ import com.erluxman.focuslauncher.ui.boredom.BoredomScreen
 
 sealed class Screen {
     data object Home : Screen()
-    data object Dashboard : Screen()  // the full ~50-card legacy home (swipe-down from Home)
+    data object Menu : Screen()       // the minimal menu — single fan-out to every feature
+    data object Dashboard : Screen()  // the full ~50-card legacy home (reachable from Menu)
     data object Onboarding : Screen()
     data object Transparency : Screen()
     data object Uninstall : Screen()
@@ -174,11 +175,25 @@ private fun AppRoot() {
                 onOpenBreath = { current = Screen.Breath }
             )
         }
+        current == Screen.Menu -> {
+            com.erluxman.focuslauncher.ui.home.minimal.MinimalMenuScreen(
+                onBack = { current = Screen.Home },
+                onOpenDashboard = { current = Screen.Dashboard },
+                onOpenTransparency = { current = Screen.Transparency },
+                onOpenVip = { current = Screen.Vip },
+                onOpenFocus = { current = Screen.Focus },
+                onOpenMantra = { current = Screen.Mantra },
+                onOpenBoredom = { current = Screen.Boredom },
+                onOpenBreath = { current = Screen.Breath },
+                onOpenFutureSelfVideo = { current = Screen.FutureSelfVideo },
+                onReplayOnboarding = { current = Screen.Onboarding },
+                onOpenUninstall = { current = Screen.Uninstall },
+            )
+        }
         else -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalHomeScreen(
                 prefs = prefs,
-                onOpenDashboard = { current = Screen.Dashboard },
-                onOpenTransparency = { current = Screen.Transparency },
+                onOpenMenu = { current = Screen.Menu },
             )
         }
     }
