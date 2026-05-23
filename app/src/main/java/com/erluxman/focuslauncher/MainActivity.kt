@@ -112,6 +112,7 @@ sealed class Screen {
     data object SadSelf : Screen()
     data object TimeMoney : Screen()
     data object Estimation : Screen()
+    data object Stress : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -250,6 +251,7 @@ private fun AppRoot() {
                 onOpenSadSelf = { current = Screen.SadSelf },
                 onOpenTimeMoney = { current = Screen.TimeMoney },
                 onOpenEstimation = { current = Screen.Estimation },
+                onOpenStress = { current = Screen.Stress },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -356,6 +358,9 @@ private fun AppRoot() {
         }
         current == Screen.Estimation -> {
             com.erluxman.focuslauncher.ui.estimation.EstimationScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.Stress -> {
+            com.erluxman.focuslauncher.ui.stress.StressScreen(onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

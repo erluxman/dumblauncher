@@ -70,6 +70,7 @@ class MinimalMenuTest {
         "menu-sad-self",
         "menu-time-money",
         "menu-estimation",
+        "menu-stress",
         "menu-feature-flags",
         "menu-uninstall",
     )
