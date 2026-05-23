@@ -34,6 +34,13 @@
     { "key": "READING_LOG",         "stage": 2, "default": true,  "required": false, "label": "reading log",          "description": "minutes read per day" },
     { "key": "WORKOUT_LOG",         "stage": 2, "default": true,  "required": false, "label": "workout log",          "description": "exercise minutes per day" },
     { "key": "COMMIT_LOG",          "stage": 2, "default": true,  "required": false, "label": "commit log",           "description": "code commits per day" },
+    { "key": "MOOD_PINGS",          "stage": 2, "default": true,  "required": false, "label": "mood pings",           "description": "quick emoji + note log" },
+    { "key": "IDEA_PARKING",        "stage": 2, "default": true,  "required": false, "label": "idea parking",         "description": "capture-and-forget list" },
+    { "key": "CONSUMPTION_LOG",     "stage": 2, "default": true,  "required": false, "label": "consumption log",      "description": "caffeine + alcohol, rolling 24h" },
+    { "key": "JOURNAL",             "stage": 2, "default": true,  "required": false, "label": "journal",              "description": "plain-text entries" },
+    { "key": "PR_WALL",             "stage": 2, "default": true,  "required": false, "label": "pr wall",              "description": "personal records, manual entry" },
+    { "key": "TRAVEL_ATLAS",        "stage": 2, "default": true,  "required": false, "label": "travel atlas",         "description": "year + location list" },
+    { "key": "COMPOUND_CURVE",      "stage": 2, "default": true,  "required": false, "label": "compound curve",       "description": "1%/day → exponential" },
 
     { "key": "BUILT_WRAPPED",       "stage": 3, "default": true,  "required": false, "label": "built wrapped",        "description": "year-in-review — score, headline, per-domain totals" },
     { "key": "MORTALITY_WIDGETS",   "stage": 3, "default": true,  "required": false, "label": "mortality widgets",    "description": "beach saturdays / days remaining; runtime opt-in still required" },

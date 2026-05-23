@@ -45,4 +45,11 @@ object FlagKey {
     const val BUILT_WRAPPED = "BUILT_WRAPPED"
     const val SUBSCRIPTIONS = "SUBSCRIPTIONS"
     const val SLEEP_CORRELATOR = "SLEEP_CORRELATOR"
+    const val MOOD_PINGS = "MOOD_PINGS"
+    const val IDEA_PARKING = "IDEA_PARKING"
+    const val CONSUMPTION_LOG = "CONSUMPTION_LOG"
+    const val JOURNAL = "JOURNAL"
+    const val PR_WALL = "PR_WALL"
+    const val TRAVEL_ATLAS = "TRAVEL_ATLAS"
+    const val COMPOUND_CURVE = "COMPOUND_CURVE"
 }

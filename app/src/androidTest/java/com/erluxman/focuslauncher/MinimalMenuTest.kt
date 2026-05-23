@@ -49,6 +49,13 @@ class MinimalMenuTest {
         "menu-wrapped",
         "menu-subscriptions",
         "menu-sleep-correlator",
+        "menu-mood",
+        "menu-ideas",
+        "menu-consumption",
+        "menu-journal",
+        "menu-pr-wall",
+        "menu-travel",
+        "menu-compound",
         "menu-feature-flags",
         "menu-uninstall",
     )

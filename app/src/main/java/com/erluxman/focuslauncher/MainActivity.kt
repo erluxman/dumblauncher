@@ -91,6 +91,13 @@ sealed class Screen {
     data object Wrapped : Screen()
     data object Subscriptions : Screen()
     data object SleepCorrelator : Screen()
+    data object Mood : Screen()
+    data object Ideas : Screen()
+    data object Consumption : Screen()
+    data object Journal : Screen()
+    data object PrWall : Screen()
+    data object Travel : Screen()
+    data object Compound : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -208,6 +215,13 @@ private fun AppRoot() {
                 onOpenWrapped = { current = Screen.Wrapped },
                 onOpenSubscriptions = { current = Screen.Subscriptions },
                 onOpenSleepCorrelator = { current = Screen.SleepCorrelator },
+                onOpenMood = { current = Screen.Mood },
+                onOpenIdeas = { current = Screen.Ideas },
+                onOpenConsumption = { current = Screen.Consumption },
+                onOpenJournal = { current = Screen.Journal },
+                onOpenPrWall = { current = Screen.PrWall },
+                onOpenTravel = { current = Screen.Travel },
+                onOpenCompound = { current = Screen.Compound },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -251,6 +265,27 @@ private fun AppRoot() {
                 prefs = prefs,
                 onBack = { current = Screen.Menu },
             )
+        }
+        current == Screen.Mood -> {
+            com.erluxman.focuslauncher.ui.mood.MoodScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Ideas -> {
+            com.erluxman.focuslauncher.ui.notes.IdeaParkingScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Consumption -> {
+            com.erluxman.focuslauncher.ui.consumption.ConsumptionScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Journal -> {
+            com.erluxman.focuslauncher.ui.journal.JournalScreen(onBack = { current = Screen.Menu })
+        }
+        current == Screen.PrWall -> {
+            com.erluxman.focuslauncher.ui.pr.PrWallScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Travel -> {
+            com.erluxman.focuslauncher.ui.travel.TravelAtlasScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Compound -> {
+            com.erluxman.focuslauncher.ui.compound.CompoundCurveScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

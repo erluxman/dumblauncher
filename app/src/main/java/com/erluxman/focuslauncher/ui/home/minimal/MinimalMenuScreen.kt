@@ -51,6 +51,13 @@ fun MinimalMenuScreen(
     onOpenWrapped: () -> Unit,
     onOpenSubscriptions: () -> Unit,
     onOpenSleepCorrelator: () -> Unit,
+    onOpenMood: () -> Unit,
+    onOpenIdeas: () -> Unit,
+    onOpenConsumption: () -> Unit,
+    onOpenJournal: () -> Unit,
+    onOpenPrWall: () -> Unit,
+    onOpenTravel: () -> Unit,
+    onOpenCompound: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -115,6 +122,20 @@ fun MinimalMenuScreen(
                 MenuRow("subscriptions", "monthly burn — manual entries", "menu-subscriptions", onOpenSubscriptions)
             if (on(FlagKey.SLEEP_CORRELATOR))
                 MenuRow("sleep ↔ output", "did last night's sleep predict tomorrow?", "menu-sleep-correlator", onOpenSleepCorrelator)
+            if (on(FlagKey.MOOD_PINGS))
+                MenuRow("mood", "tap an emoji, log the moment", "menu-mood", onOpenMood)
+            if (on(FlagKey.IDEA_PARKING))
+                MenuRow("park an idea", "capture and forget", "menu-ideas", onOpenIdeas)
+            if (on(FlagKey.CONSUMPTION_LOG))
+                MenuRow("consumption", "caffeine + drinks, last 24h", "menu-consumption", onOpenConsumption)
+            if (on(FlagKey.JOURNAL))
+                MenuRow("journal", "one entry, however short", "menu-journal", onOpenJournal)
+            if (on(FlagKey.PR_WALL))
+                MenuRow("pr wall", "your personal records", "menu-pr-wall", onOpenPrWall)
+            if (on(FlagKey.TRAVEL_ATLAS))
+                MenuRow("travel atlas", "where you've been", "menu-travel", onOpenTravel)
+            if (on(FlagKey.COMPOUND_CURVE))
+                MenuRow("compounding", "1%/day is exponential", "menu-compound", onOpenCompound)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 
