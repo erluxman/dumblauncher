@@ -60,6 +60,9 @@ class MinimalMenuTest {
         "menu-anti-bio",
         "menu-sleep-window",
         "menu-daily-logs",
+        "menu-highlights",
+        "menu-tombstones",
+        "menu-future-letters",
         "menu-feature-flags",
         "menu-uninstall",
     )

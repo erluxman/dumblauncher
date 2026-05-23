@@ -102,6 +102,9 @@ sealed class Screen {
     data object AntiBio : Screen()
     data object SleepWindow : Screen()
     data object DailyLogs : Screen()
+    data object Highlights : Screen()
+    data object Tombstones : Screen()
+    data object FutureLetters : Screen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -230,6 +233,9 @@ private fun AppRoot() {
                 onOpenAntiBio = { current = Screen.AntiBio },
                 onOpenSleepWindow = { current = Screen.SleepWindow },
                 onOpenDailyLogs = { current = Screen.DailyLogs },
+                onOpenHighlights = { current = Screen.Highlights },
+                onOpenTombstones = { current = Screen.Tombstones },
+                onOpenFutureLetters = { current = Screen.FutureLetters },
             )
         }
         current == Screen.FeatureFlags -> {
@@ -306,6 +312,15 @@ private fun AppRoot() {
         }
         current == Screen.DailyLogs -> {
             com.erluxman.focuslauncher.ui.logs.DailyLogsScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Highlights -> {
+            com.erluxman.focuslauncher.ui.highlights.HighlightsScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.Tombstones -> {
+            com.erluxman.focuslauncher.ui.tombstones.TombstonesScreen(prefs = prefs, onBack = { current = Screen.Menu })
+        }
+        current == Screen.FutureLetters -> {
+            com.erluxman.focuslauncher.ui.letters.FutureLettersScreen(prefs = prefs, onBack = { current = Screen.Menu })
         }
         current == Screen.Stats -> {
             com.erluxman.focuslauncher.ui.home.minimal.MinimalStatsScreen(

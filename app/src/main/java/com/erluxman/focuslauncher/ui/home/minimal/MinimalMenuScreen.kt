@@ -62,6 +62,9 @@ fun MinimalMenuScreen(
     onOpenAntiBio: () -> Unit,
     onOpenSleepWindow: () -> Unit,
     onOpenDailyLogs: () -> Unit,
+    onOpenHighlights: () -> Unit,
+    onOpenTombstones: () -> Unit,
+    onOpenFutureLetters: () -> Unit,
 ) {
     val flags by flagsRepo.effective.collectAsState(initial = flagsRepo.defaults)
     fun on(key: String): Boolean = flags[key] ?: true
@@ -148,6 +151,12 @@ fun MinimalMenuScreen(
                 MenuRow("sleep window", "cutoff + wake hours", "menu-sleep-window", onOpenSleepWindow)
             if (on(FlagKey.DAILY_LOGS))
                 MenuRow("daily logs", "meditation, reading, workout, commits", "menu-daily-logs", onOpenDailyLogs)
+            if (on(FlagKey.HIGHLIGHTS))
+                MenuRow("highlights", "lines you want to keep", "menu-highlights", onOpenHighlights)
+            if (on(FlagKey.TOMBSTONES))
+                MenuRow("tombstones", "apps you killed", "menu-tombstones", onOpenTombstones)
+            if (on(FlagKey.FUTURE_LETTERS))
+                MenuRow("future letters", "write to a future you", "menu-future-letters", onOpenFutureLetters)
             if (on(FlagKey.FEATURE_FLAGS))
                 MenuRow("feature flags", "toggle features on or off", "menu-feature-flags", onOpenFeatureFlags)
 

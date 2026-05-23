@@ -56,4 +56,7 @@ object FlagKey {
     const val ANTI_BIO = "ANTI_BIO"
     const val SLEEP_WINDOW = "SLEEP_WINDOW"
     const val DAILY_LOGS = "DAILY_LOGS"
+    const val HIGHLIGHTS = "HIGHLIGHTS"
+    const val TOMBSTONES = "TOMBSTONES"
+    const val FUTURE_LETTERS = "FUTURE_LETTERS"
 }

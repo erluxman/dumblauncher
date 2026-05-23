@@ -44,6 +44,9 @@
     { "key": "ANTI_BIO",            "stage": 2, "default": true,  "required": false, "label": "anti-bio",             "description": "single-line declaration of who you are not" },
     { "key": "SLEEP_WINDOW",        "stage": 2, "default": true,  "required": false, "label": "sleep window settings","description": "cutoff + wake hour pickers" },
     { "key": "DAILY_LOGS",          "stage": 2, "default": true,  "required": false, "label": "daily logs hub",       "description": "one screen, four quick-logs" },
+    { "key": "HIGHLIGHTS",          "stage": 2, "default": true,  "required": false, "label": "highlights",           "description": "free-form quote/line capture" },
+    { "key": "TOMBSTONES",          "stage": 2, "default": true,  "required": false, "label": "app tombstones",       "description": "apps you killed" },
+    { "key": "FUTURE_LETTERS",      "stage": 2, "default": true,  "required": false, "label": "future letters",       "description": "write now, surface on a future date" },
 
     { "key": "BUILT_WRAPPED",       "stage": 3, "default": true,  "required": false, "label": "built wrapped",        "description": "year-in-review — score, headline, per-domain totals" },
     { "key": "MORTALITY_WIDGETS",   "stage": 3, "default": true,  "required": false, "label": "mortality widgets",    "description": "beach saturdays / days remaining; runtime opt-in still required" },
